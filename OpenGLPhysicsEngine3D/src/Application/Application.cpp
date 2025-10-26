@@ -86,7 +86,6 @@ void Application::Run()
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
@@ -106,7 +105,7 @@ void Application::Run()
         Inputs(m_DeltaTime);
         Update(m_DeltaTime);
 
-        ShowImGUI();
+        ShowImGui();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -141,7 +140,7 @@ void Application::HandleOnMouseMove(double xpos, double ypos)
 {
 }
 
-void Application::ShowImGUI()
+void Application::ShowImGui()
 {
     ImGui::Begin("This is ImGui!!!");
     ImGui::Text("Hello world!");

@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Objects\Axes.cpp" />
     <ClCompile Include="src\Objects\Cube.cpp" />
     <ClCompile Include="src\Application\Application.cpp" />
     <ClCompile Include="src\Application\PhysicsApplication.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Objects\Axes.h" />
     <ClInclude Include="src\Objects\Cube.h" />
     <ClInclude Include="src\Application\Application.h" />
     <ClInclude Include="src\Application\PhysicsApplication.h" />
@@ -186,6 +188,7 @@
     <ClInclude Include="src\vendor\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\shaders\axis.shader" />
     <None Include="res\shaders\basic.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

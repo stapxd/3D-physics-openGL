@@ -14,6 +14,7 @@
 
 //-----
 #include "Objects/Cube.h"
+#include "Objects/Axes.h"
 
 class PhysicsApplication : public Application
 {
@@ -22,10 +23,16 @@ private:
 	std::unique_ptr<Camera> m_Camera;
 	bool m_MButtonIsPressed = false;
 
-	std::unique_ptr<Cube> cube;
-	float m_RotationAngle = 45.0f;
+	std::unique_ptr<Cube> m_Cube;
+	std::unique_ptr<Axes> m_Axes;
+
+
+	glm::vec3 m_Scale = glm::vec3(1);
+	glm::vec3 m_Rotation = glm::vec3(0);
+	glm::vec3 m_Translation = glm::vec3(0);
 
 	std::unique_ptr<Shader> m_Shader;
+	std::unique_ptr<Shader> m_AxisShader;
 
 
 public:
@@ -39,5 +46,7 @@ public:
 protected:
 	void HandleOnSize(int width, int height);
 	void HandleOnMouseMove(double xpos, double ypos);
+
+	void ShowImGui();
 };
 

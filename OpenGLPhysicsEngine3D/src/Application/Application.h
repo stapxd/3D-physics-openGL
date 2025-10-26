@@ -33,8 +33,8 @@ protected:
 	virtual void HandleOnSize(int width, int height);
 	virtual void HandleOnMouseMove(double xpos, double ypos);
 
-	//ImGUI
-	virtual void ShowImGUI();
+	//ImGui
+	virtual void ShowImGui();
 
 private:
 	static void OnSize(GLFWwindow* window, int width, int height);
