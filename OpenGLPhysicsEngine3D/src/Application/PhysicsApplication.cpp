@@ -13,6 +13,9 @@ void PhysicsApplication::Start()
 	
 	cube = std::make_unique<Cube>();
 
+	glm::vec3 rotation(m_RotationAngle, 0.0f, m_RotationAngle);
+	cube->Rotate(rotation);
+
 	m_Shader = std::make_unique<Shader>("res/shaders/basic.shader");
 
 	m_Shader->UnBind();

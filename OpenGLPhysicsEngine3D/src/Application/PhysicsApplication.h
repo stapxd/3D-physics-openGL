@@ -23,7 +23,8 @@ private:
 	bool m_MButtonIsPressed = false;
 
 	std::unique_ptr<Cube> cube;
-	
+	float m_RotationAngle = 45.0f;
+
 	std::unique_ptr<Shader> m_Shader;
 
 

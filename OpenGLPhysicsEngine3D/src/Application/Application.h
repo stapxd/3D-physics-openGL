@@ -29,8 +29,12 @@ public:
 	explicit operator bool();
 
 protected:
+	// Handling inputs
 	virtual void HandleOnSize(int width, int height);
 	virtual void HandleOnMouseMove(double xpos, double ypos);
+
+	//ImGUI
+	virtual void ShowImGUI();
 
 private:
 	static void OnSize(GLFWwindow* window, int width, int height);
