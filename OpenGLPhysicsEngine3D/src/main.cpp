@@ -4,7 +4,7 @@ int main()
 {
     PhysicsApplication app;
 
-    if (app.Init(1280, 768, "2D Physics Engine")) {
+    if (app.Init(1280, 768, "3D Physics Engine")) {
         app.Run();
     }
 

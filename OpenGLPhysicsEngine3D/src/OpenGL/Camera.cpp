@@ -51,7 +51,7 @@ void Camera::Inputs(GLFWwindow* window, float deltaTime)
 void Camera::Move(glm::vec3 vector)
 {
 	m_Position += vector;
-	printf("campos: \nx: %.2f\ny: %.2f\nz: %.2f\n", m_Position.x, m_Position.y, m_Position.z);
+	//printf("campos: \nx: %.2f\ny: %.2f\nz: %.2f\n", m_Position.x, m_Position.y, m_Position.z);
 }
 
 void Camera::SetViewport(int width, int height)

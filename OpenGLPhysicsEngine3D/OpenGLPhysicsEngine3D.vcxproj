@@ -145,6 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Physics\Collisions.cpp" />
+    <ClCompile Include="src\Physics\PhysicsWorld.cpp" />
+    <ClCompile Include="src\Objects\Parts\PhysicsBody.cpp" />
+    <ClCompile Include="src\Objects\Parts\Mesh.cpp" />
     <ClCompile Include="src\Objects\Axes.cpp" />
     <ClCompile Include="src\Objects\Cube.cpp" />
     <ClCompile Include="src\Application\Application.cpp" />
@@ -166,17 +170,26 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Physics\Collisions.h" />
+    <ClInclude Include="src\Physics\PhysicsWorld.h" />
+    <ClInclude Include="src\Objects\Parts\PhysicsBody.h" />
+    <ClInclude Include="src\Objects\Parts\Mesh.h" />
     <ClInclude Include="src\Objects\Axes.h" />
     <ClInclude Include="src\Objects\Cube.h" />
     <ClInclude Include="src\Application\Application.h" />
     <ClInclude Include="src\Application\PhysicsApplication.h" />
     <ClInclude Include="src\Application\Renderer.h" />
+    <ClInclude Include="src\Objects\Interfaces\IEntity.h" />
+    <ClInclude Include="src\Objects\Interfaces\IMesh.h" />
+    <ClInclude Include="src\Objects\Interfaces\IPhysicsBody.h" />
     <ClInclude Include="src\OpenGL\Camera.h" />
     <ClInclude Include="src\OpenGL\IndexBuffer.h" />
     <ClInclude Include="src\OpenGL\Shader.h" />
     <ClInclude Include="src\OpenGL\VertexArray.h" />
     <ClInclude Include="src\OpenGL\VertexBuffer.h" />
     <ClInclude Include="src\OpenGL\VertexLayout.h" />
+    <ClInclude Include="src\Structures\AABB.h" />
+    <ClInclude Include="src\Structures\Vertex.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />
     <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h" />

@@ -6,11 +6,7 @@
 
 #include "OpenGL/Camera.h"
 
-#include "OpenGL/VertexArray.h"
-#include "OpenGL/VertexBuffer.h"
-#include "OpenGL/IndexBuffer.h"
-#include "OpenGL/Shader.h"
-
+#include "Physics/PhysicsWorld.h"
 
 //-----
 #include "Objects/Cube.h"
@@ -23,7 +19,7 @@ private:
 	std::unique_ptr<Camera> m_Camera;
 	bool m_MButtonIsPressed = false;
 
-	std::unique_ptr<Cube> m_Cube;
+	std::vector<std::unique_ptr<IEntity>> m_Cubes;
 	std::unique_ptr<Axes> m_Axes;
 
 
@@ -31,9 +27,14 @@ private:
 	glm::vec3 m_Rotation = glm::vec3(0);
 	glm::vec3 m_Translation = glm::vec3(0);
 
+	glm::vec3 m_Scale1 = glm::vec3(1);
+	glm::vec3 m_Rotation1 = glm::vec3(0);
+	glm::vec3 m_Translation1 = glm::vec3(0.0f, 0.0f, 10.0f);
+
 	std::unique_ptr<Shader> m_Shader;
 	std::unique_ptr<Shader> m_AxisShader;
 
+	PhysicsWorld m_PhysicsWorld;
 
 public:
 	PhysicsApplication(){}

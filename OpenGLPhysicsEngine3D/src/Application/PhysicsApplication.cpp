@@ -15,7 +15,10 @@ void PhysicsApplication::Start()
 	// Variables initialization
 	m_Camera = std::make_unique<Camera>(m_Width, m_Height);
 	
-	m_Cube = std::make_unique<Cube>();
+	m_Cubes.reserve(2);
+	m_Cubes.push_back(std::make_unique<Cube>());
+	m_Cubes.push_back(std::make_unique<Cube>());
+	m_Cubes[1]->Translate(glm::vec3(0.0f, 0.0f, -10.0f));
 
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
@@ -35,6 +38,7 @@ void PhysicsApplication::Update(float deltaTime)
     // Inputs
 	m_Camera->Inputs(m_Window, deltaTime);
 	
+	m_PhysicsWorld.Update(m_Cubes);
 
 	//
 	m_Shader->Bind();
@@ -46,12 +50,17 @@ void PhysicsApplication::Update(float deltaTime)
 	m_Shader->SetUniform3f("uColor", 0.5f, 0.5f, 0.5f);
 	m_Shader->UnBind();
 
-	m_Cube->Scale(m_Scale);
-	m_Cube->Rotate(m_Rotation);
-	m_Cube->Translate(m_Translation);
+	m_Cubes[0]->Scale(m_Scale);
+	m_Cubes[0]->Rotate(m_Rotation);
+	m_Cubes[0]->Translate(m_Translation);
+
+	m_Cubes[1]->Scale(m_Scale1);
+	m_Cubes[1]->Rotate(m_Rotation1);
+	m_Cubes[1]->Translate(m_Translation1);
 	
 	//Render
-	m_Cube->Draw(*m_Shader);
+	m_Cubes[0]->Draw(*m_Shader);
+	m_Cubes[1]->Draw(*m_Shader);
 
 
 	m_AxisShader->Bind();
@@ -111,9 +120,15 @@ void PhysicsApplication::HandleOnMouseMove(double xpos, double ypos)
 
 void PhysicsApplication::ShowImGui()
 {
-	ImGui::Begin("This is ImGui!!!");
+	ImGui::Begin("Cube1");
 	ImGui::SliderFloat3("Rotation", (float*)&m_Rotation, 0.0f, 360.0f);
 	ImGui::SliderFloat3("Traslation", (float*)&m_Translation, -10.0f, 10.0f);
 	ImGui::SliderFloat3("Scale", (float*)&m_Scale, 1.0f, 10.0f);
+	ImGui::End();
+
+	ImGui::Begin("Cube2");
+	ImGui::SliderFloat3("Rotation", (float*)&m_Rotation1, 0.0f, 360.0f);
+	ImGui::SliderFloat3("Traslation", (float*)&m_Translation1, -10.0f, 10.0f);
+	ImGui::SliderFloat3("Scale", (float*)&m_Scale1, 1.0f, 10.0f);
 	ImGui::End();
 }
