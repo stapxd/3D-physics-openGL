@@ -20,18 +20,24 @@ public:
 	void Rotate(glm::vec3 rotation);
 	void Translate(glm::vec3 translation);
 
+	// temporary in mesh -> physicsbody, but maybe leave here
+	void Move(glm::vec3 translation);
+
+	glm::mat4 GetModel();
+	glm::vec3 GetScale() const { return m_Scale; }
+
 	void Draw(const Shader& shader);
 
 	void SetVertices(std::vector<Vertex> vertices);
 	void SetIndices(std::vector<unsigned int> indices);
 
-	const std::vector<glm::vec3>& GetTransformedVertices();
+	const std::vector<Vertex>& GetTransformedVertices();
 
 private:
 	void UpdateTransformedVertices();
 private:
 	std::vector<Vertex> m_Vertices;
-	std::vector<glm::vec3> m_TransformedVertices;
+	std::vector<Vertex> m_TransformedVertices;
 	std::vector<unsigned int> m_Indices;
 
 	std::unique_ptr<VertexArray> m_VAO;

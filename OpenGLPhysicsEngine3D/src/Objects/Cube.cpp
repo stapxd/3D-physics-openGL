@@ -4,8 +4,14 @@
 
 #include <Application/Renderer.h>
 
+Cube::Cube(bool isStatic)
+    : m_Mesh(24, 36), m_PhysicsBody(isStatic)
+{
+    InitializeMesh();
+}
+
 Cube::Cube()
-	: m_Mesh(24, 36)
+	: m_Mesh(24, 36), m_PhysicsBody(false)
 {
     InitializeMesh();
 }
@@ -25,6 +31,11 @@ void Cube::Translate(glm::vec3 translation)
     m_Mesh.Translate(translation);
 }
 
+void Cube::Move(glm::vec3 translation)
+{
+    m_Mesh.Move(translation);
+}
+
 AABB Cube::GetAABB()
 {
     AABB box;
@@ -33,11 +44,27 @@ AABB Cube::GetAABB()
     box.max = glm::vec3(-FLT_MAX);
 
     for (const auto& vertex : m_Mesh.GetTransformedVertices()) {
-        box.min = glm::min(box.min, vertex);
-        box.max = glm::max(box.max, vertex);
+        box.min = glm::min(box.min, vertex.position);
+        box.max = glm::max(box.max, vertex.position);
     }
 
     return box;
+}
+
+OBB Cube::GetOBB()
+{
+    OBB obb{};
+    glm::mat4 model = m_Mesh.GetModel();
+
+    obb.center = glm::vec3(model[3]);
+
+    obb.axes[0] = glm::normalize(glm::vec3(model[0]));
+    obb.axes[1] = glm::normalize(glm::vec3(model[1]));
+    obb.axes[2] = glm::normalize(glm::vec3(model[2]));
+
+    obb.halfSize = m_Mesh.GetScale();
+
+    return obb;
 }
 
 void Cube::Draw(const Shader& shader)

@@ -7,7 +7,7 @@ Mesh::Mesh(unsigned int vertexCount, unsigned int indexCount)
     : m_Scale(1), m_Rotation(0), m_Translation(0), m_Model(1)
 {
     m_Vertices = std::vector<Vertex>(vertexCount);
-    m_TransformedVertices = std::vector<glm::vec3>(vertexCount);
+    m_TransformedVertices = std::vector<Vertex>(vertexCount);
     m_Indices = std::vector<unsigned int>(indexCount);
 
     m_ShouldBeTransformed = true;
@@ -46,6 +46,18 @@ void Mesh::Translate(glm::vec3 translation)
     m_ShouldBeTransformed = true;
 }
 
+void Mesh::Move(glm::vec3 translation)
+{
+    m_Translation += translation;
+    m_ShouldBeTransformed = true;
+}
+
+glm::mat4 Mesh::GetModel()
+{
+    if (m_ShouldBeTransformed) UpdateTransformedVertices();
+    return m_Model;
+}
+
 void Mesh::Draw(const Shader& shader)
 {
     shader.Bind();
@@ -69,7 +81,7 @@ void Mesh::SetIndices(std::vector<unsigned int> indices)
     m_Indices = std::move(indices);
 }
 
-const std::vector<glm::vec3>& Mesh::GetTransformedVertices()
+const std::vector<Vertex>& Mesh::GetTransformedVertices()
 {
     if (m_ShouldBeTransformed) UpdateTransformedVertices();
     return m_TransformedVertices;
@@ -84,8 +96,12 @@ void Mesh::UpdateTransformedVertices()
     m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.z), glm::vec3(0, 0, 1));
     m_Model = glm::scale(m_Model, m_Scale);
 
-    for(int i = 0; i < m_Vertices.size(); i++)
-        m_TransformedVertices[i] = glm::vec3(m_Model * glm::vec4(m_Vertices[i].position, 1.0f));
+    for (int i = 0; i < m_Vertices.size(); i++) {
+        m_TransformedVertices[i].position = glm::vec3(m_Model * glm::vec4(m_Vertices[i].position, 1.0f));
+
+        glm::mat3 normalModel = glm::transpose(glm::inverse(m_Model));
+        m_TransformedVertices[i].normals = glm::normalize(normalModel * m_Vertices[i].normals);
+    }
 
     m_ShouldBeTransformed = false;
 }

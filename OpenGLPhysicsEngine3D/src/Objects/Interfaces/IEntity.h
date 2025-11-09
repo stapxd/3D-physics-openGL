@@ -2,7 +2,11 @@
 #include "IMesh.h"
 #include "IPhysicsBody.h"
 
-class IEntity : public IMesh, IPhysicsBody {
-protected:
+#include "Objects/Parts/Mesh.h"
+#include "Objects/Parts/PhysicsBody.h"
 
+class IEntity : public IMesh, IPhysicsBody {
+public:
+	virtual Mesh* GetMesh() = 0;
+	virtual PhysicsBody* GetPhysicsBody() = 0;
 };

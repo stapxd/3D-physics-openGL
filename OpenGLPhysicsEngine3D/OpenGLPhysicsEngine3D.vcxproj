@@ -189,6 +189,7 @@
     <ClInclude Include="src\OpenGL\VertexBuffer.h" />
     <ClInclude Include="src\OpenGL\VertexLayout.h" />
     <ClInclude Include="src\Structures\AABB.h" />
+    <ClInclude Include="src\Structures\OBB.h" />
     <ClInclude Include="src\Structures\Vertex.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />

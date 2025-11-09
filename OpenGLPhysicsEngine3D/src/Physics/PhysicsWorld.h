@@ -9,8 +9,10 @@ public:
 	void Update(const std::vector<std::unique_ptr<IEntity>>& entities);
 
 	// TODO: add narrow and broad phase
+	void SeparateBodies(IEntity* bodyA, bool isStatic_A, IEntity* bodyB, bool isStatic_B, glm::vec3 normal, float depth);
 
 	// Collisions
 	void ResolveAABBCollision(IEntity* bodyA, IEntity* bodyB);
+	void ResolveOBBCollision(IEntity* bodyA, IEntity* bodyB);
 };
 
