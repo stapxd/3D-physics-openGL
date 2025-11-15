@@ -30,18 +30,24 @@ void Mesh::Initialize(const VertexLayout& layout)
 
 void Mesh::Scale(glm::vec3 scale)
 {
+    if (m_Scale == scale) 
+        return;
     m_Scale = scale;
     m_ShouldBeTransformed = true;
 }
 
 void Mesh::Rotate(glm::vec3 rotation)
 {
+    if (m_Rotation == rotation) 
+        return;
     m_Rotation = rotation;
     m_ShouldBeTransformed = true;
 }
 
 void Mesh::Translate(glm::vec3 translation)
 {
+    if (m_Translation == translation)
+        return;
     m_Translation = translation;
     m_ShouldBeTransformed = true;
 }
@@ -60,7 +66,7 @@ glm::mat4 Mesh::GetModel()
 
 void Mesh::Draw(const Shader& shader)
 {
-    shader.Bind();
+    //shader.Bind();
     if (m_ShouldBeTransformed) UpdateTransformedVertices();
     shader.SetUniformMat4f("uModel", m_Model);
 
@@ -68,7 +74,7 @@ void Mesh::Draw(const Shader& shader)
     GLCall(glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, NULL));
     m_VAO->UnBind();
 
-    shader.UnBind();
+    //shader.UnBind();
 }
 
 void Mesh::SetVertices(std::vector<Vertex> vertices)

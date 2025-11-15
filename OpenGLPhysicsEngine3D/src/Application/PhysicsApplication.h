@@ -1,5 +1,6 @@
 #pragma once
-#include <array>
+#include <vector>
+#include <map>
 
 #include "Application.h"
 #include "OpenGL/Shader.h"
@@ -12,6 +13,10 @@
 #include "Objects/Cube.h"
 #include "Objects/Axes.h"
 
+#include "Structures/ObjectProperties.h"
+
+#include "Managers/EntityManager.h"
+
 class PhysicsApplication : public Application
 {
 private:
@@ -19,7 +24,9 @@ private:
 	std::unique_ptr<Camera> m_Camera;
 	bool m_MButtonIsPressed = false;
 
-	std::vector<std::unique_ptr<IEntity>> m_Cubes;
+	EntityManager m_Manager;
+	//std::map<std::unique_ptr<IEntity>, ObjectProperties> m_Objects;
+	//std::vector<std::unique_ptr<IEntity>> m_Cubes;
 	std::unique_ptr<Axes> m_Axes;
 
 

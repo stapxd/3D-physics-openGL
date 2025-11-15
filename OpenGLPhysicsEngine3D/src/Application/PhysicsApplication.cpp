@@ -10,15 +10,19 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include "Enumerators/EntityTypes.h"
+
 void PhysicsApplication::Start()
 {
 	// Variables initialization
 	m_Camera = std::make_unique<Camera>(m_Width, m_Height);
 	
-	m_Cubes.reserve(2);
+	m_Manager.AddEntity(EntityTypes::StaticCube, { false });
+	m_Manager.AddEntity(EntityTypes::Cube, { true });
+	/*m_Cubes.reserve(2);
 	m_Cubes.push_back(std::make_unique<Cube>());
 	m_Cubes.push_back(std::make_unique<Cube>());
-	m_Cubes[1]->Translate(glm::vec3(0.0f, 0.0f, -10.0f));
+	m_Cubes[1]->Translate(glm::vec3(0.0f, 0.0f, -10.0f));*/
 
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
@@ -38,7 +42,7 @@ void PhysicsApplication::Update(float deltaTime)
     // Inputs
 	m_Camera->Inputs(m_Window, deltaTime);
 	
-	m_PhysicsWorld.Update(m_Cubes);
+	//m_PhysicsWorld.Update(m_Cubes);
 
 	//
 	m_Shader->Bind();
@@ -47,20 +51,31 @@ void PhysicsApplication::Update(float deltaTime)
 	
 	glm::vec3 camPos = m_Camera->GetPosition();
 	m_Shader->SetUniform3f("uCameraPosition", camPos.x, camPos.y, camPos.z);
-	m_Shader->SetUniform3f("uColor", 0.5f, 0.5f, 0.5f);
-	m_Shader->UnBind();
 
-	m_Cubes[0]->Scale(m_Scale);
+	for (auto& entity : m_Manager.GetEntities()) {
+		ObjectProperties properties = entity.second.GetProperties();
+
+		m_Shader->SetUniform3f("uColor", properties.color.x, properties.color.y, properties.color.z);
+
+		entity.second->Scale(properties.transform.scale);
+		entity.second->Rotate(properties.transform.rotation);
+		entity.second->Translate(properties.transform.translation);
+
+		entity.second->Draw(*m_Shader);
+	}
+
+	m_Shader->UnBind();
+	/*m_Cubes[0]->Scale(m_Scale);
 	m_Cubes[0]->Rotate(m_Rotation);
 	m_Cubes[0]->Translate(m_Translation);
 
 	m_Cubes[1]->Scale(m_Scale1);
 	m_Cubes[1]->Rotate(m_Rotation1);
-	m_Cubes[1]->Translate(m_Translation1);
+	m_Cubes[1]->Translate(m_Translation1);*/
 	
 	//Render
-	m_Cubes[0]->Draw(*m_Shader);
-	m_Cubes[1]->Draw(*m_Shader);
+	/*m_Cubes[0]->Draw(*m_Shader);
+	m_Cubes[1]->Draw(*m_Shader);*/
 
 
 	m_AxisShader->Bind();
@@ -120,15 +135,19 @@ void PhysicsApplication::HandleOnMouseMove(double xpos, double ypos)
 
 void PhysicsApplication::ShowImGui()
 {
-	ImGui::Begin("Cube1");
-	ImGui::SliderFloat3("Rotation", (float*)&m_Rotation, 0.0f, 360.0f);
-	ImGui::SliderFloat3("Traslation", (float*)&m_Translation, -10.0f, 10.0f);
-	ImGui::SliderFloat3("Scale", (float*)&m_Scale, 1.0f, 10.0f);
-	ImGui::End();
+	Transform& objectTransform = m_Manager.FindEntity(1).GetProperties().transform;
 
-	ImGui::Begin("Cube2");
-	ImGui::SliderFloat3("Rotation", (float*)&m_Rotation1, 0.0f, 360.0f);
-	ImGui::SliderFloat3("Traslation", (float*)&m_Translation1, -10.0f, 10.0f);
-	ImGui::SliderFloat3("Scale", (float*)&m_Scale1, 1.0f, 10.0f);
+	ImGui::Begin("Cube1");
+
+	ImGui::Text("Transform"); // Transform
+	ImGui::InputFloat3("Traslation", (float*)&objectTransform.translation);
+	ImGui::InputFloat3("Rotation", (float*)&objectTransform.rotation);
+	ImGui::InputFloat3("Scale", (float*)&objectTransform.scale);
+
+	ImGui::Separator();
+
+	ImGui::Text("Material"); // Material
+	ImGui::ColorEdit3("Color", &m_Manager.FindEntity(1).GetProperties().color[0]);
+
 	ImGui::End();
 }
