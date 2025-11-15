@@ -102,3 +102,8 @@ bool Collisions::CheckOBBCollision(IEntity* bodyA, IEntity* bodyB, glm::vec3& no
     normal = candidateNormal;
     return true;
 }
+
+bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distanceOut)
+{
+    return false;
+}

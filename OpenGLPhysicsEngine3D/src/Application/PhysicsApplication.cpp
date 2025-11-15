@@ -50,7 +50,7 @@ void PhysicsApplication::Update(float deltaTime)
 		ObjectProperties properties = entity.second.GetProperties();
 
 		m_Shader->SetUniform3f("uColor", properties.color.x, properties.color.y, properties.color.z);
-
+		
 		entity.second->Scale(properties.transform.scale);
 		entity.second->Rotate(properties.transform.rotation);
 		entity.second->Translate(properties.transform.translation);
@@ -86,8 +86,8 @@ void PhysicsApplication::Inputs(float deltaTime)
 		&& !m_LMButtonIsPressed) {
 		double xPos, yPos;
 		GetCursorPosition(&xPos, &yPos);
-		// m_SeletedEntity = PhysicsWorld.SelectEntity(xPos, yPos);
-		m_SelectedEntity = &m_PhysicsWorld->FindEntity(1);
+		m_SelectedEntity = &m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height);
+		//m_SelectedEntity = &m_PhysicsWorld->FindEntity(1);
 		m_LMButtonIsPressed = true;
 	}
 	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {

@@ -1,13 +1,46 @@
 #include "PhysicsWorld.h"
-
-#include "Collisions.h"
-
 #include <iostream>
 
+#include "Collisions.h"
 #include "Enumerators/EntityTypes.h"
+#include "OpenGL/Camera.h"
 
 PhysicsWorld::PhysicsWorld()
 {
+}
+
+Entity& PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera)
+{
+	IEntity* selected = nullptr;
+	float minDist = FLT_MAX;
+	float distance;
+
+	float x = (2.0f * xPos) / windowWidth - 1.0f;
+	float y = 1.0f - (2.0f * yPos) / windowHeight;
+	float z = 1.0f;
+
+	glm::vec3 rayNds = glm::vec3(x, y, z);
+
+	glm::vec4 rayClip = glm::vec4(rayNds.x, rayNds.y, -1.0f, 1.0f);
+
+	glm::mat4 proj = camera->GetProjection();
+	glm::mat4 view = camera->GetView();
+
+	glm::vec4 rayEye = glm::inverse(proj) * rayClip;
+	rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
+
+	glm::vec3 rayWorld = glm::normalize(glm::vec3(glm::inverse(view) * rayEye));
+
+	for (auto& entity : m_Manager.GetEntities())
+	{
+		if (Collisions::CheckRayOBBCollision(camera->GetPosition(), rayWorld, entity.second->GetOBB(), distance))
+		{
+			if (distance < minDist) {
+				minDist = distance;
+				selected = entity.second.GetEntity();
+			}
+		}
+	}
 }
 
 void PhysicsWorld::Update(const std::vector<std::unique_ptr<IEntity>>& entities)

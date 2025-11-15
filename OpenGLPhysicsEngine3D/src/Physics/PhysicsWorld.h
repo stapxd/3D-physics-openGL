@@ -9,6 +9,7 @@ class PhysicsWorld
 public:
 	PhysicsWorld();
 
+	Entity& SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera);
 	// temporary passing objects 
 	void Update(const std::vector<std::unique_ptr<IEntity>>& entities);
 	
