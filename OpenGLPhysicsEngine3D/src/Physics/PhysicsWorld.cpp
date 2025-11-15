@@ -3,15 +3,14 @@
 
 #include "Collisions.h"
 #include "Enumerators/EntityTypes.h"
-#include "OpenGL/Camera.h"
 
 PhysicsWorld::PhysicsWorld()
 {
 }
 
-Entity& PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera)
+Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera)
 {
-	IEntity* selected = nullptr;
+	Entity* selected = nullptr;
 	float minDist = FLT_MAX;
 	float distance;
 
@@ -37,10 +36,12 @@ Entity& PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 		{
 			if (distance < minDist) {
 				minDist = distance;
-				selected = entity.second.GetEntity();
+				selected = &entity.second;
 			}
 		}
 	}
+
+	return selected;
 }
 
 void PhysicsWorld::Update(const std::vector<std::unique_ptr<IEntity>>& entities)

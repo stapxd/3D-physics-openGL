@@ -86,8 +86,8 @@ void PhysicsApplication::Inputs(float deltaTime)
 		&& !m_LMButtonIsPressed) {
 		double xPos, yPos;
 		GetCursorPosition(&xPos, &yPos);
-		m_SelectedEntity = &m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height);
-		//m_SelectedEntity = &m_PhysicsWorld->FindEntity(1);
+		//m_SelectedEntity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get());
+		m_SelectedEntity = &m_PhysicsWorld->FindEntity(1);
 		m_LMButtonIsPressed = true;
 	}
 	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
