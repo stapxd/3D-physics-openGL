@@ -22,21 +22,13 @@ class PhysicsApplication : public Application
 private:
 
 	std::unique_ptr<Camera> m_Camera;
-	bool m_MButtonIsPressed = false;
 
-	EntityManager m_Manager;
-	//std::map<std::unique_ptr<IEntity>, ObjectProperties> m_Objects;
-	//std::vector<std::unique_ptr<IEntity>> m_Cubes;
+	Entity* m_SelectedEntity = nullptr;
+	bool m_LMButtonIsPressed = false;
+
+	glm::vec3 m_SpawnPoint = glm::vec3(0);
+
 	std::unique_ptr<Axes> m_Axes;
-
-
-	glm::vec3 m_Scale = glm::vec3(1);
-	glm::vec3 m_Rotation = glm::vec3(0);
-	glm::vec3 m_Translation = glm::vec3(0);
-
-	glm::vec3 m_Scale1 = glm::vec3(1);
-	glm::vec3 m_Rotation1 = glm::vec3(0);
-	glm::vec3 m_Translation1 = glm::vec3(0.0f, 0.0f, 10.0f);
 
 	std::unique_ptr<Shader> m_Shader;
 	std::unique_ptr<Shader> m_AxisShader;

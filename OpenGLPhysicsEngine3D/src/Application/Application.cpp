@@ -31,6 +31,7 @@ bool Application::Init(int width, int height, const char* title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     m_Width = width;
     m_Height = height;
@@ -51,6 +52,9 @@ bool Application::Init(int width, int height, const char* title)
         std::cout << "Unable to init GLEW." << "\n";
         return false;
     }
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
 
     InitCallbacks();
 
@@ -130,6 +134,11 @@ void Application::Inputs(float deltaTime)
 Application::operator bool()
 {
 	return m_Window != nullptr;
+}
+
+void Application::GetCursorPosition(double* xPos, double* yPos)
+{
+    glfwGetCursorPos(m_Window, xPos, yPos);
 }
 
 void Application::HandleOnSize(int width, int height)

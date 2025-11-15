@@ -5,7 +5,7 @@
 void EntityManager::AddEntity(EntityTypes type, const EntityParameters& params)
 {
 	auto entityPtr = EntityFactory::CreateEntity(type, params);
-	Entity entity(std::move(entityPtr));
+	Entity entity(m_Size, std::move(entityPtr));
 	m_Entities[m_Size] = std::move(entity);
 	m_Size++;
 }

@@ -102,7 +102,7 @@ void Mesh::UpdateTransformedVertices()
     m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.z), glm::vec3(0, 0, 1));
     m_Model = glm::scale(m_Model, m_Scale);
 
-    for (int i = 0; i < m_Vertices.size(); i++) {
+    for (size_t i = 0; i < m_Vertices.size(); i++) {
         m_TransformedVertices[i].position = glm::vec3(m_Model * glm::vec4(m_Vertices[i].position, 1.0f));
 
         glm::mat3 normalModel = glm::transpose(glm::inverse(m_Model));

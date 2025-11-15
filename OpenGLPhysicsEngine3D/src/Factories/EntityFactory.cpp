@@ -1,6 +1,6 @@
 #include "EntityFactory.h"
 
-#include "Objects/Cube.h";
+#include "Objects/Cube.h"
 
 std::unique_ptr<IEntity> EntityFactory::CreateEntity(EntityTypes type, const EntityParameters params)
 {

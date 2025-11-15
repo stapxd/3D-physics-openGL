@@ -4,11 +4,17 @@
 
 #include <iostream>
 
+#include "Enumerators/EntityTypes.h"
+
+PhysicsWorld::PhysicsWorld()
+{
+}
+
 void PhysicsWorld::Update(const std::vector<std::unique_ptr<IEntity>>& entities)
 {
-	for (int i = 0; i < entities.size(); i++) {
+	for (size_t i = 0; i < entities.size(); i++) {
 		IEntity* bodyA = entities[i].get();
-		for (int j = i + 1; j < entities.size(); j++) {
+		for (size_t j = i + 1; j < entities.size(); j++) {
 			IEntity* bodyB = entities[j].get();
 
 			ResolveOBBCollision(bodyA, bodyB);

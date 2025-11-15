@@ -23,10 +23,13 @@ public:
 	virtual void Update(float deltaTime);
 	virtual void Inputs(float deltaTime);
 
-	int GetWidth()  { return m_Width;  }
+	explicit operator bool();
+public:
+	// Getters
+	int GetWidth() { return m_Width; }
 	int GetHeight() { return m_Height; }
 
-	explicit operator bool();
+	void GetCursorPosition(double* xPos, double* yPos);
 
 protected:
 	// Handling inputs
