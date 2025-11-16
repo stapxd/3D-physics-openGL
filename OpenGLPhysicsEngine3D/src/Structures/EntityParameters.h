@@ -1,5 +1,5 @@
 #pragma once
 
 struct EntityParameters {
-	bool isStatic;
+	bool isStatic = false;
 };

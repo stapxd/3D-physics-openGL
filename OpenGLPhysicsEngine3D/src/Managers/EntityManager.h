@@ -8,8 +8,10 @@
 class EntityManager
 {
 public:
-	void AddEntity(EntityTypes type, const EntityParameters& params);
+	Entity& AddEntity(EntityTypes type, const EntityParameters& params);
 	Entity& FindEntity(unsigned int id);
+
+	void SetEntityPropertiesFromParameters(Entity& entity, const EntityParameters& params);
 
 	std::unordered_map<unsigned int, Entity>& GetEntities() { return m_Entities; }
 private:

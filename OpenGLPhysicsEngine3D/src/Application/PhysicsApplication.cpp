@@ -11,6 +11,8 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include "Structures/ObjectProperties.h"
+
 void PhysicsApplication::Start()
 {
 	// Variables initialization
@@ -59,24 +61,14 @@ void PhysicsApplication::Update(float deltaTime)
 	}
 
 	m_Shader->UnBind();
-	/*m_Cubes[0]->Scale(m_Scale);
-	m_Cubes[0]->Rotate(m_Rotation);
-	m_Cubes[0]->Translate(m_Translation);
 
-	m_Cubes[1]->Scale(m_Scale1);
-	m_Cubes[1]->Rotate(m_Rotation1);
-	m_Cubes[1]->Translate(m_Translation1);*/
-	
-	//Render
-	/*m_Cubes[0]->Draw(*m_Shader);
-	m_Cubes[1]->Draw(*m_Shader);*/
+	if (m_ShowAxes) {
+		m_AxisShader->Bind();
+		m_AxisShader->SetUniformMat4f("uProj", m_Camera->GetProjection());
+		m_AxisShader->SetUniformMat4f("uView", m_Camera->GetView());
 
-
-	m_AxisShader->Bind();
-	m_AxisShader->SetUniformMat4f("uProj", m_Camera->GetProjection());
-	m_AxisShader->SetUniformMat4f("uView", m_Camera->GetView());
-
-	m_Axes->Draw(*m_AxisShader);
+		m_Axes->Draw(*m_AxisShader);
+	}
 }
 
 void PhysicsApplication::Inputs(float deltaTime)
@@ -98,6 +90,9 @@ void PhysicsApplication::Inputs(float deltaTime)
 void PhysicsApplication::HandleOnSize(int width, int height)
 {
 	//printf("w: %d \n h: %d\n", width, height);
+	m_Width = width;
+	m_Height = height;
+
 	glViewport(0, 0, width, height);
 	m_Camera->SetViewport(width, height);
 }
@@ -116,23 +111,57 @@ void PhysicsApplication::ShowImGui()
 
 		ImGui::Begin(name.c_str());
 
-		ImGui::Text("Transform"); // Transform
-		ImGui::InputFloat3("Traslation", (float*)&objectTransform.translation);
-		ImGui::InputFloat3("Rotation", (float*)&objectTransform.rotation);
-		ImGui::InputFloat3("Scale", (float*)&objectTransform.scale);
+		if (ImGui::CollapsingHeader("Transform")) { // Transform
+			ImGui::DragFloat3("Traslation", (float*)&objectTransform.translation, 0.025f);
+			ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f);
+			ImGui::DragFloat3("Scale", (float*)&objectTransform.scale, 0.025f);
+		}
 
 		ImGui::Separator();
 
-		ImGui::Text("Material"); // Material
-		ImGui::ColorEdit3("Color", &m_SelectedEntity->GetProperties().color[0]);
+		if(ImGui::CollapsingHeader("Material")) { // Material
+			ImGui::ColorEdit3("Color", &m_SelectedEntity->GetProperties().color[0]);
+		}
+
+		ImGui::Separator();
+
+		if(ImGui::CollapsingHeader("Physics Body")) { // Physics Body
+			ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().physicsProperties.isStatic);
+		}
 
 		ImGui::End();
 	}
 	else {
 		ImGui::Begin("Menu");
-		ImGui::InputFloat3("Spawn Point", (float*)&m_SpawnPoint[0]);
-		if (ImGui::Button("Spawn"))
-			std::cout << "Spawned";
+		if (ImGui::CollapsingHeader("Scene")) {
+			ImGui::Checkbox("Show Axes", &m_ShowAxes);
+			//ImGui::DragFloat3("Lighting position", ...);
+		}
+		if (ImGui::CollapsingHeader("Spawning")) {
+			SelectEntityType();
+
+			ImGui::Separator();
+
+			ImGui::Text("Entity Parameters");
+			ImGui::Checkbox("Static", &(m_SpawnManager.GetParams()).isStatic);
+
+			ImGui::Separator();
+
+			// TODO: doesn't spawn in this point. Check why???
+			ImGui::DragFloat3("Spawn Point", &m_SpawnManager.GetSpawnPointChangeable()[0], 0.1f);
+			if (ImGui::Button("Spawn", ImVec2(-1, 0)))
+				m_SpawnManager.Spawn(m_PhysicsWorld);
+		}
 		ImGui::End();
+	}
+}
+
+void PhysicsApplication::SelectEntityType()
+{
+	const char* items[] = { "Cube", "Static Cube" };
+
+	int selectedType = static_cast<int>(m_SpawnManager.GetSelectedEntityType());
+	if (ImGui::Combo("Select type", &selectedType, items, IM_ARRAYSIZE(items))) {
+		m_SpawnManager.SetSelectedEntityType(static_cast<EntityTypes>(selectedType));
 	}
 }
