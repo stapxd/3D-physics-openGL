@@ -103,7 +103,51 @@ bool Collisions::CheckOBBCollision(IEntity* bodyA, IEntity* bodyB, glm::vec3& no
     return true;
 }
 
-bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distanceOut)
+bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distance)
 {
-    return false;
+    distance = FLT_MAX;
+
+    const float eps = 1e-6f;
+
+    glm::vec3 delta = obb.center - rayOrigin;
+
+    float tMin = -FLT_MAX;
+    float tMax = FLT_MAX;
+
+    for (int i = 0; i < 3; i++) {
+        float e = glm::dot(obb.axes[i], delta);
+        float f = glm::dot(obb.axes[i], rayDir);
+
+        if (std::abs(f) > eps) {
+            float t1 = (e + obb.halfSize[i]) / f;
+            float t2 = (e - obb.halfSize[i]) / f;
+
+            if (t1 > t2) {
+                float w = t1;
+                t1 = t2;
+                t2 = w;
+            }
+
+            if (t2 < tMax) tMax = t2;
+            if (t1 > tMin) tMin = t1;
+
+            if (tMin > tMax)
+                return false;
+        }
+        else {
+            if (-e - obb.halfSize[i] > 0.0f || -e + obb.halfSize[i] < 0.0f)
+                return false;
+        }
+    }
+
+    if (tMin > 0.0f)
+        distance = tMin;
+    else
+        distance = tMax;
+
+    if (distance < 0.0f)
+        return false;
+
+    return true;
+
 }
