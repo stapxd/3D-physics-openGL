@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <glm/glm.hpp>
 
 #include "Objects/Interfaces/IEntity.h"
 
@@ -16,6 +17,8 @@ public:
 	unsigned int GetId() { return m_Id; }
 	IEntity* GetEntity() { return m_Entity.get(); }
 	ObjectProperties& GetProperties() { return m_Properties; }
+
+	void Move(glm::vec3 direction);
 
 	IEntity* operator ->() { return m_Entity.get(); }
 

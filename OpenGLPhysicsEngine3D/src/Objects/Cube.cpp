@@ -10,25 +10,30 @@ Cube::Cube()
 {
     InitializeMesh();
 }
+//
+//void Cube::Scale(glm::vec3 scale)
+//{
+//    m_Mesh.Scale(scale);
+//}
+//
+//void Cube::Rotate(glm::vec3 rotation)
+//{
+//    m_Mesh.Rotate(rotation);
+//}
+//
+//void Cube::Translate(glm::vec3 translation)
+//{
+//    m_Mesh.Translate(translation);
+//}
+//
+//void Cube::Move(glm::vec3 translation)
+//{
+//    m_Mesh.Move(translation);
+//}
 
-void Cube::Scale(glm::vec3 scale)
+void Cube::ApplyTransform(const Transform& transform)
 {
-    m_Mesh.Scale(scale);
-}
-
-void Cube::Rotate(glm::vec3 rotation)
-{
-    m_Mesh.Rotate(rotation);
-}
-
-void Cube::Translate(glm::vec3 translation)
-{
-    m_Mesh.Translate(translation);
-}
-
-void Cube::Move(glm::vec3 translation)
-{
-    m_Mesh.Move(translation);
+    m_Mesh.SetTransform(transform);
 }
 
 AABB Cube::GetAABB()

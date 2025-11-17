@@ -6,6 +6,7 @@
 #include "OpenGL/Shader.h"
 
 #include "Structures/Vertex.h"
+#include "Structures/Transform.h"
 
 class Mesh
 {
@@ -20,6 +21,7 @@ public:
 	void Rotate(glm::vec3 rotation);
 	void Translate(glm::vec3 translation);
 
+	void SetTransform(const Transform& transform);
 	// temporary in mesh -> physicsbody, but maybe leave here
 	void Move(glm::vec3 translation);
 

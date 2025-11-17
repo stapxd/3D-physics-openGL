@@ -38,9 +38,15 @@ void PhysicsApplication::Update(float deltaTime)
     // Inputs
 	m_Camera->Inputs(m_Window, deltaTime);
 	
-	//m_PhysicsWorld.Update(m_Cubes);
+	// Update world
+	for (auto& entity : m_PhysicsWorld.GetEntities()) {
+		ObjectProperties properties = entity.second.GetProperties();
+		entity.second->ApplyTransform(properties.transform);
+	}
 
-	//
+	m_PhysicsWorld.Update();
+
+	// Rendering
 	m_Shader->Bind();
 	m_Shader->SetUniformMat4f("uProj", m_Camera->GetProjection());
 	m_Shader->SetUniformMat4f("uView", m_Camera->GetView());
@@ -52,10 +58,6 @@ void PhysicsApplication::Update(float deltaTime)
 		ObjectProperties properties = entity.second.GetProperties();
 
 		m_Shader->SetUniform3f("uColor", properties.color.x, properties.color.y, properties.color.z);
-
-		entity.second->Scale(properties.transform.scale);
-		entity.second->Rotate(properties.transform.rotation);
-		entity.second->Translate(properties.transform.translation);
 
 		entity.second->Draw(*m_Shader);
 	}

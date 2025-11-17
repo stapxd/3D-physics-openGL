@@ -12,7 +12,7 @@ bool Collisions::CheckAABBCollision(Entity& bodyA, Entity& bodyB)
 
 bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth)
 {
-    const float EPSILON = 1e-4f;
+    const float eps = 1e-4f;
     depth = FLT_MAX;
     normal = glm::vec3(0.0f);
 
@@ -31,7 +31,7 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
 
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
-            absRotationMatrix[i][j] = std::abs(rotationMatrix[i][j]) + EPSILON;
+            absRotationMatrix[i][j] = std::abs(rotationMatrix[i][j]) + eps;
 
     float radiusA, radiusB, overlap;
     glm::vec3 candidateNormal;
@@ -93,8 +93,13 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
 
             if (overlap < depth)
             {
-                depth = overlap;
-                candidateNormal = glm::normalize(glm::cross(obbA.axes[i], obbB.axes[j]));
+                glm::vec3 axis = glm::cross(obbA.axes[i], obbB.axes[j]);
+                float len = glm::length(axis);
+                if (len > 1e-6f)
+                {
+                    depth = overlap;
+                    candidateNormal = axis / len;
+                }
             }
         }
     }
