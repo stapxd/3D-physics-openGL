@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Managers\SpawnManager.cpp" />
     <ClCompile Include="src\Managers\Iterator.cpp" />
     <ClCompile Include="src\Managers\EntityManager.cpp" />
     <ClCompile Include="src\Factories\EntityFactory.cpp" />
@@ -176,6 +177,7 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Managers\SpawnManager.h" />
     <ClInclude Include="src\Managers\Iterator.h" />
     <ClInclude Include="src\Managers\EntityManager.h" />
     <ClInclude Include="src\Factories\EntityFactory.h" />
@@ -203,6 +205,7 @@
     <ClInclude Include="src\OpenGL\VertexLayout.h" />
     <ClInclude Include="src\Structures\AABB.h" />
     <ClInclude Include="src\Structures\OBB.h" />
+    <ClInclude Include="src\Structures\PhysicsProperties.h" />
     <ClInclude Include="src\Structures\Transform.h" />
     <ClInclude Include="src\Structures\Vertex.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />

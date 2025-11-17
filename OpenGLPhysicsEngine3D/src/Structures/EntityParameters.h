@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Transform.h"
+#include "PhysicsProperties.h"
+
 struct EntityParameters {
-	bool isStatic;
+	Transform transform;
+	PhysicsProperties physicsProperties;
 };

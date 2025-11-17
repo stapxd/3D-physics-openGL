@@ -11,13 +11,15 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include "Structures/ObjectProperties.h"
+
 void PhysicsApplication::Start()
 {
 	// Variables initialization
 	m_Camera = std::make_unique<Camera>(m_Width, m_Height);
 	
-	m_PhysicsWorld->AddEntity(EntityTypes::StaticCube, { false });
-	m_PhysicsWorld->AddEntity(EntityTypes::Cube, { true });
+	/*m_PhysicsWorld->AddEntity(EntityTypes::Cube);
+	m_PhysicsWorld->AddEntity(EntityTypes::Cube);*/
 
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
@@ -36,9 +38,15 @@ void PhysicsApplication::Update(float deltaTime)
     // Inputs
 	m_Camera->Inputs(m_Window, deltaTime);
 	
-	//m_PhysicsWorld.Update(m_Cubes);
+	// Update world
+	for (auto& entity : m_PhysicsWorld.GetEntities()) {
+		ObjectProperties properties = entity.second.GetProperties();
+		entity.second->ApplyTransform(properties.transform);
+	}
 
-	//
+	m_PhysicsWorld.Update();
+
+	// Rendering
 	m_Shader->Bind();
 	m_Shader->SetUniformMat4f("uProj", m_Camera->GetProjection());
 	m_Shader->SetUniformMat4f("uView", m_Camera->GetView());
@@ -50,33 +58,19 @@ void PhysicsApplication::Update(float deltaTime)
 		ObjectProperties properties = entity.second.GetProperties();
 
 		m_Shader->SetUniform3f("uColor", properties.color.x, properties.color.y, properties.color.z);
-		
-		entity.second->Scale(properties.transform.scale);
-		entity.second->Rotate(properties.transform.rotation);
-		entity.second->Translate(properties.transform.translation);
 
 		entity.second->Draw(*m_Shader);
 	}
 
 	m_Shader->UnBind();
-	/*m_Cubes[0]->Scale(m_Scale);
-	m_Cubes[0]->Rotate(m_Rotation);
-	m_Cubes[0]->Translate(m_Translation);
 
-	m_Cubes[1]->Scale(m_Scale1);
-	m_Cubes[1]->Rotate(m_Rotation1);
-	m_Cubes[1]->Translate(m_Translation1);*/
-	
-	//Render
-	/*m_Cubes[0]->Draw(*m_Shader);
-	m_Cubes[1]->Draw(*m_Shader);*/
+	if (m_ShowAxes) {
+		m_AxisShader->Bind();
+		m_AxisShader->SetUniformMat4f("uProj", m_Camera->GetProjection());
+		m_AxisShader->SetUniformMat4f("uView", m_Camera->GetView());
 
-
-	m_AxisShader->Bind();
-	m_AxisShader->SetUniformMat4f("uProj", m_Camera->GetProjection());
-	m_AxisShader->SetUniformMat4f("uView", m_Camera->GetView());
-
-	m_Axes->Draw(*m_AxisShader);
+		m_Axes->Draw(*m_AxisShader);
+	}
 }
 
 void PhysicsApplication::Inputs(float deltaTime)
@@ -86,8 +80,8 @@ void PhysicsApplication::Inputs(float deltaTime)
 		&& !m_LMButtonIsPressed) {
 		double xPos, yPos;
 		GetCursorPosition(&xPos, &yPos);
-		//m_SelectedEntity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get());
-		m_SelectedEntity = &m_PhysicsWorld->FindEntity(1);
+		m_SelectedEntity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get());
+		//m_SelectedEntity = &m_PhysicsWorld->FindEntity(1);
 		m_LMButtonIsPressed = true;
 	}
 	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
@@ -98,6 +92,9 @@ void PhysicsApplication::Inputs(float deltaTime)
 void PhysicsApplication::HandleOnSize(int width, int height)
 {
 	//printf("w: %d \n h: %d\n", width, height);
+	m_Width = width;
+	m_Height = height;
+
 	glViewport(0, 0, width, height);
 	m_Camera->SetViewport(width, height);
 }
@@ -116,23 +113,62 @@ void PhysicsApplication::ShowImGui()
 
 		ImGui::Begin(name.c_str());
 
-		ImGui::Text("Transform"); // Transform
-		ImGui::InputFloat3("Traslation", (float*)&objectTransform.translation);
-		ImGui::InputFloat3("Rotation", (float*)&objectTransform.rotation);
-		ImGui::InputFloat3("Scale", (float*)&objectTransform.scale);
+		if (ImGui::CollapsingHeader("Transform")) { // Transform
+			ImGui::DragFloat3("Traslation", (float*)&objectTransform.translation, 0.025f);
+			ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f);
+			ImGui::DragFloat3("Scale", (float*)&objectTransform.scale, 0.025f);
+		}
 
 		ImGui::Separator();
 
-		ImGui::Text("Material"); // Material
-		ImGui::ColorEdit3("Color", &m_SelectedEntity->GetProperties().color[0]);
+		if(ImGui::CollapsingHeader("Material")) { // Material
+			ImGui::ColorEdit3("Color", &m_SelectedEntity->GetProperties().color[0]);
+		}
+
+		ImGui::Separator();
+
+		if(ImGui::CollapsingHeader("Physics Body")) { // Physics Body
+			ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().physicsProperties.isStatic);
+		}
 
 		ImGui::End();
 	}
 	else {
 		ImGui::Begin("Menu");
-		ImGui::InputFloat3("Spawn Point", (float*)&m_SpawnPoint[0]);
-		if (ImGui::Button("Spawn"))
-			std::cout << "Spawned";
+		if (ImGui::CollapsingHeader("Scene")) {
+			ImGui::Checkbox("Show Axes", &m_ShowAxes);
+			//ImGui::DragFloat3("Lighting position", ...);
+		}
+		if (ImGui::CollapsingHeader("Spawning")) {
+			SelectEntityType();
+
+			ImGui::Separator();
+
+			ImGui::Text("Entity Parameters");
+
+			Transform& transform = m_SpawnManager.GetParams().transform;
+			PhysicsProperties& physicsProperties = m_SpawnManager.GetParams().physicsProperties;
+			// vector not initializing
+			ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
+			ImGui::Checkbox("Static", &physicsProperties.isStatic);
+
+			ImGui::Separator();
+
+			// TODO: doesn't spawn in this point. Check why???
+			ImGui::DragFloat3("Spawn Point", &m_SpawnManager.GetSpawnPointChangeable()[0], 0.1f);
+			if (ImGui::Button("Spawn", ImVec2(-1, 0)))
+				m_SpawnManager.Spawn(m_PhysicsWorld);
+		}
 		ImGui::End();
+	}
+}
+
+void PhysicsApplication::SelectEntityType()
+{
+	const char* items[] = { "Cube" };
+
+	int selectedType = static_cast<int>(m_SpawnManager.GetSelectedEntityType());
+	if (ImGui::Combo("Select type", &selectedType, items, IM_ARRAYSIZE(items))) {
+		m_SpawnManager.SetSelectedEntityType(static_cast<EntityTypes>(selectedType));
 	}
 }

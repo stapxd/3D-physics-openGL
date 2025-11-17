@@ -1,7 +1,7 @@
 #include "Collisions.h"
 #include "Structures/OBB.h"
 
-bool Collisions::CheckAABBCollision(IEntity* bodyA, IEntity* bodyB)
+bool Collisions::CheckAABBCollision(Entity& bodyA, Entity& bodyB)
 {
     AABB a = bodyA->GetAABB();
     AABB b = bodyB->GetAABB();
@@ -10,9 +10,9 @@ bool Collisions::CheckAABBCollision(IEntity* bodyA, IEntity* bodyB)
         (a.min.z <= b.max.z && a.max.z >= b.min.z);
 }
 
-bool Collisions::CheckOBBCollision(IEntity* bodyA, IEntity* bodyB, glm::vec3& normal, float& depth)
+bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth)
 {
-    const float EPSILON = 1e-4f;
+    const float eps = 1e-4f;
     depth = FLT_MAX;
     normal = glm::vec3(0.0f);
 
@@ -31,7 +31,7 @@ bool Collisions::CheckOBBCollision(IEntity* bodyA, IEntity* bodyB, glm::vec3& no
 
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
-            absRotationMatrix[i][j] = std::abs(rotationMatrix[i][j]) + EPSILON;
+            absRotationMatrix[i][j] = std::abs(rotationMatrix[i][j]) + eps;
 
     float radiusA, radiusB, overlap;
     glm::vec3 candidateNormal;
@@ -93,8 +93,13 @@ bool Collisions::CheckOBBCollision(IEntity* bodyA, IEntity* bodyB, glm::vec3& no
 
             if (overlap < depth)
             {
-                depth = overlap;
-                candidateNormal = glm::normalize(glm::cross(obbA.axes[i], obbB.axes[j]));
+                glm::vec3 axis = glm::cross(obbA.axes[i], obbB.axes[j]);
+                float len = glm::length(axis);
+                if (len > 1e-6f)
+                {
+                    depth = overlap;
+                    candidateNormal = axis / len;
+                }
             }
         }
     }
@@ -103,7 +108,51 @@ bool Collisions::CheckOBBCollision(IEntity* bodyA, IEntity* bodyB, glm::vec3& no
     return true;
 }
 
-bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distanceOut)
+bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distance)
 {
-    return false;
+    distance = FLT_MAX;
+
+    const float eps = 1e-6f;
+
+    glm::vec3 delta = obb.center - rayOrigin;
+
+    float tMin = -FLT_MAX;
+    float tMax = FLT_MAX;
+
+    for (int i = 0; i < 3; i++) {
+        float e = glm::dot(obb.axes[i], delta);
+        float f = glm::dot(obb.axes[i], rayDir);
+
+        if (std::abs(f) > eps) {
+            float t1 = (e + obb.halfSize[i]) / f;
+            float t2 = (e - obb.halfSize[i]) / f;
+
+            if (t1 > t2) {
+                float w = t1;
+                t1 = t2;
+                t2 = w;
+            }
+
+            if (t2 < tMax) tMax = t2;
+            if (t1 > tMin) tMin = t1;
+
+            if (tMin > tMax)
+                return false;
+        }
+        else {
+            if (-e - obb.halfSize[i] > 0.0f || -e + obb.halfSize[i] < 0.0f)
+                return false;
+        }
+    }
+
+    if (tMin > 0.0f)
+        distance = tMin;
+    else
+        distance = tMax;
+
+    if (distance < 0.0f)
+        return false;
+
+    return true;
+
 }

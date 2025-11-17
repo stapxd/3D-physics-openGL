@@ -2,12 +2,16 @@
 
 #include "Factories/EntityFactory.h"
 
-void EntityManager::AddEntity(EntityTypes type, const EntityParameters& params)
+Entity& EntityManager::AddEntity(EntityTypes type, const EntityParameters& params)
 {
-	auto entityPtr = EntityFactory::CreateEntity(type, params);
+	auto entityPtr = EntityFactory::CreateEntity(type);
 	Entity entity(m_Size, std::move(entityPtr));
 	m_Entities[m_Size] = std::move(entity);
+
+	SetEntityPropertiesFromParameters(m_Entities[m_Size], params);
+
 	m_Size++;
+	return m_Entities[m_Size - 1];
 }
 
 Entity& EntityManager::FindEntity(unsigned int id)
@@ -15,4 +19,13 @@ Entity& EntityManager::FindEntity(unsigned int id)
 	if (id < 0 || id > m_Size)
 		throw std::out_of_range("EntityManager::FindEntity : id is out of range");
 	return m_Entities[id];
+}
+
+void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const EntityParameters& params)
+{
+	// Transform
+	entity.GetProperties().transform.scale = params.transform.scale;
+
+	// Physics Body
+	entity.GetProperties().physicsProperties.isStatic = params.physicsProperties.isStatic;
 }

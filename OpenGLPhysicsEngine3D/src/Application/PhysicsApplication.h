@@ -10,12 +10,9 @@
 #include "Physics/PhysicsWorld.h"
 
 //-----
-#include "Objects/Cube.h"
 #include "Objects/Axes.h"
 
-#include "Structures/ObjectProperties.h"
-
-#include "Managers/EntityManager.h"
+#include "Managers/SpawnManager.h"
 
 class PhysicsApplication : public Application
 {
@@ -24,9 +21,9 @@ private:
 	std::unique_ptr<Camera> m_Camera;
 
 	Entity* m_SelectedEntity = nullptr;
-	bool m_LMButtonIsPressed = false;
 
-	glm::vec3 m_SpawnPoint = glm::vec3(0);
+	//glm::vec3 m_SpawnPoint = glm::vec3(0);
+	SpawnManager m_SpawnManager;
 
 	std::unique_ptr<Axes> m_Axes;
 
@@ -34,6 +31,11 @@ private:
 	std::unique_ptr<Shader> m_AxisShader;
 
 	PhysicsWorld m_PhysicsWorld;
+
+	// Flags
+	bool m_LMButtonIsPressed = false;
+	bool m_ShowAxes = false;
+
 
 public:
 	PhysicsApplication(){}
@@ -48,5 +50,8 @@ protected:
 	void HandleOnMouseMove(double xpos, double ypos);
 
 	void ShowImGui();
+
+private:
+	void SelectEntityType();
 };
 

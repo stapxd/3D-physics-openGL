@@ -44,34 +44,37 @@ Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 	return selected;
 }
 
-void PhysicsWorld::Update(const std::vector<std::unique_ptr<IEntity>>& entities)
+void PhysicsWorld::Update()
 {
-	for (size_t i = 0; i < entities.size(); i++) {
-		IEntity* bodyA = entities[i].get();
-		for (size_t j = i + 1; j < entities.size(); j++) {
-			IEntity* bodyB = entities[j].get();
+	for (unsigned int i = 0; i < m_Manager.GetSize(); i++) {
+		Entity& bodyA = m_Manager.FindEntity(i);
+		for (unsigned int j = i + 1; j < m_Manager.GetSize(); j++) {
+			Entity& bodyB = m_Manager.FindEntity(j);
 
 			ResolveOBBCollision(bodyA, bodyB);
 		}
 	}
 }
 
-// TODO: check why bodies are not separeing!!!
-void PhysicsWorld::SeparateBodies(IEntity* bodyA, bool isStatic_A, IEntity* bodyB, bool isStatic_B, glm::vec3 normal, float depth)
+// something is wrong with resolving collision. Entities jitter and separating incorrectly
+void PhysicsWorld::SeparateBodies(Entity& bodyA, bool isStatic_A, Entity& bodyB, bool isStatic_B, glm::vec3 normal, float depth)
 {
+	/*std::cout << normal.x << " " << normal.y << " " << normal.z << "\n";
+	std::cout << "depth: " << depth << "\n";*/
+
 	if (isStatic_B) {
-		bodyA->Move(normal * depth);
+		bodyA.Move(normal * depth);
 	}
 	else if (isStatic_A) {
-		bodyB->Move(-normal * depth);
+		bodyB.Move(-normal * depth);
 	}
 	else {
-		bodyA->Move(normal * (depth / 2));
-		bodyB->Move(-normal * (depth / 2));
+		bodyA.Move(normal * (depth / 2));
+		bodyB.Move(-normal * (depth / 2));
 	}
 }
 
-void PhysicsWorld::ResolveAABBCollision(IEntity* bodyA, IEntity* bodyB)
+void PhysicsWorld::ResolveAABBCollision(Entity& bodyA, Entity& bodyB)
 {
 	if (Collisions::CheckAABBCollision(bodyA, bodyB))
 		std::cout << "Collision detected!\n";
@@ -79,13 +82,13 @@ void PhysicsWorld::ResolveAABBCollision(IEntity* bodyA, IEntity* bodyB)
 		std::cout << "No collision!\n";
 }
 
-void PhysicsWorld::ResolveOBBCollision(IEntity* bodyA, IEntity* bodyB)
+void PhysicsWorld::ResolveOBBCollision(Entity& bodyA, Entity& bodyB)
 {
 	glm::vec3 normal;
 	float depth;
 
-	bool isStatic_A = bodyA->GetPhysicsBody()->GetStatic();
-	bool isStatic_B = bodyB->GetPhysicsBody()->GetStatic();
+	bool isStatic_A = bodyA.GetProperties().physicsProperties.isStatic;
+	bool isStatic_B = bodyB.GetProperties().physicsProperties.isStatic;
 
 	if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
 		std::cout << "Collision detected!\n";

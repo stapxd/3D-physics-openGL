@@ -7,22 +7,21 @@
 
 #include "Interfaces/IEntity.h"
 
-#include "Structures/OBB.h"
-
 #include <iostream>
 #include <vector>
 
 class Cube : public IEntity
 {
 public:
-	Cube(bool isStatic);
 	Cube();
 
-	void Scale(glm::vec3 scale);
+	/*void Scale(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
 	void Translate(glm::vec3 translation);
 
-	void Move(glm::vec3 translation);
+	void Move(glm::vec3 translation);*/
+
+	void ApplyTransform(const Transform& transform);
 
 	// maybe not in here
 	AABB GetAABB();

@@ -52,6 +52,13 @@ void Mesh::Translate(glm::vec3 translation)
     m_ShouldBeTransformed = true;
 }
 
+void Mesh::SetTransform(const Transform& transform)
+{
+    Translate(transform.translation);
+    Rotate(transform.rotation);
+    Scale(transform.scale);
+}
+
 void Mesh::Move(glm::vec3 translation)
 {
     m_Translation += translation;
