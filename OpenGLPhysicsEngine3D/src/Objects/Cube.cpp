@@ -4,14 +4,9 @@
 
 #include <Application/Renderer.h>
 
-Cube::Cube(bool isStatic)
-    : m_Mesh(24, 36), m_PhysicsBody(isStatic)
-{
-    InitializeMesh();
-}
 
 Cube::Cube()
-	: m_Mesh(24, 36), m_PhysicsBody(false)
+	: m_Mesh(24, 36)
 {
     InitializeMesh();
 }

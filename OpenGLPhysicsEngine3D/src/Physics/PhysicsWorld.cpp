@@ -44,12 +44,12 @@ Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 	return selected;
 }
 
-void PhysicsWorld::Update(const std::vector<std::unique_ptr<IEntity>>& entities)
+void PhysicsWorld::Update()
 {
-	for (size_t i = 0; i < entities.size(); i++) {
-		IEntity* bodyA = entities[i].get();
-		for (size_t j = i + 1; j < entities.size(); j++) {
-			IEntity* bodyB = entities[j].get();
+	for (unsigned int i = 0; i < m_Manager.GetSize(); i++) {
+		Entity& bodyA = m_Manager.FindEntity(i);
+		for (unsigned int j = i + 1; j < m_Manager.GetSize(); j++) {
+			Entity& bodyB = m_Manager.FindEntity(j);
 
 			ResolveOBBCollision(bodyA, bodyB);
 		}
@@ -57,7 +57,7 @@ void PhysicsWorld::Update(const std::vector<std::unique_ptr<IEntity>>& entities)
 }
 
 // TODO: check why bodies are not separeing!!!
-void PhysicsWorld::SeparateBodies(IEntity* bodyA, bool isStatic_A, IEntity* bodyB, bool isStatic_B, glm::vec3 normal, float depth)
+void PhysicsWorld::SeparateBodies(Entity& bodyA, bool isStatic_A, Entity& bodyB, bool isStatic_B, glm::vec3 normal, float depth)
 {
 	if (isStatic_B) {
 		bodyA->Move(normal * depth);
@@ -71,7 +71,7 @@ void PhysicsWorld::SeparateBodies(IEntity* bodyA, bool isStatic_A, IEntity* body
 	}
 }
 
-void PhysicsWorld::ResolveAABBCollision(IEntity* bodyA, IEntity* bodyB)
+void PhysicsWorld::ResolveAABBCollision(Entity& bodyA, Entity& bodyB)
 {
 	if (Collisions::CheckAABBCollision(bodyA, bodyB))
 		std::cout << "Collision detected!\n";
@@ -79,13 +79,13 @@ void PhysicsWorld::ResolveAABBCollision(IEntity* bodyA, IEntity* bodyB)
 		std::cout << "No collision!\n";
 }
 
-void PhysicsWorld::ResolveOBBCollision(IEntity* bodyA, IEntity* bodyB)
+void PhysicsWorld::ResolveOBBCollision(Entity& bodyA, Entity& bodyB)
 {
 	glm::vec3 normal;
 	float depth;
 
-	bool isStatic_A = bodyA->GetPhysicsBody()->GetStatic();
-	bool isStatic_B = bodyB->GetPhysicsBody()->GetStatic();
+	bool isStatic_A = bodyA.GetProperties().physicsProperties.isStatic;
+	bool isStatic_B = bodyB.GetProperties().physicsProperties.isStatic;
 
 	if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
 		std::cout << "Collision detected!\n";

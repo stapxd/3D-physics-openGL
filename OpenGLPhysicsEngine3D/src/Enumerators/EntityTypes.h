@@ -2,5 +2,4 @@
 
 enum class EntityTypes {
 	Cube,
-	StaticCube
 };

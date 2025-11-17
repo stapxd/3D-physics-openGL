@@ -4,7 +4,7 @@
 
 Entity& EntityManager::AddEntity(EntityTypes type, const EntityParameters& params)
 {
-	auto entityPtr = EntityFactory::CreateEntity(type, params);
+	auto entityPtr = EntityFactory::CreateEntity(type);
 	Entity entity(m_Size, std::move(entityPtr));
 	m_Entities[m_Size] = std::move(entity);
 
@@ -23,7 +23,9 @@ Entity& EntityManager::FindEntity(unsigned int id)
 
 void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const EntityParameters& params)
 {
-	// Maybe unite both Properties and PhysicsBody, so we dont need to parse it to both
-	entity.GetProperties().physicsProperties.isStatic = params.isStatic;
-	entity->GetPhysicsBody()->SetStatic(params.isStatic);
+	// Transform
+	entity.GetProperties().transform.scale = params.transform.scale;
+
+	// Physics Body
+	entity.GetProperties().physicsProperties.isStatic = params.physicsProperties.isStatic;
 }

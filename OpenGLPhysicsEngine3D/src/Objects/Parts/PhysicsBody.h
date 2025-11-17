@@ -2,13 +2,21 @@
 class PhysicsBody
 {
 public:
-	PhysicsBody(bool isStatic) {
-		SetStatic(isStatic);
-	}
+	PhysicsBody();
 
-	void SetStatic(bool value) { m_IsStatic = value; }
-	bool GetStatic() const { return m_IsStatic; }
+	/*
+	void AddForce();
+	void AddRotatinalVelocity();
+	
+	*/
+
 private:
-	bool m_IsStatic;
+	/*
+	glm::vec3 m_RotatinalVelocity;
+	glm::vec3 m_Velocity;
+
+	glm::vec3 m_Force;
+	
+	*/
 };
 

@@ -15,7 +15,6 @@
 class Cube : public IEntity
 {
 public:
-	Cube(bool isStatic);
 	Cube();
 
 	void Scale(glm::vec3 scale);

@@ -18,8 +18,8 @@ void PhysicsApplication::Start()
 	// Variables initialization
 	m_Camera = std::make_unique<Camera>(m_Width, m_Height);
 	
-	m_PhysicsWorld->AddEntity(EntityTypes::StaticCube, { false });
-	m_PhysicsWorld->AddEntity(EntityTypes::Cube, { true });
+	/*m_PhysicsWorld->AddEntity(EntityTypes::Cube);
+	m_PhysicsWorld->AddEntity(EntityTypes::Cube);*/
 
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
@@ -52,7 +52,7 @@ void PhysicsApplication::Update(float deltaTime)
 		ObjectProperties properties = entity.second.GetProperties();
 
 		m_Shader->SetUniform3f("uColor", properties.color.x, properties.color.y, properties.color.z);
-		
+
 		entity.second->Scale(properties.transform.scale);
 		entity.second->Rotate(properties.transform.rotation);
 		entity.second->Translate(properties.transform.translation);
@@ -143,7 +143,12 @@ void PhysicsApplication::ShowImGui()
 			ImGui::Separator();
 
 			ImGui::Text("Entity Parameters");
-			ImGui::Checkbox("Static", &(m_SpawnManager.GetParams()).isStatic);
+
+			Transform& transform = m_SpawnManager.GetParams().transform;
+			PhysicsProperties& physicsProperties = m_SpawnManager.GetParams().physicsProperties;
+			// vector not initializing
+			ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
+			ImGui::Checkbox("Static", &physicsProperties.isStatic);
 
 			ImGui::Separator();
 
@@ -158,7 +163,7 @@ void PhysicsApplication::ShowImGui()
 
 void PhysicsApplication::SelectEntityType()
 {
-	const char* items[] = { "Cube", "Static Cube" };
+	const char* items[] = { "Cube" };
 
 	int selectedType = static_cast<int>(m_SpawnManager.GetSelectedEntityType());
 	if (ImGui::Combo("Select type", &selectedType, items, IM_ARRAYSIZE(items))) {

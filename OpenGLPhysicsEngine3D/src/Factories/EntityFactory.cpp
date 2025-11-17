@@ -2,14 +2,12 @@
 
 #include "Objects/Cube.h"
 
-std::unique_ptr<IEntity> EntityFactory::CreateEntity(EntityTypes type, const EntityParameters params)
+std::unique_ptr<IEntity> EntityFactory::CreateEntity(EntityTypes type)
 {
 	switch (type)
 	{
 	case EntityTypes::Cube:
-		return std::make_unique<Cube>(params.isStatic);
-	case EntityTypes::StaticCube:
-		return std::make_unique<Cube>(true);
+		return std::make_unique<Cube>();
 	default:
 		return nullptr;
 	}
