@@ -26,6 +26,8 @@ void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const Enti
 	// Transform
 	entity.GetProperties().transform.scale = params.transform.scale;
 
-	// Physics Body
-	entity.GetProperties().physicsProperties.isStatic = params.physicsProperties.isStatic;
+	// Rigidbody
+	entity.GetProperties().rigidbody.isStatic = params.rigidbody.isStatic;
+	entity.GetProperties().rigidbody.mass = params.rigidbody.mass;
+	entity.GetProperties().rigidbody.restitution = params.rigidbody.restitution;
 }

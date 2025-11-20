@@ -39,12 +39,7 @@ void PhysicsApplication::Update(float deltaTime)
 	m_Camera->Inputs(m_Window, deltaTime);
 	
 	// Update world
-	for (auto& entity : m_PhysicsWorld.GetEntities()) {
-		ObjectProperties properties = entity.second.GetProperties();
-		entity.second->ApplyTransform(properties.transform);
-	}
-
-	m_PhysicsWorld.Update();
+	m_PhysicsWorld.Update(deltaTime, 1);
 
 	// Rendering
 	m_Shader->Bind();
@@ -87,6 +82,22 @@ void PhysicsApplication::Inputs(float deltaTime)
 	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
 		m_LMButtonIsPressed = false;
 	}
+
+	float fM = .1f;
+	if (m_SelectedEntity && !m_SelectedEntity->GetProperties().rigidbody.isStatic) {
+		if (glfwGetKey(m_Window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(1.0f, 0.0f, 0.0f) * fM;
+		}
+		if (glfwGetKey(m_Window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(-1.0f, 0.0f, 0.0f) * fM;
+		}
+		if (glfwGetKey(m_Window, GLFW_KEY_UP) == GLFW_PRESS) {
+			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(0.0f, 0.0f, 1.0f) * fM;
+		}
+		if (glfwGetKey(m_Window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(0.0f, 0.0f, -1.0f) * fM;
+		}
+	}
 }
 
 void PhysicsApplication::HandleOnSize(int width, int height)
@@ -127,8 +138,10 @@ void PhysicsApplication::ShowImGui()
 
 		ImGui::Separator();
 
-		if(ImGui::CollapsingHeader("Physics Body")) { // Physics Body
-			ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().physicsProperties.isStatic);
+		if(ImGui::CollapsingHeader("Rigidbody")) { // Rigidbody
+			ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().rigidbody.isStatic);
+			ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
+			ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
 		}
 
 		ImGui::End();
@@ -147,10 +160,17 @@ void PhysicsApplication::ShowImGui()
 			ImGui::Text("Entity Parameters");
 
 			Transform& transform = m_SpawnManager.GetParams().transform;
-			PhysicsProperties& physicsProperties = m_SpawnManager.GetParams().physicsProperties;
+			Rigidbody3D& rigidbody = m_SpawnManager.GetParams().rigidbody;
 			// vector not initializing
-			ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
-			ImGui::Checkbox("Static", &physicsProperties.isStatic);
+			if (ImGui::CollapsingHeader("Transform")) {
+				ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
+			}
+
+			if (ImGui::CollapsingHeader("Rigidbody")) {
+				ImGui::Checkbox("Static", &rigidbody.isStatic);
+				ImGui::DragFloat("Mass", &rigidbody.mass, 0.02f, 0.01f, 1000.0f);
+				ImGui::DragFloat("Restitution", &rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+			}
 
 			ImGui::Separator();
 

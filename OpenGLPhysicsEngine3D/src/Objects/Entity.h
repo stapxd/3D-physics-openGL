@@ -18,6 +18,7 @@ public:
 	IEntity* GetEntity() { return m_Entity.get(); }
 	ObjectProperties& GetProperties() { return m_Properties; }
 
+	void Step(float deltaTime);
 	void Move(glm::vec3 direction);
 
 	IEntity* operator ->() { return m_Entity.get(); }

@@ -13,20 +13,26 @@ public:
 
 	Entity* SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera);
 	// temporary passing objects 
-	void Update();
+	void Update(float deltaTime, int iterations = 1);
 	
 	EntityManager* operator->() { return &m_Manager; }
 	std::unordered_map<unsigned int, Entity>& GetEntities() { return m_Manager.GetEntities(); }
+	
+	static glm::vec3 GetGravity() { return m_Gravity; }
 
 protected:
-	// TODO: add narrow and broad phase
+	void NarrowPhase();
+	void BroadPhase();
+	void MovementEntitiesStep(float deltaTime);
+
 	void SeparateBodies(Entity& bodyA, bool isStatic_A, Entity& bodyB, bool isStatic_B, glm::vec3 normal, float depth);
 
-	// Collisions
-	void ResolveAABBCollision(Entity& bodyA, Entity& bodyB);
-	void ResolveOBBCollision(Entity& bodyA, Entity& bodyB);
+	// Resolving
+	void ResolveCollision(Entity& bodyA, Entity& bodyB, glm::vec3 normal, float depth);
 
 private:
+	static glm::vec3 m_Gravity;
+
 	EntityManager m_Manager;
 };
 
