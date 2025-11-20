@@ -83,7 +83,7 @@ void PhysicsApplication::Inputs(float deltaTime)
 		m_LMButtonIsPressed = false;
 	}
 
-	float fM = .1f;
+	float fM = .05f;
 	if (m_SelectedEntity && !m_SelectedEntity->GetProperties().rigidbody.isStatic) {
 		if (glfwGetKey(m_Window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(1.0f, 0.0f, 0.0f) * fM;
@@ -96,6 +96,12 @@ void PhysicsApplication::Inputs(float deltaTime)
 		}
 		if (glfwGetKey(m_Window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(0.0f, 0.0f, -1.0f) * fM;
+		}
+		if (glfwGetKey(m_Window, GLFW_KEY_KP_0) == GLFW_PRESS) {
+			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(0.0f, -1.0f, 0.0f) * fM;
+		}
+		if (glfwGetKey(m_Window, GLFW_KEY_KP_1) == GLFW_PRESS) {
+			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(0.0f, 1.0f, 0.0f) * fM;
 		}
 	}
 }
