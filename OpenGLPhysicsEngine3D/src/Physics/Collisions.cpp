@@ -104,7 +104,11 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
         }
     }
 
-    normal = candidateNormal;
+    normal = glm::normalize(candidateNormal);
+
+    if (glm::dot(tA, normal) < 0)
+        normal = -normal;
+
     return true;
 }
 

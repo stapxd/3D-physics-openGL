@@ -56,23 +56,23 @@ void PhysicsWorld::Update()
 	}
 }
 
-// something is wrong with resolving collision. Entities jitter and separating incorrectly
+// maybe add correction if it brokes
 void PhysicsWorld::SeparateBodies(Entity& bodyA, bool isStatic_A, Entity& bodyB, bool isStatic_B, glm::vec3 normal, float depth)
 {
-	/*std::cout << normal.x << " " << normal.y << " " << normal.z << "\n";
-	std::cout << "depth: " << depth << "\n";*/
+	normal = glm::normalize(normal);
 
 	if (isStatic_B) {
-		bodyA.Move(normal * depth);
+		bodyA.Move(-normal * depth);
 	}
 	else if (isStatic_A) {
-		bodyB.Move(-normal * depth);
+		bodyB.Move(normal * depth);
 	}
 	else {
-		bodyA.Move(normal * (depth / 2));
-		bodyB.Move(-normal * (depth / 2));
+		bodyA.Move(-normal * (depth * 0.5f));
+		bodyB.Move(normal * (depth * 0.5f));
 	}
 }
+
 
 void PhysicsWorld::ResolveAABBCollision(Entity& bodyA, Entity& bodyB)
 {
