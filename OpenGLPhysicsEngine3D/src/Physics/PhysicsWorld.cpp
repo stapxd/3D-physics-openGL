@@ -4,6 +4,8 @@
 #include "Collisions.h"
 #include "Enumerators/EntityTypes.h"
 
+glm::vec3 PhysicsWorld::m_Gravity = glm::vec3(0.0f, -9.81f, 0.0f);
+
 PhysicsWorld::PhysicsWorld()
 {
 }
@@ -44,14 +46,61 @@ Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 	return selected;
 }
 
-void PhysicsWorld::Update()
+void PhysicsWorld::Update(float deltaTime, int iterations)
+{
+	iterations = glm::clamp(iterations, 0, 128);
+
+	float deltaTimePerIteration = deltaTime / iterations;
+
+	for (int i = 0; i < iterations; i++) {
+
+		MovementEntitiesStep(deltaTimePerIteration);
+		BroadPhase();
+	}
+}
+
+void PhysicsWorld::NarrowPhase()
+{
+}
+
+void PhysicsWorld::BroadPhase()
 {
 	for (unsigned int i = 0; i < m_Manager.GetSize(); i++) {
 		Entity& bodyA = m_Manager.FindEntity(i);
 		for (unsigned int j = i + 1; j < m_Manager.GetSize(); j++) {
 			Entity& bodyB = m_Manager.FindEntity(j);
 
-			ResolveOBBCollision(bodyA, bodyB);
+			glm::vec3 normal;
+			float depth;
+
+			bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
+			bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
+
+			if (isStatic_A && isStatic_B)
+				return;
+
+			if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
+				SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
+
+				ResolveCollision(bodyA, bodyB, normal, depth);
+			}
+		}
+	}
+}
+
+void PhysicsWorld::MovementEntitiesStep(float deltaTime)
+{
+	for (auto& entity : m_Manager.GetEntities()) {
+		
+		/*const ObjectProperties& properties = entity.second.GetProperties();
+		entity.second->ApplyTransform(properties.transform);*/
+
+		if (entity.second.GetProperties().rigidbody.isStatic) {
+			const ObjectProperties& properties = entity.second.GetProperties();
+			entity.second->ApplyTransform(properties.transform);
+		}
+		else {
+			entity.second.Step(deltaTime);
 		}
 	}
 }
@@ -73,28 +122,30 @@ void PhysicsWorld::SeparateBodies(Entity& bodyA, bool isStatic_A, Entity& bodyB,
 	}
 }
 
-
-void PhysicsWorld::ResolveAABBCollision(Entity& bodyA, Entity& bodyB)
+void PhysicsWorld::ResolveCollision(Entity& bodyA, Entity& bodyB, glm::vec3 normal, float depth)
 {
-	if (Collisions::CheckAABBCollision(bodyA, bodyB))
-		std::cout << "Collision detected!\n";
-	else
-		std::cout << "No collision!\n";
-}
+	ObjectProperties& propertiesA = bodyA.GetProperties();
+	ObjectProperties& propertiesB = bodyB.GetProperties();
 
-void PhysicsWorld::ResolveOBBCollision(Entity& bodyA, Entity& bodyB)
-{
-	glm::vec3 normal;
-	float depth;
+	glm::vec3 relativeVelocity = propertiesA.rigidbody.linearVelocity - propertiesB.rigidbody.linearVelocity;
 
-	bool isStatic_A = bodyA.GetProperties().physicsProperties.isStatic;
-	bool isStatic_B = bodyB.GetProperties().physicsProperties.isStatic;
+	float e = std::min(propertiesA.rigidbody.restitution, propertiesB.rigidbody.restitution);
 
-	if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
-		std::cout << "Collision detected!\n";
-		
-		SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
-	}	
-	else
-		std::cout << "No collision!\n";
+	float numerator = -(1 + e) * glm::dot(relativeVelocity, normal);
+	
+	float massA = propertiesA.rigidbody.mass;
+	float invMassA = (!propertiesA.rigidbody.isStatic && massA > 0.0f)
+		? 1.0f / massA
+		: 0.0f;
+
+	float massB = propertiesB.rigidbody.mass;
+	float invMassB = (!propertiesB.rigidbody.isStatic && massB > 0.0f)
+		? 1.0f / massB
+		: 0.0f;
+
+	float denominator = invMassA + invMassB;
+	float j = numerator / denominator;
+
+	propertiesA.rigidbody.linearVelocity += j * invMassA * normal;
+	propertiesB.rigidbody.linearVelocity -= j * invMassB * normal;
 }

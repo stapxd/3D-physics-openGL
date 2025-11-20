@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Transform.h"
-#include "PhysicsProperties.h"
+#include "Rigidbody3D.h"
 
 struct EntityParameters {
 	Transform transform;
-	PhysicsProperties physicsProperties;
+	Rigidbody3D rigidbody;
 };

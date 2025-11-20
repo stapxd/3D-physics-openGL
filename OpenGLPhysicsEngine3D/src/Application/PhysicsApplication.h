@@ -22,7 +22,6 @@ private:
 
 	Entity* m_SelectedEntity = nullptr;
 
-	//glm::vec3 m_SpawnPoint = glm::vec3(0);
 	SpawnManager m_SpawnManager;
 
 	std::unique_ptr<Axes> m_Axes;
@@ -33,6 +32,7 @@ private:
 	PhysicsWorld m_PhysicsWorld;
 
 	// Flags
+	bool m_KeyPressed = false;
 	bool m_LMButtonIsPressed = false;
 	bool m_ShowAxes = false;
 
