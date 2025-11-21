@@ -21,6 +21,12 @@ Entity& EntityManager::FindEntity(unsigned int id)
 	return m_Entities[id];
 }
 
+void EntityManager::ClearAll()
+{
+	m_Size = 0;
+	m_Entities.clear();
+}
+
 void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const EntityParameters& params)
 {
 	// Transform

@@ -53,7 +53,7 @@ AABB Cube::GetAABB()
 
 OBB Cube::GetOBB()
 {
-    OBB obb{};
+    OBB obb;
     glm::mat4 model = m_Mesh.GetModel();
 
     obb.center = glm::vec3(model[3]);

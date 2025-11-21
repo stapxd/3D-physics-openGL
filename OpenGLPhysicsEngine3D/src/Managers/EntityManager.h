@@ -10,6 +10,7 @@ class EntityManager
 public:
 	Entity& AddEntity(EntityTypes type, const EntityParameters& params);
 	Entity& FindEntity(unsigned int id);
+	void ClearAll();
 
 	void SetEntityPropertiesFromParameters(Entity& entity, const EntityParameters& params);
 

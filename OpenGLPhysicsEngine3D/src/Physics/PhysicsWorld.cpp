@@ -48,41 +48,56 @@ Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 
 void PhysicsWorld::Update(float deltaTime, int iterations)
 {
-	iterations = glm::clamp(iterations, 0, 128);
+	iterations = glm::clamp(iterations, 1, 128);
 
 	float deltaTimePerIteration = deltaTime / iterations;
 
 	for (int i = 0; i < iterations; i++) {
 
 		MovementEntitiesStep(deltaTimePerIteration);
-		BroadPhase();
 	}
+	
+	BroadPhase();
+	NarrowPhase();
 }
 
 void PhysicsWorld::NarrowPhase()
 {
+	for (size_t i = 0; i < m_CollisionPairs.size(); i++) {
+		Entity& bodyA = m_CollisionPairs[i].bodyA;
+		Entity& bodyB = m_CollisionPairs[i].bodyB;
+
+		glm::vec3 normal;
+		float depth;
+
+		bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
+		bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
+
+		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
+			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
+
+			ResolveCollision(bodyA, bodyB, normal, depth);
+		}
+	}
 }
 
 void PhysicsWorld::BroadPhase()
 {
+	m_CollisionPairs.clear();
+
 	for (unsigned int i = 0; i < m_Manager.GetSize(); i++) {
 		Entity& bodyA = m_Manager.FindEntity(i);
 		for (unsigned int j = i + 1; j < m_Manager.GetSize(); j++) {
 			Entity& bodyB = m_Manager.FindEntity(j);
 
-			glm::vec3 normal;
-			float depth;
-
 			bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
 			bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
 
 			if (isStatic_A && isStatic_B)
-				return;
+				continue;
 
-			if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
-				SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
-
-				ResolveCollision(bodyA, bodyB, normal, depth);
+			if (Collisions::CheckAABBCollision(bodyA, bodyB)) {
+				m_CollisionPairs.push_back({ bodyA, bodyB });
 			}
 		}
 	}

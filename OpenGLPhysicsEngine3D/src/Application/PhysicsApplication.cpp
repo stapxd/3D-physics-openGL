@@ -39,7 +39,7 @@ void PhysicsApplication::Update(float deltaTime)
 	m_Camera->Inputs(m_Window, deltaTime);
 	
 	// Update world
-	m_PhysicsWorld.Update(deltaTime, 1);
+	m_PhysicsWorld.Update(deltaTime, 16);
 
 	// Rendering
 	m_Shader->Bind();
@@ -156,6 +156,8 @@ void PhysicsApplication::ShowImGui()
 		ImGui::Begin("Menu");
 		if (ImGui::CollapsingHeader("Scene")) {
 			ImGui::Checkbox("Show Axes", &m_ShowAxes);
+			if (ImGui::Button("Clear all entities"))
+				m_PhysicsWorld->ClearAll();
 			//ImGui::DragFloat3("Lighting position", ...);
 		}
 		if (ImGui::CollapsingHeader("Spawning")) {
@@ -167,7 +169,7 @@ void PhysicsApplication::ShowImGui()
 
 			Transform& transform = m_SpawnManager.GetParams().transform;
 			Rigidbody3D& rigidbody = m_SpawnManager.GetParams().rigidbody;
-			// vector not initializing
+
 			if (ImGui::CollapsingHeader("Transform")) {
 				ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
 			}
@@ -180,7 +182,6 @@ void PhysicsApplication::ShowImGui()
 
 			ImGui::Separator();
 
-			// TODO: doesn't spawn in this point. Check why???
 			ImGui::DragFloat3("Spawn Point", &m_SpawnManager.GetSpawnPointChangeable()[0], 0.1f);
 			if (ImGui::Button("Spawn", ImVec2(-1, 0)))
 				m_SpawnManager.Spawn(m_PhysicsWorld);

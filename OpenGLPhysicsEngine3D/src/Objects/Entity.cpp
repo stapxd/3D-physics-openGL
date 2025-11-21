@@ -18,11 +18,11 @@ void Entity::Step(float deltaTime)
 	if (m_Properties.rigidbody.isStatic)
 		return;
 
-	//m_Properties.rigidBody.linearVelocity += deltaTime * PhysicsWorld::GetGravity();
+	m_Properties.rigidbody.linearVelocity += PhysicsWorld::GetGravity() * deltaTime;
 	
-	m_Properties.rigidbody.linearVelocity += m_Properties.rigidbody.force * deltaTime;
+	//m_Properties.rigidbody.linearVelocity += m_Properties.rigidbody.force * deltaTime;
 
-	Move(m_Properties.rigidbody.linearVelocity);
+	Move(m_Properties.rigidbody.linearVelocity * deltaTime);
 
 	m_Properties.rigidbody.force = glm::vec3(0);
 

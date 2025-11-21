@@ -1,6 +1,9 @@
 #pragma once
 #include <vector>
-#include <../Objects/Interfaces/IEntity.h>
+
+#include "Objects/Interfaces/IEntity.h"
+
+#include "Structures/CollisionPair.h"
 
 #include "Managers/EntityManager.h"
 
@@ -33,6 +36,7 @@ protected:
 private:
 	static glm::vec3 m_Gravity;
 
+	std::vector<CollisionPair> m_CollisionPairs;
 	EntityManager m_Manager;
 };
 
