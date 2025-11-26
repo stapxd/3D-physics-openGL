@@ -184,6 +184,8 @@
     <ClInclude Include="src\Factories\EntityFactory.h" />
     <ClInclude Include="src\Enumerators\EntityTypes.h" />
     <ClInclude Include="src\Objects\Entity.h" />
+    <ClInclude Include="src\Structures\CollisionPair.h" />
+    <ClInclude Include="src\Structures\ContactPoint.h" />
     <ClInclude Include="src\Structures\EntityParameters.h" />
     <ClInclude Include="src\Structures\ObjectProperties.h" />
     <ClInclude Include="src\Physics\Collisions.h" />
@@ -207,6 +209,7 @@
     <ClInclude Include="src\Structures\AABB.h" />
     <ClInclude Include="src\Structures\OBB.h" />
     <ClInclude Include="src\Structures\Rigidbody3D.h" />
+    <ClInclude Include="src\Structures\CollisionType.h" />
     <ClInclude Include="src\Structures\Transform.h" />
     <ClInclude Include="src\Structures\Vertex.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />

@@ -39,7 +39,7 @@ void PhysicsApplication::Update(float deltaTime)
 	m_Camera->Inputs(m_Window, deltaTime);
 	
 	// Update world
-	m_PhysicsWorld.Update(deltaTime, 1);
+	m_PhysicsWorld.Update(deltaTime, 16);
 
 	// Rendering
 	m_Shader->Bind();
@@ -83,7 +83,7 @@ void PhysicsApplication::Inputs(float deltaTime)
 		m_LMButtonIsPressed = false;
 	}
 
-	float fM = .05f;
+	float fM = 20.0f;
 	if (m_SelectedEntity && !m_SelectedEntity->GetProperties().rigidbody.isStatic) {
 		if (glfwGetKey(m_Window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(1.0f, 0.0f, 0.0f) * fM;
@@ -146,6 +146,7 @@ void PhysicsApplication::ShowImGui()
 
 		if(ImGui::CollapsingHeader("Rigidbody")) { // Rigidbody
 			ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().rigidbody.isStatic);
+			ImGui::Checkbox("Use Gravity", &m_SelectedEntity->GetProperties().rigidbody.useGravity);
 			ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
 			ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
 		}
@@ -156,6 +157,8 @@ void PhysicsApplication::ShowImGui()
 		ImGui::Begin("Menu");
 		if (ImGui::CollapsingHeader("Scene")) {
 			ImGui::Checkbox("Show Axes", &m_ShowAxes);
+			if (ImGui::Button("Clear all entities"))
+				m_PhysicsWorld->ClearAll();
 			//ImGui::DragFloat3("Lighting position", ...);
 		}
 		if (ImGui::CollapsingHeader("Spawning")) {
@@ -167,20 +170,20 @@ void PhysicsApplication::ShowImGui()
 
 			Transform& transform = m_SpawnManager.GetParams().transform;
 			Rigidbody3D& rigidbody = m_SpawnManager.GetParams().rigidbody;
-			// vector not initializing
+
 			if (ImGui::CollapsingHeader("Transform")) {
 				ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
 			}
 
 			if (ImGui::CollapsingHeader("Rigidbody")) {
 				ImGui::Checkbox("Static", &rigidbody.isStatic);
+				ImGui::Checkbox("Use Gravity", &rigidbody.useGravity);
 				ImGui::DragFloat("Mass", &rigidbody.mass, 0.02f, 0.01f, 1000.0f);
 				ImGui::DragFloat("Restitution", &rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
 			}
 
 			ImGui::Separator();
 
-			// TODO: doesn't spawn in this point. Check why???
 			ImGui::DragFloat3("Spawn Point", &m_SpawnManager.GetSpawnPointChangeable()[0], 0.1f);
 			if (ImGui::Button("Spawn", ImVec2(-1, 0)))
 				m_SpawnManager.Spawn(m_PhysicsWorld);

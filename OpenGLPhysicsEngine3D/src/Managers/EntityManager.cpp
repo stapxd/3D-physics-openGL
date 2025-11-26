@@ -21,6 +21,12 @@ Entity& EntityManager::FindEntity(unsigned int id)
 	return m_Entities[id];
 }
 
+void EntityManager::ClearAll()
+{
+	m_Size = 0;
+	m_Entities.clear();
+}
+
 void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const EntityParameters& params)
 {
 	// Transform
@@ -28,6 +34,9 @@ void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const Enti
 
 	// Rigidbody
 	entity.GetProperties().rigidbody.isStatic = params.rigidbody.isStatic;
+	entity.GetProperties().rigidbody.useGravity = params.rigidbody.useGravity;
 	entity.GetProperties().rigidbody.mass = params.rigidbody.mass;
 	entity.GetProperties().rigidbody.restitution = params.rigidbody.restitution;
+
+	entity->EstimateInertiaTensor(entity.GetProperties().rigidbody);
 }

@@ -27,6 +27,8 @@ public:
 	AABB GetAABB();
 	OBB GetOBB();
 
+	void EstimateInertiaTensor(Rigidbody3D& rigidbody);
+
 	Mesh* GetMesh() { return &m_Mesh; }
 	PhysicsBody* GetPhysicsBody() { return &m_PhysicsBody; }
 

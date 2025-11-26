@@ -53,7 +53,7 @@ AABB Cube::GetAABB()
 
 OBB Cube::GetOBB()
 {
-    OBB obb{};
+    OBB obb;
     glm::mat4 model = m_Mesh.GetModel();
 
     obb.center = glm::vec3(model[3]);
@@ -65,6 +65,23 @@ OBB Cube::GetOBB()
     obb.halfSize = m_Mesh.GetScale();
 
     return obb;
+}
+
+void Cube::EstimateInertiaTensor(Rigidbody3D& rigidbody)
+{
+    OBB obb = GetOBB();
+    float m = rigidbody.mass;
+    float hx = obb.halfSize.x;
+    float hy = obb.halfSize.y;
+    float hz = obb.halfSize.z;
+
+    rigidbody.inertiaTensor = glm::mat3(
+        (1.0f / 12.0f) * m * (hy * hy + hz * hz), 0.0f, 0.0f,
+        0.0f, (1.0f / 12.0f) * m * (hx * hx + hz * hz), 0.0f,
+        0.0f, 0.0f, (1.0f / 12.0f) * m * (hx * hx + hy * hy)
+    );
+
+    rigidbody.inverseInertiaTensor = glm::inverse(rigidbody.inertiaTensor);
 }
 
 void Cube::Draw(const Shader& shader)

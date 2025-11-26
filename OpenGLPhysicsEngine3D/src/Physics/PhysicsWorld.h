@@ -1,6 +1,10 @@
 #pragma once
 #include <vector>
-#include <../Objects/Interfaces/IEntity.h>
+
+#include "Objects/Interfaces/IEntity.h"
+
+#include "Structures/CollisionPair.h"
+#include "Structures/ContactPoint.h"
 
 #include "Managers/EntityManager.h"
 
@@ -30,9 +34,15 @@ protected:
 	// Resolving
 	void ResolveCollision(Entity& bodyA, Entity& bodyB, glm::vec3 normal, float depth);
 
+	void ResolveCollisionWithRotation3D(
+		Entity& bodyA, Entity& bodyB,
+		const glm::vec3& normal,
+		float depth,
+		const glm::vec3& contact);
 private:
 	static glm::vec3 m_Gravity;
 
+	std::vector<CollisionPair> m_CollisionPairs;
 	EntityManager m_Manager;
 };
 
