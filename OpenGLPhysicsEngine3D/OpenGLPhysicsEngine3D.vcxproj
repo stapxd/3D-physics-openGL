@@ -147,6 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\OpenGL\ShadowMap.cpp" />
+    <ClCompile Include="src\OpenGL\FrameBuffer.cpp" />
     <ClCompile Include="src\Managers\SpawnManager.cpp" />
     <ClCompile Include="src\Managers\Iterator.cpp" />
     <ClCompile Include="src\Managers\EntityManager.cpp" />
@@ -178,6 +180,8 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\OpenGL\ShadowMap.h" />
+    <ClInclude Include="src\OpenGL\FrameBuffer.h" />
     <ClInclude Include="src\Managers\SpawnManager.h" />
     <ClInclude Include="src\Managers\Iterator.h" />
     <ClInclude Include="src\Managers\EntityManager.h" />
@@ -225,6 +229,7 @@
   <ItemGroup>
     <None Include="res\shaders\axis.shader" />
     <None Include="res\shaders\basic.shader" />
+    <None Include="res\shaders\shadow.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
