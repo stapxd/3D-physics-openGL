@@ -4,6 +4,7 @@
 #include "Collisions.h"
 #include "Enumerators/EntityTypes.h"
 
+
 glm::vec3 PhysicsWorld::m_Gravity = glm::vec3(0.0f, -9.81f, 0.0f);
 
 PhysicsWorld::PhysicsWorld()
@@ -67,16 +68,21 @@ void PhysicsWorld::NarrowPhase()
 		Entity& bodyA = m_CollisionPairs[i].bodyA;
 		Entity& bodyB = m_CollisionPairs[i].bodyB;
 
+		glm::vec3 contactPoint;
 		glm::vec3 normal;
 		float depth;
 
 		bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
 		bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
 
-		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
+		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth, contactPoint)) {
+			//auto contacts = Collisions::GenerateOBBContactPoints(bodyA->GetOBB(), bodyB->GetOBB(), normal, depth);
+			//std::printf("x: %f    y: %f    z: %f\n", contactPoint.x, contactPoint.y, contactPoint.z);
+
 			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
 
 			ResolveCollision(bodyA, bodyB, normal, depth);
+			//ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, contactPoint);
 		}
 	}
 }
@@ -163,4 +169,13 @@ void PhysicsWorld::ResolveCollision(Entity& bodyA, Entity& bodyB, glm::vec3 norm
 
 	propertiesA.rigidbody.linearVelocity += j * invMassA * normal;
 	propertiesB.rigidbody.linearVelocity -= j * invMassB * normal;
+}
+
+void PhysicsWorld::ResolveCollisionWithRotation3D(
+	Entity& bodyA,
+	Entity& bodyB,
+	const glm::vec3& normal,
+	float depth,
+	const glm::vec3& contact)
+{
 }

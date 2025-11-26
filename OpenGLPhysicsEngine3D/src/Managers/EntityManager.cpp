@@ -34,6 +34,9 @@ void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const Enti
 
 	// Rigidbody
 	entity.GetProperties().rigidbody.isStatic = params.rigidbody.isStatic;
+	entity.GetProperties().rigidbody.useGravity = params.rigidbody.useGravity;
 	entity.GetProperties().rigidbody.mass = params.rigidbody.mass;
 	entity.GetProperties().rigidbody.restitution = params.rigidbody.restitution;
+
+	entity->EstimateInertiaTensor(entity.GetProperties().rigidbody);
 }

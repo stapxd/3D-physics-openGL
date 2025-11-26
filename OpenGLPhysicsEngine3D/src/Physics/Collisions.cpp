@@ -1,6 +1,8 @@
 #include "Collisions.h"
 #include "Structures/OBB.h"
 
+#include <array>
+
 bool Collisions::CheckAABBCollision(Entity& bodyA, Entity& bodyB)
 {
     AABB a = bodyA->GetAABB();
@@ -10,7 +12,7 @@ bool Collisions::CheckAABBCollision(Entity& bodyA, Entity& bodyB)
         (a.min.z <= b.max.z && a.max.z >= b.min.z);
 }
 
-bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth)
+bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth, glm::vec3& contactPoint)
 {
     const float eps = 1e-4f;
     depth = FLT_MAX;

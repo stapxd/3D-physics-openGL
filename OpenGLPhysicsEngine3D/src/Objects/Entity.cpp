@@ -18,13 +18,16 @@ void Entity::Step(float deltaTime)
 	if (m_Properties.rigidbody.isStatic)
 		return;
 
-	m_Properties.rigidbody.linearVelocity += PhysicsWorld::GetGravity() * deltaTime;
-	
-	//m_Properties.rigidbody.linearVelocity += m_Properties.rigidbody.force * deltaTime;
+	if(m_Properties.rigidbody.useGravity)
+		m_Properties.rigidbody.linearVelocity += PhysicsWorld::GetGravity() * deltaTime;
+	else
+		m_Properties.rigidbody.linearVelocity += m_Properties.rigidbody.force * deltaTime;
 
 	Move(m_Properties.rigidbody.linearVelocity * deltaTime);
 
 	m_Properties.rigidbody.force = glm::vec3(0);
+
+	AddRotation(m_Properties.rigidbody.angularVelocity * deltaTime);
 
 	m_Entity->ApplyTransform(m_Properties.transform);
 }
@@ -32,5 +35,10 @@ void Entity::Step(float deltaTime)
 void Entity::Move(glm::vec3 direction)
 {
 	m_Properties.transform.translation += direction;
+}
+
+void Entity::AddRotation(glm::vec3 rotation)
+{
+	m_Properties.transform.rotation += rotation;
 }
 

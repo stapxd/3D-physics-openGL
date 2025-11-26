@@ -83,7 +83,7 @@ void PhysicsApplication::Inputs(float deltaTime)
 		m_LMButtonIsPressed = false;
 	}
 
-	float fM = .05f;
+	float fM = 20.0f;
 	if (m_SelectedEntity && !m_SelectedEntity->GetProperties().rigidbody.isStatic) {
 		if (glfwGetKey(m_Window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 			m_SelectedEntity->GetProperties().rigidbody.force = glm::vec3(1.0f, 0.0f, 0.0f) * fM;
@@ -146,6 +146,7 @@ void PhysicsApplication::ShowImGui()
 
 		if(ImGui::CollapsingHeader("Rigidbody")) { // Rigidbody
 			ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().rigidbody.isStatic);
+			ImGui::Checkbox("Use Gravity", &m_SelectedEntity->GetProperties().rigidbody.useGravity);
 			ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
 			ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
 		}
@@ -176,6 +177,7 @@ void PhysicsApplication::ShowImGui()
 
 			if (ImGui::CollapsingHeader("Rigidbody")) {
 				ImGui::Checkbox("Static", &rigidbody.isStatic);
+				ImGui::Checkbox("Use Gravity", &rigidbody.useGravity);
 				ImGui::DragFloat("Mass", &rigidbody.mass, 0.02f, 0.01f, 1000.0f);
 				ImGui::DragFloat("Restitution", &rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
 			}

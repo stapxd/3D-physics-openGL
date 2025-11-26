@@ -20,6 +20,7 @@ public:
 
 	void Step(float deltaTime);
 	void Move(glm::vec3 direction);
+	void AddRotation(glm::vec3 rotation);
 
 	IEntity* operator ->() { return m_Entity.get(); }
 
