@@ -147,10 +147,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Interfaces\IPausable.cpp" />
+    <ClCompile Include="src\Patterns\Observer.cpp" />
+    <ClCompile Include="src\Managers\PauseManager.cpp" />
     <ClCompile Include="src\OpenGL\ShadowMap.cpp" />
     <ClCompile Include="src\OpenGL\FrameBuffer.cpp" />
     <ClCompile Include="src\Managers\SpawnManager.cpp" />
-    <ClCompile Include="src\Managers\Iterator.cpp" />
+    <ClCompile Include="src\Patterns\Iterator.cpp" />
     <ClCompile Include="src\Managers\EntityManager.cpp" />
     <ClCompile Include="src\Factories\EntityFactory.cpp" />
     <ClCompile Include="src\Objects\Entity.cpp" />
@@ -180,10 +183,14 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Enumerators\ApplicationStates.h" />
+    <ClInclude Include="src\Interfaces\IPausable.h" />
+    <ClInclude Include="src\Patterns\Observer.h" />
+    <ClInclude Include="src\Managers\PauseManager.h" />
     <ClInclude Include="src\OpenGL\ShadowMap.h" />
     <ClInclude Include="src\OpenGL\FrameBuffer.h" />
     <ClInclude Include="src\Managers\SpawnManager.h" />
-    <ClInclude Include="src\Managers\Iterator.h" />
+    <ClInclude Include="src\Patterns\Iterator.h" />
     <ClInclude Include="src\Managers\EntityManager.h" />
     <ClInclude Include="src\Factories\EntityFactory.h" />
     <ClInclude Include="src\Enumerators\EntityTypes.h" />

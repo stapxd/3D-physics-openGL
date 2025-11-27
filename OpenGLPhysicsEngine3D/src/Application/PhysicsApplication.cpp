@@ -36,6 +36,8 @@ void PhysicsApplication::Start()
 	m_AxisShader->UnBind();
 	m_ShadowShader->UnBind();
 	
+	m_PauseManager.Attach(&m_PhysicsWorld);
+
 	glClearColor(0.102f, 0.204f, 0.349f, 1.0f);
 }
 
@@ -122,19 +124,33 @@ void PhysicsApplication::RenderSceneDepthMap()
 
 void PhysicsApplication::Inputs(float deltaTime)
 {
+	// Pause handling
+	if (glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS && !m_KeyPressed) {
+		if (m_PauseManager.GetCurrentState() == ApplicationStates::Paused)
+			m_PauseManager.ChangeState(ApplicationStates::Play);
+		else if (m_PauseManager.GetCurrentState() == ApplicationStates::Play)
+			m_PauseManager.ChangeState(ApplicationStates::Paused);
+
+		m_KeyPressed = true;
+	}
+	else if (glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_RELEASE) {
+		m_KeyPressed = false;
+	}
+
+	// Mouse click
 	if(glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
 		&& glfwGetKey(m_Window, GLFW_KEY_P) == GLFW_PRESS
 		&& !m_LMButtonIsPressed) {
 		double xPos, yPos;
 		GetCursorPosition(&xPos, &yPos);
 		m_SelectedEntity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get());
-		//m_SelectedEntity = &m_PhysicsWorld->FindEntity(1);
 		m_LMButtonIsPressed = true;
 	}
 	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
 		m_LMButtonIsPressed = false;
 	}
 
+	// Adding force to selected entity
 	float fM = 20.0f;
 	if (m_SelectedEntity && !m_SelectedEntity->GetProperties().rigidbody.isStatic) {
 		if (glfwGetKey(m_Window, GLFW_KEY_LEFT) == GLFW_PRESS) {
@@ -175,6 +191,12 @@ void PhysicsApplication::HandleOnMouseMove(double xpos, double ypos)
 
 void PhysicsApplication::ShowImGui()
 {
+	if (m_PauseManager.GetCurrentState() == ApplicationStates::Paused) {
+		ImGui::Begin("Pause");
+		ImGui::Text("Engine is Paused!");
+		ImGui::End();
+	}
+
 	if (m_SelectedEntity) {
 		Transform& objectTransform = m_SelectedEntity->GetProperties().transform;
 
