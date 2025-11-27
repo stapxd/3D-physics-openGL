@@ -41,10 +41,10 @@ private:
 	bool m_ShowAxes = false;
 
 	// Light
-	glm::vec3 m_LightPosition = glm::vec3(5.0f, 5.0f, 5.0f);
+	glm::vec3 m_LightPosition = glm::vec3(15.0f, 15.0f, 15.0f);
 	glm::vec3 m_LightColor = glm::vec3(1);
 
-	float m_NearPlane = 0.1f, m_FarPlane = 100.0f;
+	float m_NearPlane = 1.0f, m_FarPlane = 50.0f;
 	glm::mat4 m_LightProjection = glm::mat4(1);
 	glm::mat4 m_LightView = glm::mat4(1);
 

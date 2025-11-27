@@ -42,30 +42,33 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec4 FragPosLightSpace;
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDirection)
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDirection, vec3 normal)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
-    float closestDepth = texture(uShadowMap, projCoords.xy).r;   
+
+    if(projCoords.z > 1.0)
+        return 0.0;
+
     float currentDepth = projCoords.z;
 
-    float bias = max(0.05 * (1.0 - dot(Normal, lightDirection)), 0.003);  
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;  
-
+    float bias = max(0.005 * dot(normal, lightDirection), 0.0005);
+    
+    float shadow = 0.0;
+    
     vec2 texelSize = 1.0 / textureSize(uShadowMap, 0);
     for(int x = -1; x <= 1; x++)
     {
         for(int y = -1; y <= 1; y++)
         {
-            float pcfDepth = texture(uShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
-        }    
+            float pcfDepth = texture(uShadowMap, projCoords.xy + vec2(x, y) * texelSize).r;
+
+            if(currentDepth - bias > pcfDepth)
+                shadow += 1.0;
+        }
     }
     shadow /= 9.0;
 
-    if(projCoords.z > 1.0)
-        shadow = 0.0;
-    
     return shadow;
 }
 
@@ -73,7 +76,7 @@ vec4 directionalLight() {
     vec3 ambientLight = 0.5f * uLightColor;
 
     vec3 normal = normalize(Normal);
-    vec3 lightDirection = normalize(uLightPosition);
+    vec3 lightDirection = normalize(uLightPosition - FragPos);
     float diff = max(dot(normal, lightDirection), 0.0f);
     vec3 diffuse = diff * uLightColor;
 
@@ -83,7 +86,7 @@ vec4 directionalLight() {
     float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 32);
     float specular = specAmount * specularLight;
 
-    float shadow = ShadowCalculation(FragPosLightSpace, lightDirection);
+    float shadow = ShadowCalculation(FragPosLightSpace, lightDirection, normal);
     vec3 color = uColor * (ambientLight + (1.0 - shadow) * (diffuse + specular));
     return vec4(color, 1.0);
 }

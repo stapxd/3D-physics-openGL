@@ -20,8 +20,8 @@ void PhysicsApplication::Start()
 	
 	m_ShadowMap = std::make_unique<ShadowMap>();
 
-	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
-	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
+	m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
+	m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
 
 	m_LightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, m_NearPlane, m_FarPlane);
 
