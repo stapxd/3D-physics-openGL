@@ -7,9 +7,6 @@ class Application
 protected:
 	GLFWwindow* m_Window = nullptr;
 
-	float m_DeltaTime = 0.0f;
-	float m_LastFrame = 0.0f;
-
 	int m_Width = 0, m_Height = 0;
 
 public:
@@ -45,5 +42,9 @@ private:
 
 private:
 	void InitCallbacks();
+
+private:
+	float m_DeltaTime = 0.0f;
+	float m_LastFrame = 0.0f;
 };
 

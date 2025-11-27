@@ -18,17 +18,23 @@ void PhysicsApplication::Start()
 	// Variables initialization
 	m_Camera = std::make_unique<Camera>(m_Width, m_Height);
 	
-	/*m_PhysicsWorld->AddEntity(EntityTypes::Cube);
-	m_PhysicsWorld->AddEntity(EntityTypes::Cube);*/
+	m_ShadowMap = std::make_unique<ShadowMap>();
+
+	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
+	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
+
+	m_LightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, m_NearPlane, m_FarPlane);
 
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
 
 	m_Shader = std::make_unique<Shader>("res/shaders/basic.shader");
 	m_AxisShader = std::make_unique<Shader>("res/shaders/axis.shader");
+	m_ShadowShader = std::make_unique<Shader>("res/shaders/shadow.shader");
 
 	m_Shader->UnBind();
 	m_AxisShader->UnBind();
+	m_ShadowShader->UnBind();
 	
 	glClearColor(0.102f, 0.204f, 0.349f, 1.0f);
 }
@@ -42,10 +48,37 @@ void PhysicsApplication::Update(float deltaTime)
 	m_PhysicsWorld.Update(deltaTime, 16);
 
 	// Rendering
+	glViewport(0, 0, m_ShadowMap->GetShadowWidth(), m_ShadowMap->GetShadowHeight());
+
+	m_ShadowMap->Bind();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	glCullFace(GL_FRONT);
+	RenderSceneDepthMap();
+	glCullFace(GL_BACK);
+	m_ShadowMap->UnBind();
+
+	glViewport(0, 0, m_Width, m_Height);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	m_ShadowMap->BindDepthMap();
+	RenderScene();
+}
+
+void PhysicsApplication::RenderScene()
+{
 	m_Shader->Bind();
 	m_Shader->SetUniformMat4f("uProj", m_Camera->GetProjection());
 	m_Shader->SetUniformMat4f("uView", m_Camera->GetView());
-	
+
+	m_Shader->SetUniformMat4f("uLightProj", m_LightProjection);
+	m_Shader->SetUniformMat4f("uLightView", m_LightView);
+
+	m_Shader->SetUniform3f("uLightColor", m_LightColor.x, m_LightColor.y, m_LightColor.z);
+	m_Shader->SetUniform3f("uLightPosition", m_LightPosition.x, m_LightPosition.y, m_LightPosition.z);
+
+	glActiveTexture(GL_TEXTURE0);
+	m_ShadowMap->BindDepthMap();
+	m_Shader->SetUniform1i("uShadowMap", 0);
+
 	glm::vec3 camPos = m_Camera->GetPosition();
 	m_Shader->SetUniform3f("uCameraPosition", camPos.x, camPos.y, camPos.z);
 
@@ -65,7 +98,26 @@ void PhysicsApplication::Update(float deltaTime)
 		m_AxisShader->SetUniformMat4f("uView", m_Camera->GetView());
 
 		m_Axes->Draw(*m_AxisShader);
+		m_AxisShader->UnBind();
 	}
+}
+
+void PhysicsApplication::RenderSceneDepthMap()
+{
+	m_LightView = glm::lookAt(m_LightPosition,
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f));
+
+	m_ShadowShader->Bind();
+	m_ShadowShader->SetUniformMat4f("uLightProj", m_LightProjection);
+	m_ShadowShader->SetUniformMat4f("uLightView", m_LightView);
+
+	for (auto& entity : m_PhysicsWorld.GetEntities()) {
+		ObjectProperties properties = entity.second.GetProperties();
+		entity.second->Draw(*m_ShadowShader);
+	}
+
+	m_ShadowShader->UnBind();
 }
 
 void PhysicsApplication::Inputs(float deltaTime)
@@ -159,7 +211,7 @@ void PhysicsApplication::ShowImGui()
 			ImGui::Checkbox("Show Axes", &m_ShowAxes);
 			if (ImGui::Button("Clear all entities"))
 				m_PhysicsWorld->ClearAll();
-			//ImGui::DragFloat3("Lighting position", ...);
+			ImGui::DragFloat3("Lighting position", &m_LightPosition[0], 0.025f);
 		}
 		if (ImGui::CollapsingHeader("Spawning")) {
 			SelectEntityType();
