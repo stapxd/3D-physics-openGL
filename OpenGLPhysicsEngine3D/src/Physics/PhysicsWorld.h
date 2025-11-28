@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "Objects/Interfaces/IEntity.h"
+#include "Interfaces/IPausable.h"
 
 #include "Structures/CollisionPair.h"
 #include "Structures/ContactPoint.h"
@@ -10,15 +11,17 @@
 
 #include "OpenGL/Camera.h"
 
-class PhysicsWorld
+class PhysicsWorld : public IPausable
 {
 public:
 	PhysicsWorld();
 
 	Entity* SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera);
-	// temporary passing objects 
+
 	void Update(float deltaTime, int iterations = 1);
 	
+	void ChangeState(ApplicationStates newState);
+
 	EntityManager* operator->() { return &m_Manager; }
 	std::unordered_map<unsigned int, Entity>& GetEntities() { return m_Manager.GetEntities(); }
 	
@@ -40,6 +43,7 @@ protected:
 		float depth,
 		const glm::vec3& contact);
 private:
+	bool m_Paused = false;
 	static glm::vec3 m_Gravity;
 
 	std::vector<CollisionPair> m_CollisionPairs;

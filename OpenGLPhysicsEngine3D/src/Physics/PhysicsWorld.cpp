@@ -4,7 +4,6 @@
 #include "Collisions.h"
 #include "Enumerators/EntityTypes.h"
 
-
 glm::vec3 PhysicsWorld::m_Gravity = glm::vec3(0.0f, -9.81f, 0.0f);
 
 PhysicsWorld::PhysicsWorld()
@@ -54,12 +53,23 @@ void PhysicsWorld::Update(float deltaTime, int iterations)
 	float deltaTimePerIteration = deltaTime / iterations;
 
 	for (int i = 0; i < iterations; i++) {
-
 		MovementEntitiesStep(deltaTimePerIteration);
 	}
 	
+	if (m_Paused)
+		return;
+
 	BroadPhase();
 	NarrowPhase();
+}
+
+void PhysicsWorld::ChangeState(ApplicationStates newState)
+{
+	if (newState == ApplicationStates::Play)
+		m_Paused = false;
+	else if (newState == ApplicationStates::Paused) {
+		m_Paused = true;
+	}
 }
 
 void PhysicsWorld::NarrowPhase()
@@ -116,13 +126,12 @@ void PhysicsWorld::MovementEntitiesStep(float deltaTime)
 		/*const ObjectProperties& properties = entity.second.GetProperties();
 		entity.second->ApplyTransform(properties.transform);*/
 
-		if (entity.second.GetProperties().rigidbody.isStatic) {
-			const ObjectProperties& properties = entity.second.GetProperties();
-			entity.second->ApplyTransform(properties.transform);
-		}
-		else {
-			entity.second.Step(deltaTime);
-		}
+		const ObjectProperties& properties = entity.second.GetProperties();
+		entity.second->ApplyTransform(properties.transform);
+
+		if (!m_Paused)
+			if (!entity.second.GetProperties().rigidbody.isStatic)
+				entity.second.Step(deltaTime);
 	}
 }
 

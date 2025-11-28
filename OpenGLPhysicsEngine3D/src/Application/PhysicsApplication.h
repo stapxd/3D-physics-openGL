@@ -14,6 +14,7 @@
 #include "Objects/Axes.h"
 
 #include "Managers/SpawnManager.h"
+#include "Managers/PauseManager.h"
 
 class PhysicsApplication : public Application
 {
@@ -21,6 +22,7 @@ private:
 
 	// Managers
 	SpawnManager m_SpawnManager;
+	PauseManager m_PauseManager;
 
 	// World
 	PhysicsWorld m_PhysicsWorld;
