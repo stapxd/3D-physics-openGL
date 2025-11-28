@@ -15,6 +15,7 @@
 
 #include "Managers/SpawnManager.h"
 #include "Managers/PauseManager.h"
+#include "Managers/SaveManager.h"
 
 class PhysicsApplication : public Application
 {
@@ -23,6 +24,7 @@ private:
 	// Managers
 	SpawnManager m_SpawnManager;
 	PauseManager m_PauseManager;
+	SaveManager  m_SaveManager;
 
 	// World
 	PhysicsWorld m_PhysicsWorld;
@@ -38,6 +40,8 @@ private:
 	std::unique_ptr<Shader> m_ShadowShader;
 
 	// Flags
+	bool m_F5Pressed = false;
+	bool m_F6Pressed = false;
 	bool m_KeyPressed = false;
 	bool m_LMButtonIsPressed = false;
 	bool m_ShowAxes = false;
@@ -68,19 +72,21 @@ private:
 		glm::vec3(1.0f, 1.0f, 1.0f),
 	};
 
-	EntityParameters m_Params1 = {
+	ObjectProperties m_Params1 = {
 		m_Transform1,
+		glm::vec3(0.5f, 0.5f, 0.5f),
 		m_RB
 	};
 
-	EntityParameters m_Params2 = {
+	ObjectProperties m_Params2 = {
 		m_Transform2,
+		glm::vec3(0.5f, 0.5f, 0.5f),
 		m_RB
 	};
 
 public:
-	PhysicsApplication(){}
-	~PhysicsApplication(){}
+	PhysicsApplication();
+	~PhysicsApplication();
 
 	void Start();
 	void Update(float deltaTime);

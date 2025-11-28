@@ -2,13 +2,27 @@
 
 #include "Factories/EntityFactory.h"
 
-Entity& EntityManager::AddEntity(EntityTypes type, const EntityParameters& params)
+#include "Application/Globals.h"
+
+Entity& EntityManager::AddEntity(EntityTypes type, const ObjectProperties& properties)
 {
+	std::lock_guard<std::mutex> lock(Globals::s_EntitySpawnMutex);
+
 	auto entityPtr = EntityFactory::CreateEntity(type);
-	Entity entity(m_Size, std::move(entityPtr));
+	Entity entity(m_Size, type, std::move(entityPtr));
+	entity.GetProperties() = properties;
+
 	m_Entities[m_Size] = std::move(entity);
 
-	SetEntityPropertiesFromParameters(m_Entities[m_Size], params);
+	m_Size++;
+	return m_Entities[m_Size - 1];
+}
+
+Entity& EntityManager::AddEntity(Entity& entity)
+{
+	std::lock_guard<std::mutex> lock(Globals::s_EntitySpawnMutex);
+	entity.SetId(m_Size);
+	m_Entities[m_Size] = std::move(entity);
 
 	m_Size++;
 	return m_Entities[m_Size - 1];
@@ -23,11 +37,12 @@ Entity& EntityManager::FindEntity(unsigned int id)
 
 void EntityManager::ClearAll()
 {
+	std::lock_guard<std::mutex> lock(Globals::s_EntitySpawnMutex);
 	m_Size = 0;
 	m_Entities.clear();
 }
 
-void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const EntityParameters& params)
+void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const ObjectProperties& params)
 {
 	// Transform
 	entity.GetProperties().transform.scale = params.transform.scale;

@@ -1,5 +1,6 @@
 #include "PhysicsApplication.h"
 #include <iostream>
+#include <thread>
 #include <glm/glm.hpp>
 
 #include "Renderer.h"
@@ -12,6 +13,15 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 #include "Structures/ObjectProperties.h"
+
+PhysicsApplication::PhysicsApplication()
+	: m_SaveManager(m_PhysicsWorld)
+{
+}
+
+PhysicsApplication::~PhysicsApplication()
+{
+}
 
 void PhysicsApplication::Start()
 {
@@ -124,6 +134,40 @@ void PhysicsApplication::RenderSceneDepthMap()
 
 void PhysicsApplication::Inputs(float deltaTime)
 {
+	// Saving 
+	if (glfwGetKey(m_Window, GLFW_KEY_F5) == GLFW_PRESS && !m_F5Pressed) {
+		std::thread save([&]() {
+			try {
+				m_SaveManager.Save();
+			}
+			catch (const std::string& e) {
+				std::cout << "Saving error (" << e << ")\n";
+			}
+		});
+		save.join();
+		m_F5Pressed = true;
+	}
+	else if (glfwGetKey(m_Window, GLFW_KEY_F5) == GLFW_RELEASE) {
+		m_F5Pressed = false;
+	}
+
+	if (glfwGetKey(m_Window, GLFW_KEY_F6) == GLFW_PRESS && !m_F6Pressed) {
+		std::thread load([&]() {
+			try {
+				m_SaveManager.Load();
+			}
+			catch (const std::string& e) {
+				std::cout << "Loading error (" << e << ")\n";
+			}
+		});
+		load.join();
+		m_PauseManager.ChangeState(ApplicationStates::Paused);
+		m_F6Pressed = true;
+	}
+	else if (glfwGetKey(m_Window, GLFW_KEY_F5) == GLFW_RELEASE) {
+		m_F6Pressed = false;
+	}
+
 	// Pause handling
 	if (glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS && !m_KeyPressed) {
 		if (m_PauseManager.GetCurrentState() == ApplicationStates::Paused)
@@ -240,10 +284,10 @@ void PhysicsApplication::ShowImGui()
 
 			ImGui::Separator();
 
-			ImGui::Text("Entity Parameters");
+			ImGui::Text("Entity Properties");
 
-			Transform& transform = m_SpawnManager.GetParams().transform;
-			Rigidbody3D& rigidbody = m_SpawnManager.GetParams().rigidbody;
+			Transform& transform = m_SpawnManager.GetProperties().transform;
+			Rigidbody3D& rigidbody = m_SpawnManager.GetProperties().rigidbody;
 
 			if (ImGui::CollapsingHeader("Transform")) {
 				ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);

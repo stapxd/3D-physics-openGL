@@ -4,6 +4,8 @@
 #include "Collisions.h"
 #include "Enumerators/EntityTypes.h"
 
+#include "Application/Globals.h"
+
 glm::vec3 PhysicsWorld::m_Gravity = glm::vec3(0.0f, -9.81f, 0.0f);
 
 PhysicsWorld::PhysicsWorld()
@@ -48,6 +50,7 @@ Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 
 void PhysicsWorld::Update(float deltaTime, int iterations)
 {
+
 	iterations = glm::clamp(iterations, 1, 128);
 
 	float deltaTimePerIteration = deltaTime / iterations;
@@ -59,8 +62,11 @@ void PhysicsWorld::Update(float deltaTime, int iterations)
 	if (m_Paused)
 		return;
 
-	BroadPhase();
-	NarrowPhase();
+	{
+		std::lock_guard<std::mutex> lock(Globals::s_EntityTransformMutex);
+		BroadPhase();
+		NarrowPhase();
+	}
 }
 
 void PhysicsWorld::ChangeState(ApplicationStates newState)
