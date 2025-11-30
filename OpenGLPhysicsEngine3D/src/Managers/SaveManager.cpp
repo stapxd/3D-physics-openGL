@@ -13,9 +13,6 @@ SaveManager::SaveManager(PhysicsWorld& physicsWorld)
 
 void SaveManager::Save()
 {
-	std::lock_guard<std::mutex> spawnLock(Globals::s_EntitySpawnMutex);
-	std::lock_guard<std::mutex> trasformLock(Globals::s_EntityTransformMutex);
-
 	std::string filepath = GetFilePathWithExplorer(SaveActions::Save);
 
 	if (filepath == "")
@@ -37,9 +34,6 @@ void SaveManager::Save()
 
 void SaveManager::Load()
 {
-	std::lock_guard<std::mutex> spawnLock(Globals::s_EntitySpawnMutex);
-	std::lock_guard<std::mutex> trasformLock(Globals::s_EntityTransformMutex);
-
 	std::string filepath = GetFilePathWithExplorer(SaveActions::Load);
 
 	if (filepath == "")
@@ -50,7 +44,7 @@ void SaveManager::Load()
 
 	Entity entity;
 	std::size_t expectedEntitySize = sizeof(EntityTypes) + sizeof(ObjectProperties);
-	
+
 	file.seekg(0, std::ios::end);
 	auto fileSize = file.tellg();
 
@@ -67,7 +61,7 @@ void SaveManager::Load()
 
 		file.read((char*)&type, sizeof(type));
 		file.read((char*)&props, sizeof(props));
-	
+
 		m_PhysicsWorld->AddEntity(type, props);
 	}
 

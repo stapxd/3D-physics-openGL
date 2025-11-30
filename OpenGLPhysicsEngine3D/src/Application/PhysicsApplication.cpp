@@ -30,8 +30,8 @@ void PhysicsApplication::Start()
 	
 	m_ShadowMap = std::make_unique<ShadowMap>();
 
-	m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
-	m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
+	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
+	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
 
 	m_LightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, m_NearPlane, m_FarPlane);
 
@@ -53,6 +53,9 @@ void PhysicsApplication::Start()
 
 void PhysicsApplication::Update(float deltaTime)
 {
+	// Clearing
+	m_PhysicsWorld->Flush();
+
     // Inputs
 	m_Camera->Inputs(m_Window, deltaTime);
 	
@@ -136,15 +139,12 @@ void PhysicsApplication::Inputs(float deltaTime)
 {
 	// Saving 
 	if (glfwGetKey(m_Window, GLFW_KEY_F5) == GLFW_PRESS && !m_F5Pressed) {
-		std::thread save([&]() {
-			try {
-				m_SaveManager.Save();
-			}
-			catch (const std::string& e) {
-				std::cout << "Saving error (" << e << ")\n";
-			}
-		});
-		save.join();
+		try {
+			m_SaveManager.Save();
+		}
+		catch (const std::string& e) {
+			std::cout << "Saving error (" << e << ")\n";
+		}
 		m_F5Pressed = true;
 	}
 	else if (glfwGetKey(m_Window, GLFW_KEY_F5) == GLFW_RELEASE) {
@@ -152,15 +152,12 @@ void PhysicsApplication::Inputs(float deltaTime)
 	}
 
 	if (glfwGetKey(m_Window, GLFW_KEY_F6) == GLFW_PRESS && !m_F6Pressed) {
-		std::thread load([&]() {
-			try {
-				m_SaveManager.Load();
-			}
-			catch (const std::string& e) {
-				std::cout << "Loading error (" << e << ")\n";
-			}
-		});
-		load.join();
+		try {
+			m_SaveManager.Load();
+		}
+		catch (const std::string& e) {
+			std::cout << "Loading error (" << e << ")\n";
+		}
 		m_PauseManager.ChangeState(ApplicationStates::Paused);
 		m_F6Pressed = true;
 	}
@@ -182,7 +179,7 @@ void PhysicsApplication::Inputs(float deltaTime)
 	}
 
 	// Mouse click
-	if(glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
+	if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
 		&& glfwGetKey(m_Window, GLFW_KEY_P) == GLFW_PRESS
 		&& !m_LMButtonIsPressed) {
 		double xPos, yPos;
@@ -242,72 +239,93 @@ void PhysicsApplication::ShowImGui()
 	}
 
 	if (m_SelectedEntity) {
-		Transform& objectTransform = m_SelectedEntity->GetProperties().transform;
-
-		std::string name = "Entity #" + std::to_string(m_SelectedEntity->GetId());
-
-		ImGui::Begin(name.c_str());
-
-		if (ImGui::CollapsingHeader("Transform")) { // Transform
-			ImGui::DragFloat3("Traslation", (float*)&objectTransform.translation, 0.025f);
-			ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f);
-			ImGui::DragFloat3("Scale", (float*)&objectTransform.scale, 0.025f);
-		}
-
-		ImGui::Separator();
-
-		if(ImGui::CollapsingHeader("Material")) { // Material
-			ImGui::ColorEdit3("Color", &m_SelectedEntity->GetProperties().color[0]);
-		}
-
-		ImGui::Separator();
-
-		if(ImGui::CollapsingHeader("Rigidbody")) { // Rigidbody
-			ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().rigidbody.isStatic);
-			ImGui::Checkbox("Use Gravity", &m_SelectedEntity->GetProperties().rigidbody.useGravity);
-			ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
-			ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
-		}
-
-		ImGui::End();
+		ShowEntityMenu();
 	}
 	else {
-		ImGui::Begin("Menu");
-		if (ImGui::CollapsingHeader("Scene")) {
-			ImGui::Checkbox("Show Axes", &m_ShowAxes);
-			if (ImGui::Button("Clear all entities"))
-				m_PhysicsWorld->ClearAll();
-			ImGui::DragFloat3("Lighting position", &m_LightPosition[0], 0.025f);
-		}
-		if (ImGui::CollapsingHeader("Spawning")) {
-			SelectEntityType();
-
-			ImGui::Separator();
-
-			ImGui::Text("Entity Properties");
-
-			Transform& transform = m_SpawnManager.GetProperties().transform;
-			Rigidbody3D& rigidbody = m_SpawnManager.GetProperties().rigidbody;
-
-			if (ImGui::CollapsingHeader("Transform")) {
-				ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
-			}
-
-			if (ImGui::CollapsingHeader("Rigidbody")) {
-				ImGui::Checkbox("Static", &rigidbody.isStatic);
-				ImGui::Checkbox("Use Gravity", &rigidbody.useGravity);
-				ImGui::DragFloat("Mass", &rigidbody.mass, 0.02f, 0.01f, 1000.0f);
-				ImGui::DragFloat("Restitution", &rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
-			}
-
-			ImGui::Separator();
-
-			ImGui::DragFloat3("Spawn Point", &m_SpawnManager.GetSpawnPointChangeable()[0], 0.1f);
-			if (ImGui::Button("Spawn", ImVec2(-1, 0)))
-				m_SpawnManager.Spawn(m_PhysicsWorld);
-		}
-		ImGui::End();
+		ShowMainMenu();
 	}
+}
+
+void PhysicsApplication::ShowMainMenu()
+{
+	ImGui::Begin("Menu");
+	if (ImGui::CollapsingHeader("Scene")) {
+		ImGui::Checkbox("Show Axes", &m_ShowAxes);
+		if (ImGui::Button("Clear all entities", ImVec2(-1, 0)))
+			m_PhysicsWorld->ClearAll();
+		ImGui::DragFloat3("Lighting position", &m_LightPosition[0], 0.025f);
+	}
+	if (ImGui::CollapsingHeader("Spawning")) {
+		SelectEntityType();
+
+		ImGui::Separator();
+
+		ImGui::Text("Entity Properties");
+
+		Transform& transform = m_SpawnManager.GetProperties().transform;
+		Rigidbody3D& rigidbody = m_SpawnManager.GetProperties().rigidbody;
+
+		if (ImGui::CollapsingHeader("Transform")) {
+			ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
+		}
+
+		if (ImGui::CollapsingHeader("Rigidbody")) {
+			ImGui::Checkbox("Static", &rigidbody.isStatic);
+			ImGui::Checkbox("Use Gravity", &rigidbody.useGravity);
+			ImGui::DragFloat("Mass", &rigidbody.mass, 0.02f, 0.01f, 1000.0f);
+			ImGui::DragFloat("Restitution", &rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+		}
+
+		ImGui::Separator();
+
+		ImGui::DragFloat3("Spawn Point", &m_SpawnManager.GetSpawnPointChangeable()[0], 0.1f);
+		if (ImGui::Button("Spawn", ImVec2(-1, 0)))
+			m_SpawnManager.Spawn(m_PhysicsWorld);
+	}
+	ImGui::End();
+}
+
+void PhysicsApplication::ShowEntityMenu()
+{
+	Transform& objectTransform = m_SelectedEntity->GetProperties().transform;
+
+	std::string name = "Entity #" + std::to_string(m_SelectedEntity->GetId());
+
+	ImGui::Begin(name.c_str());
+
+	if (ImGui::CollapsingHeader("State")) {     // State
+		if (ImGui::Button("Delete", ImVec2(-1, 0))) {
+			m_PhysicsWorld->DeleteEntity(m_SelectedEntity->GetId());
+			m_SelectedEntity = nullptr;
+			ImGui::End();
+			return;
+		}
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::CollapsingHeader("Transform")) { // Transform
+		ImGui::DragFloat3("Traslation", (float*)&objectTransform.translation, 0.025f);
+		ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f);
+		ImGui::DragFloat3("Scale", (float*)&objectTransform.scale, 0.025f);
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::CollapsingHeader("Material")) { // Material
+		ImGui::ColorEdit3("Color", &m_SelectedEntity->GetProperties().color[0]);
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::CollapsingHeader("Rigidbody")) { // Rigidbody
+		ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().rigidbody.isStatic);
+		ImGui::Checkbox("Use Gravity", &m_SelectedEntity->GetProperties().rigidbody.useGravity);
+		ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
+		ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+	}
+
+	ImGui::End();
 }
 
 void PhysicsApplication::SelectEntityType()

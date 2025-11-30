@@ -97,6 +97,9 @@ protected:
 	void HandleOnMouseMove(double xpos, double ypos);
 
 	void ShowImGui();
+	void ShowMainMenu();
+	void ShowEntityMenu();
+
 
 private:
 	void RenderScene();

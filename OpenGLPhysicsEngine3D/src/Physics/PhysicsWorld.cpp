@@ -63,7 +63,7 @@ void PhysicsWorld::Update(float deltaTime, int iterations)
 		return;
 
 	{
-		std::lock_guard<std::mutex> lock(Globals::s_EntityTransformMutex);
+		//std::lock_guard<std::mutex> lock(Globals::s_EntityTransformMutex);
 		BroadPhase();
 		NarrowPhase();
 	}
@@ -107,20 +107,17 @@ void PhysicsWorld::BroadPhase()
 {
 	m_CollisionPairs.clear();
 
-	for (unsigned int i = 0; i < m_Manager.GetSize(); i++) {
-		Entity& bodyA = m_Manager.FindEntity(i);
-		for (unsigned int j = i + 1; j < m_Manager.GetSize(); j++) {
-			Entity& bodyB = m_Manager.FindEntity(j);
+	auto& entities = m_Manager.GetEntities();
+	for (auto itA = entities.begin(); itA != entities.end(); ++itA) {
+		for (auto itB = std::next(itA); itB != entities.end(); ++itB) {
+			Entity& bodyA = itA->second;
+			Entity& bodyB = itB->second;
 
-			bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
-			bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
-
-			if (isStatic_A && isStatic_B)
+			if (bodyA.GetProperties().rigidbody.isStatic && bodyB.GetProperties().rigidbody.isStatic)
 				continue;
 
-			if (Collisions::CheckAABBCollision(bodyA, bodyB)) {
+			if (Collisions::CheckAABBCollision(bodyA, bodyB))
 				m_CollisionPairs.push_back({ bodyA, bodyB });
-			}
 		}
 	}
 }
