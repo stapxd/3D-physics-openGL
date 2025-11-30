@@ -7,9 +7,10 @@ Entity::Entity()
 {
 }
 
-Entity::Entity(unsigned int id, std::unique_ptr<IEntity> entity)
+Entity::Entity(unsigned int id, EntityTypes type, std::unique_ptr<IEntity> entity)
 {
 	m_Id = id;
+	m_Type = type;
 	m_Entity = std::move(entity);
 }
 

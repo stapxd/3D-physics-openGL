@@ -147,6 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Application\Globals.cpp" />
+    <ClCompile Include="src\Managers\SaveManager.cpp" />
     <ClCompile Include="src\Interfaces\IPausable.cpp" />
     <ClCompile Include="src\Patterns\Observer.cpp" />
     <ClCompile Include="src\Managers\PauseManager.cpp" />
@@ -183,6 +185,8 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Application\Globals.h" />
+    <ClInclude Include="src\Managers\SaveManager.h" />
     <ClInclude Include="src\Enumerators\ApplicationStates.h" />
     <ClInclude Include="src\Interfaces\IPausable.h" />
     <ClInclude Include="src\Patterns\Observer.h" />

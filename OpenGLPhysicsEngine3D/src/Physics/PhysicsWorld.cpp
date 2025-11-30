@@ -4,6 +4,8 @@
 #include "Collisions.h"
 #include "Enumerators/EntityTypes.h"
 
+#include "Application/Globals.h"
+
 glm::vec3 PhysicsWorld::m_Gravity = glm::vec3(0.0f, -9.81f, 0.0f);
 
 PhysicsWorld::PhysicsWorld()
@@ -48,6 +50,7 @@ Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 
 void PhysicsWorld::Update(float deltaTime, int iterations)
 {
+
 	iterations = glm::clamp(iterations, 1, 128);
 
 	float deltaTimePerIteration = deltaTime / iterations;
@@ -59,8 +62,11 @@ void PhysicsWorld::Update(float deltaTime, int iterations)
 	if (m_Paused)
 		return;
 
-	BroadPhase();
-	NarrowPhase();
+	{
+		//std::lock_guard<std::mutex> lock(Globals::s_EntityTransformMutex);
+		BroadPhase();
+		NarrowPhase();
+	}
 }
 
 void PhysicsWorld::ChangeState(ApplicationStates newState)
@@ -101,20 +107,17 @@ void PhysicsWorld::BroadPhase()
 {
 	m_CollisionPairs.clear();
 
-	for (unsigned int i = 0; i < m_Manager.GetSize(); i++) {
-		Entity& bodyA = m_Manager.FindEntity(i);
-		for (unsigned int j = i + 1; j < m_Manager.GetSize(); j++) {
-			Entity& bodyB = m_Manager.FindEntity(j);
+	auto& entities = m_Manager.GetEntities();
+	for (auto itA = entities.begin(); itA != entities.end(); ++itA) {
+		for (auto itB = std::next(itA); itB != entities.end(); ++itB) {
+			Entity& bodyA = itA->second;
+			Entity& bodyB = itB->second;
 
-			bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
-			bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
-
-			if (isStatic_A && isStatic_B)
+			if (bodyA.GetProperties().rigidbody.isStatic && bodyB.GetProperties().rigidbody.isStatic)
 				continue;
 
-			if (Collisions::CheckAABBCollision(bodyA, bodyB)) {
+			if (Collisions::CheckAABBCollision(bodyA, bodyB))
 				m_CollisionPairs.push_back({ bodyA, bodyB });
-			}
 		}
 	}
 }

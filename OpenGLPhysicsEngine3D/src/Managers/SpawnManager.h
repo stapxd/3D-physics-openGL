@@ -17,11 +17,11 @@ public:
 	void SetSelectedEntityType(EntityTypes type) { m_SelectedType = type; }
 	EntityTypes GetSelectedEntityType() { return m_SelectedType; }
 
-	EntityParameters& GetParams() { return m_Params; }
+	ObjectProperties& GetProperties() { return m_Properties; }
 
 private:
 	glm::vec3 m_SpawnPoint = glm::vec3(0);
 	EntityTypes m_SelectedType = EntityTypes::Cube;
-	EntityParameters m_Params;
+	ObjectProperties m_Properties;
 };
 

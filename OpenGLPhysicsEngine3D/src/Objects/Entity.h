@@ -12,9 +12,11 @@ class Entity
 {
 public:
 	Entity();
-	Entity(unsigned int id, std::unique_ptr<IEntity> entity);
+	Entity(unsigned int id, EntityTypes type, std::unique_ptr<IEntity> entity);
 
+	void SetId(unsigned int id) { m_Id = id; }
 	unsigned int GetId() { return m_Id; }
+	EntityTypes GetType() { return m_Type; }
 	IEntity* GetEntity() { return m_Entity.get(); }
 	ObjectProperties& GetProperties() { return m_Properties; }
 
@@ -26,6 +28,7 @@ public:
 
 private:
 	unsigned int m_Id;
+	EntityTypes m_Type;
 	std::unique_ptr<IEntity> m_Entity;
 	ObjectProperties m_Properties;
 };
