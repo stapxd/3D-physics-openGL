@@ -1,5 +1,7 @@
 #pragma once
 
+#include <glm/gtc/quaternion.hpp>
+
 #include "OpenGL/VertexArray.h"
 #include "OpenGL/VertexBuffer.h"
 #include "OpenGL/IndexBuffer.h"
@@ -19,6 +21,7 @@ public:
 
 	void Scale(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
+	void SetOrientation(glm::quat orientation);
 	void Translate(glm::vec3 translation);
 
 	void SetTransform(const Transform& transform);
@@ -49,10 +52,10 @@ private:
 	bool m_ShouldBeTransformed;
 
 	glm::vec3 m_Scale;
-	glm::vec3 m_Rotation;
+	glm::vec3 m_Rotation;		//depricated
+	glm::quat m_Orientation;
 	glm::vec3 m_Translation;
 	
-	// maybe without model
 	glm::mat4 m_Model;
 };
 

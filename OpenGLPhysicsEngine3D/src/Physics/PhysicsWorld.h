@@ -26,6 +26,10 @@ public:
 	std::unordered_map<unsigned int, Entity>& GetEntities() { return m_Manager.GetEntities(); }
 	
 	static glm::vec3 GetGravity() { return m_Gravity; }
+	static float GetDragCoeff() { return m_DragCoeff; }
+
+	static void SetIsVaccum(bool v) { m_IsVacuum = v; }
+	static bool GetIsVaccum() { return m_IsVacuum; }
 
 protected:
 	void NarrowPhase();
@@ -45,6 +49,8 @@ protected:
 private:
 	bool m_Paused = false;
 	static glm::vec3 m_Gravity;
+	static float m_DragCoeff;
+	static bool m_IsVacuum;
 
 	std::vector<CollisionPair> m_CollisionPairs;
 	EntityManager m_Manager;

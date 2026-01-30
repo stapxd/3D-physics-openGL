@@ -7,6 +7,8 @@
 #include "Application/Globals.h"
 
 glm::vec3 PhysicsWorld::m_Gravity = glm::vec3(0.0f, -9.81f, 0.0f);
+float PhysicsWorld::m_DragCoeff = 0.1f;
+bool PhysicsWorld::m_IsVacuum = true;
 
 PhysicsWorld::PhysicsWorld()
 {

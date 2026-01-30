@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include "Objects/Interfaces/IEntity.h"
 
@@ -22,7 +23,8 @@ public:
 
 	void Step(float deltaTime);
 	void Move(glm::vec3 direction);
-	void AddRotation(glm::vec3 rotation);
+	//void AddRotation(glm::vec3 rotation); // depricated
+	void UpdateOrientation(float deltaTime);
 
 	IEntity* operator ->() { return m_Entity.get(); }
 

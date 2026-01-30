@@ -19,8 +19,36 @@ void Entity::Step(float deltaTime)
 	if (m_Properties.rigidbody.isStatic)
 		return;
 
-	if(m_Properties.rigidbody.useGravity)
-		m_Properties.rigidbody.linearVelocity += PhysicsWorld::GetGravity() * deltaTime;
+	if (m_Properties.rigidbody.useGravity) {
+		glm::vec3 acceleration(0.0f);
+
+		if (!PhysicsWorld::GetIsVaccum()) {
+			glm::vec3 gravityForce = m_Properties.rigidbody.mass * PhysicsWorld::GetGravity();
+
+			glm::vec3 velocity = m_Properties.rigidbody.linearVelocity;
+			float speed = glm::length(velocity);
+			glm::vec3 dragForce(0.0f);
+
+			if (speed > 0.0001f) {
+				float rho = 1.225f;
+				float Cd = 1.05f;
+
+				float L = m_Properties.transform.scale.x * m_Properties.transform.scale.z;
+				float A = 1.5f * (L * L);
+
+				float dragMagnitude = 0.5f * rho * Cd * A * (speed * speed);
+				dragForce = -glm::normalize(velocity) * dragMagnitude;
+			}
+
+			glm::vec3 aggregateForce = gravityForce + dragForce + m_Properties.rigidbody.force;
+			acceleration = aggregateForce / m_Properties.rigidbody.mass;
+		}
+		else {
+			acceleration = PhysicsWorld::GetGravity();
+		}
+
+		m_Properties.rigidbody.linearVelocity += acceleration * deltaTime;
+	}
 	else
 		m_Properties.rigidbody.linearVelocity += m_Properties.rigidbody.force * deltaTime;
 
@@ -28,7 +56,8 @@ void Entity::Step(float deltaTime)
 
 	m_Properties.rigidbody.force = glm::vec3(0);
 
-	AddRotation(m_Properties.rigidbody.angularVelocity * deltaTime);
+	//AddRotation(m_Properties.rigidbody.angularVelocity * deltaTime);
+	UpdateOrientation(deltaTime);
 
 	m_Entity->ApplyTransform(m_Properties.transform);
 }
@@ -38,8 +67,20 @@ void Entity::Move(glm::vec3 direction)
 	m_Properties.transform.translation += direction;
 }
 
-void Entity::AddRotation(glm::vec3 rotation)
+//void Entity::AddRotation(glm::vec3 rotation)
+//{
+//	m_Properties.transform.rotation += rotation;
+//}
+
+void Entity::UpdateOrientation(float deltaTime)
 {
-	m_Properties.transform.rotation += rotation;
+	glm::vec3 angularVel = m_Properties.rigidbody.angularVelocity;
+
+	if (glm::length(angularVel) > 0.0001f) {
+		glm::quat qW(0.0f, angularVel.x, angularVel.y, angularVel.z);
+
+		m_Properties.transform.orientation += (qW * m_Properties.transform.orientation) * (deltaTime * 0.5f);
+		m_Properties.transform.orientation = glm::normalize(m_Properties.transform.orientation);
+	}
 }
 

@@ -4,7 +4,7 @@
 
 
 Mesh::Mesh(unsigned int vertexCount, unsigned int indexCount)
-    : m_Scale(1), m_Rotation(0), m_Translation(0), m_Model(1)
+    : m_Scale(1), m_Rotation(0), m_Orientation(1.0f, 0.0f, 0.0f, 0.0f), m_Translation(0), m_Model(1)
 {
     m_Vertices = std::vector<Vertex>(vertexCount);
     m_TransformedVertices = std::vector<Vertex>(vertexCount);
@@ -44,6 +44,14 @@ void Mesh::Rotate(glm::vec3 rotation)
     m_ShouldBeTransformed = true;
 }
 
+void Mesh::SetOrientation(glm::quat orientation)
+{
+    if (m_Orientation == orientation)
+        return;
+    m_Orientation = orientation;
+    m_ShouldBeTransformed = true;
+}
+
 void Mesh::Translate(glm::vec3 translation)
 {
     if (m_Translation == translation)
@@ -55,7 +63,8 @@ void Mesh::Translate(glm::vec3 translation)
 void Mesh::SetTransform(const Transform& transform)
 {
     Translate(transform.translation);
-    Rotate(transform.rotation);
+    //Rotate(transform.rotation);       // depricated
+    SetOrientation(transform.orientation);
     Scale(transform.scale);
 }
 
@@ -104,9 +113,10 @@ void Mesh::UpdateTransformedVertices()
 {
     m_Model = glm::mat4(1.0f);
     m_Model = glm::translate(m_Model, m_Translation);
-    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.x), glm::vec3(1, 0, 0));
+    /*m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.x), glm::vec3(1, 0, 0));
     m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.y), glm::vec3(0, 1, 0));
-    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.z), glm::vec3(0, 0, 1));
+    m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.z), glm::vec3(0, 0, 1));*/  // depricated
+    m_Model *= glm::mat4_cast(m_Orientation);
     m_Model = glm::scale(m_Model, m_Scale);
 
     for (size_t i = 0; i < m_Vertices.size(); i++) {

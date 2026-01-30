@@ -251,6 +251,12 @@ void PhysicsApplication::ShowMainMenu()
 	ImGui::Begin("Menu");
 	if (ImGui::CollapsingHeader("Scene")) {
 		ImGui::Checkbox("Show Axes", &m_ShowAxes);
+
+		bool isVaccum = m_PhysicsWorld.GetIsVaccum();
+		if (ImGui::Checkbox("Vacuum Mode", &isVaccum)) {
+			m_PhysicsWorld.SetIsVaccum(isVaccum);
+		}
+
 		if (ImGui::Button("Clear all entities", ImVec2(-1, 0)))
 			m_PhysicsWorld->ClearAll();
 		ImGui::DragFloat3("Lighting position", &m_LightPosition[0], 0.025f);
@@ -306,7 +312,12 @@ void PhysicsApplication::ShowEntityMenu()
 
 	if (ImGui::CollapsingHeader("Transform")) { // Transform
 		ImGui::DragFloat3("Traslation", (float*)&objectTransform.translation, 0.025f);
-		ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f);
+
+		//ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f); // depricated
+		if (ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f)) {
+			objectTransform.orientation = glm::quat(glm::radians(objectTransform.rotation));
+		}
+
 		ImGui::DragFloat3("Scale", (float*)&objectTransform.scale, 0.025f);
 	}
 
