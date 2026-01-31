@@ -1,5 +1,7 @@
 #include "Entity.h"
 
+#include <glm/gtc/quaternion.hpp>
+
 #include "Physics/PhysicsWorld.h"
 
 Entity::Entity()
@@ -58,6 +60,10 @@ void Entity::Step(float deltaTime)
 
 	//AddRotation(m_Properties.rigidbody.angularVelocity * deltaTime);
 	UpdateOrientation(deltaTime);
+	m_Properties.rigidbody.angularVelocity *= glm::pow(0.99f, deltaTime);
+	if (glm::length(m_Properties.rigidbody.angularVelocity) < 0.001f) {
+		m_Properties.rigidbody.angularVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
+	}
 
 	m_Entity->ApplyTransform(m_Properties.transform);
 }
@@ -65,6 +71,17 @@ void Entity::Step(float deltaTime)
 void Entity::Move(glm::vec3 direction)
 {
 	m_Properties.transform.translation += direction;
+}
+
+void Entity::UpdateInertiaTensor()
+{
+	Rigidbody3D& rb = m_Properties.rigidbody;
+	if (rb.isStatic)
+		return;
+
+	glm::mat3 R = glm::mat3_cast(m_Properties.transform.orientation);
+
+	rb.inverseInertiaTensorWorld = R * rb.inverseInertiaTensorLocal * glm::transpose(R);
 }
 
 //void Entity::AddRotation(glm::vec3 rotation)

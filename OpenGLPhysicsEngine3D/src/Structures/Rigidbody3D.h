@@ -14,5 +14,6 @@ struct Rigidbody3D {
 	glm::vec3 angularVelocity = glm::vec3(0);
 
 	glm::mat3 inertiaTensor = glm::mat3(0);
-	glm::mat3 inverseInertiaTensor = glm::mat3(0);
+	glm::mat3 inverseInertiaTensorLocal = glm::mat3(0);
+	glm::mat3 inverseInertiaTensorWorld = glm::mat3(0);
 };

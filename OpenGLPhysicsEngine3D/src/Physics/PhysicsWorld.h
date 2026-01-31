@@ -6,6 +6,7 @@
 
 #include "Structures/CollisionPair.h"
 #include "Structures/ContactPoint.h"
+#include "Structures/ForceAtPoint.h"
 
 #include "Managers/EntityManager.h"
 
@@ -16,9 +17,11 @@ class PhysicsWorld : public IPausable
 public:
 	PhysicsWorld();
 
-	Entity* SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera);
+	Entity* SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera, glm::vec3& rayDir, glm::vec3* hitPoint);
+	void UpdateInertiaTensors();
 
 	void Update(float deltaTime, int iterations = 1);
+	void AddForceAtPoint(Entity& entity, glm::vec3 hitPoint, glm::vec3 forceDir, float forceMagnitude);
 	
 	void ChangeState(ApplicationStates newState);
 
@@ -32,6 +35,8 @@ public:
 	static bool GetIsVaccum() { return m_IsVacuum; }
 
 protected:
+	void ApplyForceAtPoint();
+
 	void NarrowPhase();
 	void BroadPhase();
 	void MovementEntitiesStep(float deltaTime);
@@ -51,6 +56,8 @@ private:
 	static glm::vec3 m_Gravity;
 	static float m_DragCoeff;
 	static bool m_IsVacuum;
+
+	std::vector<ForceAtPoint> m_ForcesAtPoints;
 
 	std::vector<CollisionPair> m_CollisionPairs;
 	EntityManager m_Manager;

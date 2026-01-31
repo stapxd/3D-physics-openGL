@@ -10,6 +10,10 @@ Entity& EntityManager::AddEntity(EntityTypes type, const ObjectProperties& prope
 	Entity entity(m_LastId, type, std::move(entityPtr));
 	entity.GetProperties() = properties;
 
+	if (!entity.GetProperties().rigidbody.isStatic) {
+		entity->EstimateInertiaTensor(entity.GetProperties().rigidbody);
+	}
+
 	m_Entities[m_LastId] = std::move(entity);
 
 	m_LastId++;
@@ -55,16 +59,21 @@ void EntityManager::ClearAll()
 	m_Entities.clear();
 }
 
-void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const ObjectProperties& params)
+void EntityManager::SetEntityPropertiesFromParameters(Entity& entity, const ObjectProperties& params) // depricated
 {
+	ObjectProperties& props = entity.GetProperties();
 	// Transform
-	entity.GetProperties().transform.scale = params.transform.scale;
+	props.transform.scale = params.transform.scale;
+	props.transform.translation = params.transform.translation;
+	props.transform.rotation = params.transform.rotation;
+	props.transform.orientation = params.transform.orientation;
 
 	// Rigidbody
-	entity.GetProperties().rigidbody.isStatic = params.rigidbody.isStatic;
-	entity.GetProperties().rigidbody.useGravity = params.rigidbody.useGravity;
-	entity.GetProperties().rigidbody.mass = params.rigidbody.mass;
-	entity.GetProperties().rigidbody.restitution = params.rigidbody.restitution;
+	props.rigidbody.isStatic = params.rigidbody.isStatic;
+	props.rigidbody.useGravity = params.rigidbody.useGravity;
+	props.rigidbody.mass = params.rigidbody.mass;
+	props.rigidbody.restitution = params.rigidbody.restitution;
 
-	entity->EstimateInertiaTensor(entity.GetProperties().rigidbody);
+	std::cout << "Mass: " << params.rigidbody.mass << " Scale: " << params.transform.scale.x << std::endl;
+	entity->EstimateInertiaTensor(props.rigidbody);
 }

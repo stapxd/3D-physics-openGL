@@ -114,7 +114,7 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
     return true;
 }
 
-bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distance)
+bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distance, glm::vec3* hitPoint)
 {
     distance = FLT_MAX;
 
@@ -158,6 +158,10 @@ bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec
 
     if (distance < 0.0f)
         return false;
+
+    if (hitPoint != 0) {
+        *hitPoint = rayOrigin + rayDir * tMin;
+    }
 
     return true;
 

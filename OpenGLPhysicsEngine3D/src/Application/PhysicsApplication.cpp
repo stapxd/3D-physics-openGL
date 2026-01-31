@@ -179,13 +179,31 @@ void PhysicsApplication::Inputs(float deltaTime)
 	}
 
 	// Mouse click
-	if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
+	if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS  // selection
 		&& glfwGetKey(m_Window, GLFW_KEY_P) == GLFW_PRESS
 		&& !m_LMButtonIsPressed) {
 		double xPos, yPos;
 		GetCursorPosition(&xPos, &yPos);
-		m_SelectedEntity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get());
+		glm::vec3 rayDir;
+		m_SelectedEntity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get(), rayDir, 0);
 		m_LMButtonIsPressed = true;
+	}
+	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+		m_LMButtonIsPressed = false;
+	}
+
+	if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS  // hitting object at point
+		&& glfwGetKey(m_Window, GLFW_KEY_H) == GLFW_PRESS
+		&& !m_LMButtonIsPressed) {
+		double xPos, yPos;
+		GetCursorPosition(&xPos, &yPos);
+		glm::vec3 hitPoint;
+		glm::vec3 rayDir;
+		Entity* entity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get(), rayDir, &hitPoint);
+		if (entity != nullptr) {
+			m_PhysicsWorld.AddForceAtPoint(*entity, hitPoint, rayDir, 20.0f);
+			m_LMButtonIsPressed = true;
+		}
 	}
 	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
 		m_LMButtonIsPressed = false;
@@ -317,6 +335,14 @@ void PhysicsApplication::ShowEntityMenu()
 		if (ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f)) {
 			objectTransform.orientation = glm::quat(glm::radians(objectTransform.rotation));
 		}
+		if (!ImGui::IsItemActive()) {
+			glm::vec3 currentEuler = glm::degrees(glm::eulerAngles(objectTransform.orientation));
+
+			if (glm::distance(objectTransform.rotation, currentEuler) > 0.01f) {
+				objectTransform.rotation = currentEuler;
+			}
+		}
+
 
 		ImGui::DragFloat3("Scale", (float*)&objectTransform.scale, 0.025f);
 	}
@@ -334,6 +360,11 @@ void PhysicsApplication::ShowEntityMenu()
 		ImGui::Checkbox("Use Gravity", &m_SelectedEntity->GetProperties().rigidbody.useGravity);
 		ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
 		ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+		
+		ImGui::Separator();
+
+		ImGui::InputFloat3("Linear Velocity", (float*) &m_SelectedEntity->GetProperties().rigidbody.linearVelocity);
+		ImGui::InputFloat3("Angular Velocity", (float*) &m_SelectedEntity->GetProperties().rigidbody.angularVelocity);
 	}
 
 	ImGui::End();

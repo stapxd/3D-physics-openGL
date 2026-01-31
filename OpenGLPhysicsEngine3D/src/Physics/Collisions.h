@@ -14,7 +14,7 @@ public:
     static bool CheckAABBCollision(Entity& bodyA, Entity& bodyB);
     static bool CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth, glm::vec3& contactPoint);
 
-    static bool CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distance);
+    static bool CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distance, glm::vec3* hitPoint);
 
     static std::vector<ContactPoint> GenerateOBBContactPoints(const OBB& A, const OBB& B, const glm::vec3& normal, float depth);
 };

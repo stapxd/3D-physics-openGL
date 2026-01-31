@@ -14,7 +14,7 @@ PhysicsWorld::PhysicsWorld()
 {
 }
 
-Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera)
+Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera, glm::vec3& rayDir, glm::vec3* hitPoint)
 {
 	Entity* selected = nullptr;
 	float minDist = FLT_MAX;
@@ -34,11 +34,11 @@ Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 	glm::vec4 rayEye = glm::inverse(proj) * rayClip;
 	rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f);
 
-	glm::vec3 rayWorld = glm::normalize(glm::vec3(glm::inverse(view) * rayEye));
+	rayDir = glm::normalize(glm::vec3(glm::inverse(view) * rayEye)); // rayWorld
 
 	for (auto& entity : m_Manager.GetEntities())
 	{
-		if (Collisions::CheckRayOBBCollision(camera->GetPosition(), rayWorld, entity.second->GetOBB(), distance))
+		if (Collisions::CheckRayOBBCollision(camera->GetPosition(), rayDir, entity.second->GetOBB(), distance, hitPoint))
 		{
 			if (distance < minDist) {
 				minDist = distance;
@@ -50,25 +50,62 @@ Entity* PhysicsWorld::SelectEntityWithScreenPosition(double xPos, double yPos, i
 	return selected;
 }
 
+void PhysicsWorld::UpdateInertiaTensors()
+{
+	for (auto& entity : m_Manager.GetEntities()) {
+		entity.second.UpdateInertiaTensor();
+	}
+}
+
 void PhysicsWorld::Update(float deltaTime, int iterations)
 {
+	if (!m_Paused) {
+		iterations = glm::clamp(iterations, 1, 128);
+		float deltaTimePerIteration = deltaTime / iterations;
 
-	iterations = glm::clamp(iterations, 1, 128);
+		for (int i = 0; i < iterations; i++) {
+			UpdateInertiaTensors();
 
-	float deltaTimePerIteration = deltaTime / iterations;
+			ApplyForceAtPoint();
 
-	for (int i = 0; i < iterations; i++) {
-		MovementEntitiesStep(deltaTimePerIteration);
+			MovementEntitiesStep(deltaTimePerIteration);
+
+			BroadPhase();
+			NarrowPhase();
+		}
 	}
-	
-	if (m_Paused)
+	else {
+		MovementEntitiesStep(deltaTime);
+	}
+}
+
+void PhysicsWorld::AddForceAtPoint(Entity& entity, glm::vec3 hitPoint, glm::vec3 forceDir, float forceMagnitude)
+{
+	if (entity.GetProperties().rigidbody.isStatic)
 		return;
+	m_ForcesAtPoints.emplace_back(entity, hitPoint, forceDir, forceMagnitude);
+}
 
-	{
-		//std::lock_guard<std::mutex> lock(Globals::s_EntityTransformMutex);
-		BroadPhase();
-		NarrowPhase();
+void PhysicsWorld::ApplyForceAtPoint()
+{
+	if (m_ForcesAtPoints.empty()) return;
+
+	for (auto& hit : m_ForcesAtPoints) {
+		Rigidbody3D& rb = hit.entity.GetProperties().rigidbody;
+		const Transform& transform = hit.entity.GetProperties().transform;
+
+		if (rb.isStatic) continue;
+
+		glm::vec3 r = hit.hitPoint - transform.translation;
+		glm::vec3 force = hit.forceDir * hit.forceMagnitude;
+
+		glm::vec3 torque = glm::cross(r, force);
+		rb.angularVelocity += rb.inverseInertiaTensorWorld * torque;
+
+		glm::vec3 linearAcceleration = force / rb.mass;
+		rb.linearVelocity += linearAcceleration;
 	}
+	m_ForcesAtPoints.clear();
 }
 
 void PhysicsWorld::ChangeState(ApplicationStates newState)
