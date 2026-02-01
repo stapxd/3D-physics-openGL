@@ -1,7 +1,6 @@
 #pragma once
 
 struct ContactPoint {
-    glm::vec3 position;
-    glm::vec3 normal;
-    float depth;
+    glm::vec3 point;
+    float separation;
 };

@@ -60,7 +60,7 @@ void PhysicsApplication::Update(float deltaTime)
 	m_Camera->Inputs(m_Window, deltaTime);
 	
 	// Update world
-	m_PhysicsWorld.Update(deltaTime, 16);
+	m_PhysicsWorld.Update(deltaTime, 1);
 
 	// Rendering
 	glViewport(0, 0, m_ShadowMap->GetShadowWidth(), m_ShadowMap->GetShadowHeight());
@@ -201,7 +201,7 @@ void PhysicsApplication::Inputs(float deltaTime)
 		glm::vec3 rayDir;
 		Entity* entity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get(), rayDir, &hitPoint);
 		if (entity != nullptr) {
-			m_PhysicsWorld.AddForceAtPoint(*entity, hitPoint, rayDir, 20.0f);
+			m_PhysicsWorld.AddForceAtPoint(*entity, hitPoint, rayDir, 0.6f);
 			m_LMButtonIsPressed = true;
 		}
 	}
@@ -296,8 +296,16 @@ void PhysicsApplication::ShowMainMenu()
 		if (ImGui::CollapsingHeader("Rigidbody")) {
 			ImGui::Checkbox("Static", &rigidbody.isStatic);
 			ImGui::Checkbox("Use Gravity", &rigidbody.useGravity);
+			
+			ImGui::Separator();
+
 			ImGui::DragFloat("Mass", &rigidbody.mass, 0.02f, 0.01f, 1000.0f);
 			ImGui::DragFloat("Restitution", &rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+
+			ImGui::Separator();
+
+			ImGui::DragFloat("Static Friction", &rigidbody.staticFriction, 0.05f, 0.1f, 10.0f);
+			ImGui::DragFloat("Dynamic Friction", &rigidbody.dynamicFriction, 0.05f, 0.1f, 10.0f);
 		}
 
 		ImGui::Separator();
@@ -358,8 +366,16 @@ void PhysicsApplication::ShowEntityMenu()
 	if (ImGui::CollapsingHeader("Rigidbody")) { // Rigidbody
 		ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().rigidbody.isStatic);
 		ImGui::Checkbox("Use Gravity", &m_SelectedEntity->GetProperties().rigidbody.useGravity);
+
+		ImGui::Separator();
+
 		ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
 		ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+
+		ImGui::Separator();
+
+		ImGui::DragFloat("Static Friction", &m_SelectedEntity->GetProperties().rigidbody.staticFriction, 0.05f, 0.1f, 10.0f);
+		ImGui::DragFloat("Dynamic Friction", &m_SelectedEntity->GetProperties().rigidbody.dynamicFriction, 0.05f, 0.1f, 10.0f);
 		
 		ImGui::Separator();
 

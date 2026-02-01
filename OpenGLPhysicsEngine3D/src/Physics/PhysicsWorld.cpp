@@ -123,21 +123,22 @@ void PhysicsWorld::NarrowPhase()
 		Entity& bodyA = m_CollisionPairs[i].bodyA;
 		Entity& bodyB = m_CollisionPairs[i].bodyB;
 
-		glm::vec3 contactPoint;
+		std::vector<glm::vec3> contactPoints;
 		glm::vec3 normal;
 		float depth;
 
 		bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
 		bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
 
-		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth, contactPoint)) {
+		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth, contactPoints)) {
 			//auto contacts = Collisions::GenerateOBBContactPoints(bodyA->GetOBB(), bodyB->GetOBB(), normal, depth);
 			//std::printf("x: %f    y: %f    z: %f\n", contactPoint.x, contactPoint.y, contactPoint.z);
 
 			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
 
-			ResolveCollision(bodyA, bodyB, normal, depth);
-			//ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, contactPoint);
+			//ResolveCollision(bodyA, bodyB, normal, depth);
+			//ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, contactPoints);
+			ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, contactPoints);
 		}
 	}
 }
@@ -227,6 +228,206 @@ void PhysicsWorld::ResolveCollisionWithRotation3D(
 	Entity& bodyB,
 	const glm::vec3& normal,
 	float depth,
-	const glm::vec3& contact)
+	const std::vector<glm::vec3>& contactPoints)
 {
+	ObjectProperties& propertiesA = bodyA.GetProperties();
+	ObjectProperties& propertiesB = bodyB.GetProperties();
+
+	Rigidbody3D& rbA = propertiesA.rigidbody;
+	Rigidbody3D& rbB = propertiesB.rigidbody;
+
+	Transform& transformA = propertiesA.transform;
+	Transform& transformB = propertiesB.transform;
+
+	size_t contactCount = contactPoints.size();
+	if (contactCount < 1)
+		return;
+
+	glm::vec3 collisionDir = transformA.translation - transformB.translation;
+	glm::vec3 actualNormal = normal;
+	if (glm::dot(actualNormal, collisionDir) < 0) {
+		actualNormal = -actualNormal;
+	}
+
+	float e = std::min(rbA.restitution, rbB.restitution);
+
+	float massA = rbA.mass;
+	float invMassA = (!rbA.isStatic && massA > 0.0f)
+		? 1.0f / massA
+		: 0.0f;
+
+	float massB = rbB.mass;
+	float invMassB = (!rbB.isStatic && massB > 0.0f)
+		? 1.0f / massB
+		: 0.0f;
+
+	glm::vec3 cp(0.0f);
+
+	for (size_t i = 0; i < contactCount; i++) {
+		cp = contactPoints[i];
+
+		glm::vec3 rA = cp - transformA.translation;
+		glm::vec3 rB = cp - transformB.translation;
+
+		glm::vec3 angularVA = glm::cross(rbA.angularVelocity, rA);
+		glm::vec3 angularVB = glm::cross(rbB.angularVelocity, rB);
+
+		glm::vec3 relativeVelocity = (rbA.linearVelocity + angularVA) - (rbB.linearVelocity + angularVB);
+
+		float contactVelocityMag = glm::dot(relativeVelocity, actualNormal);
+
+		if (contactVelocityMag >= 0.0f)
+			continue;
+
+		glm::vec3 geometricTorqueA = glm::cross(rA, actualNormal);
+		glm::vec3 geometricTorqueB = glm::cross(rB, actualNormal);
+
+		float angTermA = glm::dot(geometricTorqueA, rbA.inverseInertiaTensorWorld * geometricTorqueA);
+		float angTermB = glm::dot(geometricTorqueB, rbB.inverseInertiaTensorWorld * geometricTorqueB);
+
+		float denominator = invMassA + invMassB + angTermA + angTermB;
+
+		if (denominator < 0.000001f) continue;
+
+		float j = -(1.0f + e) * contactVelocityMag;
+		j /= (denominator * (float)contactCount);
+
+		glm::vec3 impulse = j * actualNormal;
+
+		rbA.linearVelocity += impulse * invMassA;
+		rbA.angularVelocity += rbA.inverseInertiaTensorWorld * glm::cross(rA, impulse);
+
+		rbB.linearVelocity -= impulse * invMassB;
+		rbB.angularVelocity -= rbB.inverseInertiaTensorWorld * glm::cross(rB, impulse);
+	}
+}
+
+void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
+	Entity& bodyA, 
+	Entity& bodyB, 
+	const glm::vec3& normal, 
+	float depth, 
+	const std::vector<glm::vec3>& contactPoints)
+{
+	ObjectProperties& propertiesA = bodyA.GetProperties();
+	ObjectProperties& propertiesB = bodyB.GetProperties();
+
+	Rigidbody3D& rbA = propertiesA.rigidbody;
+	Rigidbody3D& rbB = propertiesB.rigidbody;
+
+	Transform& transformA = propertiesA.transform;
+	Transform& transformB = propertiesB.transform;
+
+	size_t contactCount = contactPoints.size();
+	if (contactCount < 1)
+		return;
+
+	glm::vec3 collisionDir = transformA.translation - transformB.translation;
+	glm::vec3 actualNormal = normal;
+	if (glm::dot(actualNormal, collisionDir) < 0) {
+		actualNormal = -actualNormal;
+	}
+
+	float e = std::min(rbA.restitution, rbB.restitution);
+	float sf = (rbA.staticFriction + rbB.staticFriction) * 0.5f;
+	float df = (rbA.dynamicFriction + rbB.dynamicFriction) * 0.5f;
+
+	float massA = rbA.mass;
+	float invMassA = (!rbA.isStatic && massA > 0.0f)
+		? 1.0f / massA
+		: 0.0f;
+
+	float massB = rbB.mass;
+	float invMassB = (!rbB.isStatic && massB > 0.0f)
+		? 1.0f / massB
+		: 0.0f;
+
+	glm::vec3 cp(0.0f);
+
+	for (size_t i = 0; i < contactCount; i++) {
+		cp = contactPoints[i];
+
+		glm::vec3 rA = cp - transformA.translation;
+		glm::vec3 rB = cp - transformB.translation;
+
+		glm::vec3 angularVA = glm::cross(rbA.angularVelocity, rA);
+		glm::vec3 angularVB = glm::cross(rbB.angularVelocity, rB);
+
+		glm::vec3 relativeVelocity = (rbA.linearVelocity + angularVA) - (rbB.linearVelocity + angularVB);
+
+		float contactVelocityMag = glm::dot(relativeVelocity, actualNormal);
+
+		if (contactVelocityMag >= 0.0f)
+			continue;
+
+		glm::vec3 geometricTorqueA = glm::cross(rA, actualNormal);
+		glm::vec3 geometricTorqueB = glm::cross(rB, actualNormal);
+
+		float angTermA = glm::dot(geometricTorqueA, rbA.inverseInertiaTensorWorld * geometricTorqueA);
+		float angTermB = glm::dot(geometricTorqueB, rbB.inverseInertiaTensorWorld * geometricTorqueB);
+
+		float denominator = invMassA + invMassB + angTermA + angTermB;
+
+		if (denominator < 0.000001f) continue;
+
+		float j = -(1.0f + e) * contactVelocityMag;
+		j /= (denominator * (float)contactCount);
+
+		glm::vec3 impulse = j * actualNormal;
+
+
+		if (!rbA.isStatic) {
+			rbA.linearVelocity += impulse * invMassA;
+			rbA.angularVelocity += rbA.inverseInertiaTensorWorld * glm::cross(rA, impulse);
+		}
+
+
+		if (!rbB.isStatic) {
+			rbB.linearVelocity -= impulse * invMassB;
+			rbB.angularVelocity -= rbB.inverseInertiaTensorWorld * glm::cross(rB, impulse);
+		}
+
+		// friction
+		angularVA = glm::cross(rbA.angularVelocity, rA);
+		angularVB = glm::cross(rbB.angularVelocity, rB);
+
+		relativeVelocity = (rbA.linearVelocity + angularVA) - (rbB.linearVelocity + angularVB);
+
+		glm::vec3 tangent = relativeVelocity - (glm::dot(relativeVelocity, actualNormal) * actualNormal);
+
+		if (glm::length(tangent) > 0.0001f) {
+			tangent = glm::normalize(tangent);
+
+			glm::vec3 crossAT = glm::cross(rA, tangent);
+			glm::vec3 crossBT = glm::cross(rB, tangent);
+
+			float angTermA = glm::dot(crossAT, rbA.inverseInertiaTensorWorld * crossAT);
+			float angTermB = glm::dot(crossBT, rbB.inverseInertiaTensorWorld * crossBT);
+
+			float denominator = invMassA + invMassB + angTermA + angTermB;
+
+			if (denominator > 0.000001f) {
+				float jt = -glm::dot(relativeVelocity, tangent) / (denominator * (float)contactCount);
+
+				float frictionMag;
+				if (glm::abs(jt) <= j * sf) {
+					frictionMag = jt;
+				}
+				else {
+					frictionMag = -j * df;
+				}
+
+				glm::vec3 frictionImpulse = frictionMag * tangent;
+
+				if (!rbA.isStatic) {
+					rbA.linearVelocity += frictionImpulse * invMassA;
+					rbA.angularVelocity += rbA.inverseInertiaTensorWorld * glm::cross(rA, frictionImpulse);
+				}
+				if (!rbB.isStatic) {
+					rbB.linearVelocity -= frictionImpulse * invMassB;
+					rbB.angularVelocity -= rbB.inverseInertiaTensorWorld * glm::cross(rB, frictionImpulse);
+				}
+			}
+		}
+	}
 }

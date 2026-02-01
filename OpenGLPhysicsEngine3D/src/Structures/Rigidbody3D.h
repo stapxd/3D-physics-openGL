@@ -16,4 +16,7 @@ struct Rigidbody3D {
 	glm::mat3 inertiaTensor = glm::mat3(0);
 	glm::mat3 inverseInertiaTensorLocal = glm::mat3(0);
 	glm::mat3 inverseInertiaTensorWorld = glm::mat3(0);
+
+	float staticFriction = 0.6f;
+	float dynamicFriction = 0.45f;
 };

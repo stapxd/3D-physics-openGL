@@ -50,7 +50,13 @@ protected:
 		Entity& bodyA, Entity& bodyB,
 		const glm::vec3& normal,
 		float depth,
-		const glm::vec3& contact);
+		const std::vector<glm::vec3>& contactPoints);
+
+	void ResolveCollisionWithRotationAndFriction3D(
+		Entity& bodyA, Entity& bodyB,
+		const glm::vec3& normal,
+		float depth,
+		const std::vector<glm::vec3>& contactPoints);
 private:
 	bool m_Paused = false;
 	static glm::vec3 m_Gravity;

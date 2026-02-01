@@ -202,6 +202,7 @@
     <ClInclude Include="src\Structures\CollisionPair.h" />
     <ClInclude Include="src\Structures\ContactPoint.h" />
     <ClInclude Include="src\Structures\EntityParameters.h" />
+    <ClInclude Include="src\Structures\Face.h" />
     <ClInclude Include="src\Structures\ForceAtPoint.h" />
     <ClInclude Include="src\Structures\ObjectProperties.h" />
     <ClInclude Include="src\Physics\Collisions.h" />
