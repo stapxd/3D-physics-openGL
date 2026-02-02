@@ -57,7 +57,6 @@ Face Collisions::GetIncidentFace(const OBB& obb, const glm::vec3& hitNormal) {
     return face;
 }
 
-// Исправленный клиппинг: теперь он более строгий к направлениям
 void Collisions::Clip(std::vector<glm::vec3>& points, const glm::vec3& planeNormal, float planeDist) {
     std::vector<glm::vec3> clipped;
     if (points.empty()) return;
@@ -68,16 +67,13 @@ void Collisions::Clip(std::vector<glm::vec3>& points, const glm::vec3& planeNorm
     for (const auto& p2 : points) {
         float d2 = glm::dot(p2, planeNormal) - planeDist;
 
-        // Точка p2 внутри (дистанция <= 0, так как нормаль смотрит НАРУЖУ)
         if (d2 <= 0.0f) {
             if (d1 > 0.0f) {
-                // Переход снаружи внутрь
                 clipped.push_back(p1 + (p2 - p1) * (d1 / (d1 - d2)));
             }
             clipped.push_back(p2);
         }
         else if (d1 <= 0.0f) {
-            // Переход изнутри наружу
             clipped.push_back(p1 + (p2 - p1) * (d1 / (d1 - d2)));
         }
         p1 = p2;
@@ -94,57 +90,109 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
     OBB obbA = bodyA->GetOBB();
     OBB obbB = bodyB->GetOBB();
 
-    // Возвращаем как было, раз 0.5 дает провал
-    glm::vec3 hA = obbA.halfSize;
-    glm::vec3 hB = obbB.halfSize;
+    // SAT collision
+    float rotationMatrix[3][3];
+    float absRotationMatrix[3][3];
 
-    glm::vec3 tA_world = obbB.center - obbA.center;
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            rotationMatrix[i][j] = glm::dot(obbA.axes[i], obbB.axes[j]);
 
-    float R[3][3], AbsR[3][3];
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            R[i][j] = glm::dot(obbA.axes[i], obbB.axes[j]);
-            AbsR[i][j] = std::abs(R[i][j]) + 1e-6f;
-        }
-    }
+    glm::vec3 tAWorld = obbB.center - obbA.center;
+    glm::vec3 tA = glm::vec3(glm::dot(tAWorld, obbA.axes[0]), glm::dot(tAWorld, obbA.axes[1]), glm::dot(tAWorld, obbA.axes[2]));
 
-    auto TestAxis = [&](glm::vec3 axis, float overlap) {
-        float len = glm::length(axis);
-        if (len < 1e-6f) return true;
-        axis /= len;
-        overlap /= len;
+    for (int i = 0; i < 3; i++)
+        for (int j = 0; j < 3; j++)
+            absRotationMatrix[i][j] = std::abs(rotationMatrix[i][j]) + eps;
 
-        if (overlap < 0.0f) return false;
-        if (overlap < depth) {
+    float rA, rB, overlap;
+    glm::vec3 candidateNormal;
+
+    for (int i = 0; i < 3; i++)
+    {
+        rA = obbA.halfSize[i];
+        rB = obbB.halfSize.x * absRotationMatrix[i][0] +
+            obbB.halfSize.y * absRotationMatrix[i][1] +
+            obbB.halfSize.z * absRotationMatrix[i][2];
+
+        overlap = rA + rB - std::abs(tA[i]);
+
+        if (overlap < 0.0f)
+            return false;
+
+        if (overlap < depth)
+        {
             depth = overlap;
-            if (glm::dot(axis, tA_world) < 0.0f) axis = -axis;
-            normal = axis;
+            candidateNormal = obbA.axes[i];
         }
-        return true;
-        };
+    }
 
-    // SAT Тесты
-    for (int i = 0; i < 3; i++) {
-        float ra = hA[i];
-        float rb = hB[0] * AbsR[i][0] + hB[1] * AbsR[i][1] + hB[2] * AbsR[i][2];
-        if (!TestAxis(obbA.axes[i], ra + rb - std::abs(glm::dot(tA_world, obbA.axes[i])))) return false;
+    for (int i = 0; i < 3; i++)
+    {
+        rA = obbA.halfSize.x * absRotationMatrix[0][i] +
+            obbA.halfSize.y * absRotationMatrix[1][i] +
+            obbA.halfSize.z * absRotationMatrix[2][i];
+
+        rB = obbB.halfSize[i];
+
+        float proj = std::abs(tA.x * rotationMatrix[0][i] +
+            tA.y * rotationMatrix[1][i] +
+            tA.z * rotationMatrix[2][i]);
+
+        overlap = rA + rB - proj;
+
+        if (overlap < 0.0f)
+            return false;
+
+        if (overlap < depth)
+        {
+            depth = overlap;
+            candidateNormal = obbB.axes[i];
+        }
     }
-    for (int i = 0; i < 3; i++) {
-        float ra = hA[0] * AbsR[0][i] + hA[1] * AbsR[1][i] + hA[2] * AbsR[2][i];
-        float rb = hB[i];
-        if (!TestAxis(obbB.axes[i], ra + rb - std::abs(glm::dot(tA_world, obbB.axes[i])))) return false;
-    }
+
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             glm::vec3 axis = glm::cross(obbA.axes[i], obbB.axes[j]);
-            if (glm::length(axis) < 1e-6f) continue;
-            float ra = hA[(i + 1) % 3] * AbsR[(i + 2) % 3][j] + hA[(i + 2) % 3] * AbsR[(i + 1) % 3][j];
-            float rb = hB[(j + 1) % 3] * AbsR[i][(j + 2) % 3] + hB[(j + 2) % 3] * AbsR[i][(j + 1) % 3];
-            if (!TestAxis(axis, ra + rb - std::abs(glm::dot(tA_world, axis)))) return false;
+
+            float len = glm::length(axis);
+
+            if (len < 1e-6f) continue;
+
+            axis /= len;
+
+            float radiusA = std::abs(glm::dot(obbA.axes[0] * obbA.halfSize.x, axis)) +
+                std::abs(glm::dot(obbA.axes[1] * obbA.halfSize.y, axis)) +
+                std::abs(glm::dot(obbA.axes[2] * obbA.halfSize.z, axis));
+
+
+            float radiusB = std::abs(glm::dot(obbB.axes[0] * obbB.halfSize.x, axis)) +
+                std::abs(glm::dot(obbB.axes[1] * obbB.halfSize.y, axis)) +
+                std::abs(glm::dot(obbB.axes[2] * obbB.halfSize.z, axis));
+
+            float proj = std::abs(glm::dot(tAWorld, axis));
+
+            float overlap = radiusA + radiusB - proj;
+
+            if (overlap < 0.0f)
+                return false;
+
+            if (overlap < depth) {
+                depth = overlap;
+                candidateNormal = axis;
+            }
         }
     }
 
-    // Поиск манифольда
+    normal = glm::normalize(candidateNormal);
+
+    if (glm::dot(tA, normal) < 0)
+        normal = -normal;
+
+    // Contact Points
+    glm::vec3 hA = obbA.halfSize;
+    glm::vec3 hB = obbB.halfSize;
+
     OBB* ref = &obbA; OBB* inc = &obbB;
     glm::vec3 rH = hA, iH = hB;
     bool flipped = false;
@@ -167,7 +215,6 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
     int s1 = (refAxis + 1) % 3; int s2 = (refAxis + 2) % 3;
     std::vector<glm::vec3> points = { incidentFace.vertices[0], incidentFace.vertices[1], incidentFace.vertices[2], incidentFace.vertices[3] };
 
-    // Клиппинг
     Clip(points, ref->axes[s1], glm::dot(ref->center + ref->axes[s1] * rH[s1], ref->axes[s1]));
     Clip(points, -ref->axes[s1], glm::dot(ref->center - ref->axes[s1] * rH[s1], -ref->axes[s1]));
     Clip(points, ref->axes[s2], glm::dot(ref->center + ref->axes[s2] * rH[s2], ref->axes[s2]));
@@ -177,7 +224,6 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
     if (glm::dot(refNormal, flipped ? -normal : normal) < 0) refNormal = -refNormal;
     float planeDist = glm::dot(ref->center + refNormal * rH[refAxis], refNormal);
 
-    // Увеличим порог фильтрации до 0.1 для надежности
     for (auto& p : points) {
         float separation = glm::dot(p, refNormal) - planeDist;
         if (separation <= 0.1f) {
@@ -185,9 +231,7 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
         }
     }
 
-    // Гвоздь программы: Если после клиппинга пусто, SAT все равно требует точки!
     if (contactPoints.empty()) {
-        // Берем оригинальные вершины грани инцидентного объекта
         for (int i = 0; i < 4; i++) {
             float s = glm::dot(incidentFace.vertices[i], refNormal) - planeDist;
             if (s <= 0.1f) contactPoints.push_back(incidentFace.vertices[i]);
