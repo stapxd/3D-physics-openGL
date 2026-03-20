@@ -16,6 +16,6 @@ protected:
 	virtual void Invoke(IPausable* subscriber);
 
 private:
-	ApplicationStates m_CurrentState = ApplicationStates::Play;
+	ApplicationStates m_CurrentState = ApplicationStates::Stop;
 };
 

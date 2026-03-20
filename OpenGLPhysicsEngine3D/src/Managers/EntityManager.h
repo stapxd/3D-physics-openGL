@@ -2,6 +2,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "RenderSnapshotManager.h"
+
 #include "Objects/Entity.h"
 
 #include "Structures/ObjectProperties.h"
@@ -13,8 +15,12 @@ public:
 	Entity& AddEntity(Entity& entity);
 	Entity* FindEntity(unsigned int id);
 
+	void SetSnapshots();
+	void ReturnToSnapshot();
+
 	void Flush();
 	void DeleteEntity(unsigned int id);
+	void AddToDeleteAfterStopSimulation(unsigned int id);
 
 	void ClearAll();
 
@@ -28,5 +34,8 @@ private:
 	unsigned int m_LastId = 0;
 	std::unordered_map<unsigned int, Entity> m_Entities;
 	std::vector<unsigned int> m_ToDelete;
+	std::vector<unsigned int> m_DeleteAfterStopSimulation;
+
+	RenderSnapshotManager m_SnapshotManager;
 };
 

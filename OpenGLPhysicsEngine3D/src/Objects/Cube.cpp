@@ -81,7 +81,7 @@ void Cube::EstimateInertiaTensor(Rigidbody3D& rigidbody)
         0.0f, 0.0f, (1.0f / 12.0f) * m * (hx * hx + hy * hy)
     );
 
-    rigidbody.inverseInertiaTensor = glm::inverse(rigidbody.inertiaTensor);
+    rigidbody.inverseInertiaTensorLocal = glm::inverse(rigidbody.inertiaTensor);
 }
 
 void Cube::Draw(const Shader& shader)

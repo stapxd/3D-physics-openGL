@@ -6,6 +6,7 @@
 
 #include "Structures/CollisionPair.h"
 #include "Structures/ContactPoint.h"
+#include "Structures/ForceAtPoint.h"
 
 #include "Managers/EntityManager.h"
 
@@ -16,9 +17,11 @@ class PhysicsWorld : public IPausable
 public:
 	PhysicsWorld();
 
-	Entity* SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera);
+	Entity* SelectEntityWithScreenPosition(double xPos, double yPos, int windowWidth, int windowHeight, Camera* camera, glm::vec3& rayDir, glm::vec3* hitPoint);
+	void UpdateInertiaTensors();
 
 	void Update(float deltaTime, int iterations = 1);
+	void AddForceAtPoint(Entity& entity, glm::vec3 hitPoint, glm::vec3 forceDir, float forceMagnitude);
 	
 	void ChangeState(ApplicationStates newState);
 
@@ -26,8 +29,14 @@ public:
 	std::unordered_map<unsigned int, Entity>& GetEntities() { return m_Manager.GetEntities(); }
 	
 	static glm::vec3 GetGravity() { return m_Gravity; }
+	static float GetDragCoeff() { return m_DragCoeff; }
+
+	static void SetIsVaccum(bool v) { m_IsVacuum = v; }
+	static bool GetIsVaccum() { return m_IsVacuum; }
 
 protected:
+	void ApplyForceAtPoint();
+
 	void NarrowPhase();
 	void BroadPhase();
 	void MovementEntitiesStep(float deltaTime);
@@ -41,10 +50,20 @@ protected:
 		Entity& bodyA, Entity& bodyB,
 		const glm::vec3& normal,
 		float depth,
-		const glm::vec3& contact);
+		const std::vector<glm::vec3>& contactPoints);
+
+	void ResolveCollisionWithRotationAndFriction3D(
+		Entity& bodyA, Entity& bodyB,
+		const glm::vec3& normal,
+		float depth,
+		const std::vector<glm::vec3>& contactPoints);
 private:
-	bool m_Paused = false;
+	bool m_Paused = true;
 	static glm::vec3 m_Gravity;
+	static float m_DragCoeff;
+	static bool m_IsVacuum;
+
+	std::vector<ForceAtPoint> m_ForcesAtPoints;
 
 	std::vector<CollisionPair> m_CollisionPairs;
 	EntityManager m_Manager;

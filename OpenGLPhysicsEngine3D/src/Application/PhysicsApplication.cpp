@@ -60,7 +60,7 @@ void PhysicsApplication::Update(float deltaTime)
 	m_Camera->Inputs(m_Window, deltaTime);
 	
 	// Update world
-	m_PhysicsWorld.Update(deltaTime, 16);
+	m_PhysicsWorld.Update(deltaTime, 1);
 
 	// Rendering
 	glViewport(0, 0, m_ShadowMap->GetShadowWidth(), m_ShadowMap->GetShadowHeight());
@@ -139,11 +139,13 @@ void PhysicsApplication::Inputs(float deltaTime)
 {
 	// Saving 
 	if (glfwGetKey(m_Window, GLFW_KEY_F5) == GLFW_PRESS && !m_F5Pressed) {
-		try {
-			m_SaveManager.Save();
-		}
-		catch (const std::string& e) {
-			std::cout << "Saving error (" << e << ")\n";
+		if (m_PauseManager.GetCurrentState() != ApplicationStates::Play) {
+			try {
+				m_SaveManager.Save();
+			}
+			catch (const std::string& e) {
+				std::cout << "Saving error (" << e << ")\n";
+			}
 		}
 		m_F5Pressed = true;
 	}
@@ -158,7 +160,7 @@ void PhysicsApplication::Inputs(float deltaTime)
 		catch (const std::string& e) {
 			std::cout << "Loading error (" << e << ")\n";
 		}
-		m_PauseManager.ChangeState(ApplicationStates::Paused);
+		m_PauseManager.ChangeState(ApplicationStates::Stop);
 		m_F6Pressed = true;
 	}
 	else if (glfwGetKey(m_Window, GLFW_KEY_F5) == GLFW_RELEASE) {
@@ -179,13 +181,31 @@ void PhysicsApplication::Inputs(float deltaTime)
 	}
 
 	// Mouse click
-	if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
+	if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS  // selection
 		&& glfwGetKey(m_Window, GLFW_KEY_P) == GLFW_PRESS
 		&& !m_LMButtonIsPressed) {
 		double xPos, yPos;
 		GetCursorPosition(&xPos, &yPos);
-		m_SelectedEntity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get());
+		glm::vec3 rayDir;
+		m_SelectedEntity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get(), rayDir, 0);
 		m_LMButtonIsPressed = true;
+	}
+	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
+		m_LMButtonIsPressed = false;
+	}
+
+	if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS  // hitting object at point
+		&& glfwGetKey(m_Window, GLFW_KEY_H) == GLFW_PRESS
+		&& !m_LMButtonIsPressed) {
+		double xPos, yPos;
+		GetCursorPosition(&xPos, &yPos);
+		glm::vec3 hitPoint;
+		glm::vec3 rayDir;
+		Entity* entity = m_PhysicsWorld.SelectEntityWithScreenPosition(xPos, yPos, m_Width, m_Height, m_Camera.get(), rayDir, &hitPoint);
+		if (entity != nullptr) {
+			m_PhysicsWorld.AddForceAtPoint(*entity, hitPoint, rayDir, 0.6f);
+			m_LMButtonIsPressed = true;
+		}
 	}
 	else if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) {
 		m_LMButtonIsPressed = false;
@@ -238,51 +258,89 @@ void PhysicsApplication::ShowImGui()
 		ImGui::End();
 	}
 
+	ShowMainMenu();
+
+	if (m_ShowSpawningMenu) {
+		ShowSpawningMenu();
+	}
+
 	if (m_SelectedEntity) {
 		ShowEntityMenu();
-	}
-	else {
-		ShowMainMenu();
 	}
 }
 
 void PhysicsApplication::ShowMainMenu()
 {
-	ImGui::Begin("Menu");
-	if (ImGui::CollapsingHeader("Scene")) {
-		ImGui::Checkbox("Show Axes", &m_ShowAxes);
-		if (ImGui::Button("Clear all entities", ImVec2(-1, 0)))
-			m_PhysicsWorld->ClearAll();
-		ImGui::DragFloat3("Lighting position", &m_LightPosition[0], 0.025f);
-	}
-	if (ImGui::CollapsingHeader("Spawning")) {
-		SelectEntityType();
-
-		ImGui::Separator();
-
-		ImGui::Text("Entity Properties");
-
-		Transform& transform = m_SpawnManager.GetProperties().transform;
-		Rigidbody3D& rigidbody = m_SpawnManager.GetProperties().rigidbody;
-
-		if (ImGui::CollapsingHeader("Transform")) {
-			ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Scene"))
+		{
+			if (ImGui::MenuItem("Save", "F5")) {
+				if (m_PauseManager.GetCurrentState() != ApplicationStates::Play) {
+					try {
+						m_SaveManager.Save();
+					}
+					catch (const std::string& e) {
+						std::cout << "Saving error (" << e << ")\n";
+					}
+				}
+			}
+			if (ImGui::MenuItem("Open...", "F6")) {
+				try {
+					m_SaveManager.Load();
+				}
+				catch (const std::string& e) {
+					std::cout << "Loading error (" << e << ")\n";
+				}
+				m_PauseManager.ChangeState(ApplicationStates::Stop);
+			}
+			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("General"))
+		{
 
-		if (ImGui::CollapsingHeader("Rigidbody")) {
-			ImGui::Checkbox("Static", &rigidbody.isStatic);
-			ImGui::Checkbox("Use Gravity", &rigidbody.useGravity);
-			ImGui::DragFloat("Mass", &rigidbody.mass, 0.02f, 0.01f, 1000.0f);
-			ImGui::DragFloat("Restitution", &rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+			ImGui::Checkbox("Show Axes", &m_ShowAxes);
+
+			bool isVaccum = m_PhysicsWorld.GetIsVaccum();
+			if (ImGui::Checkbox("Vacuum Mode", &isVaccum)) {
+				m_PhysicsWorld.SetIsVaccum(isVaccum);
+			}
+
+			ImGui::DragFloat3("Lighting position", &m_LightPosition[0], 0.025f);
+
+			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Objects"))
+		{
+			if (ImGui::Button("Clear all entities", ImVec2(-1, 0)))
+				m_PhysicsWorld->ClearAll();
 
-		ImGui::Separator();
+			ImGui::Checkbox("Toggle Spawning Menu", &m_ShowSpawningMenu);
 
-		ImGui::DragFloat3("Spawn Point", &m_SpawnManager.GetSpawnPointChangeable()[0], 0.1f);
-		if (ImGui::Button("Spawn", ImVec2(-1, 0)))
-			m_SpawnManager.Spawn(m_PhysicsWorld);
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Simulation")) {
+			if (ImGui::MenuItem("Play")) {
+				m_PauseManager.ChangeState(ApplicationStates::Play);
+				m_PhysicsWorld->SetSnapshots();
+			}
+			if (ImGui::MenuItem("Stop")) {
+				if(m_PauseManager.GetCurrentState() != ApplicationStates::Stop)
+					m_PhysicsWorld->ReturnToSnapshot();
+
+				m_PauseManager.ChangeState(ApplicationStates::Stop);
+			}
+			if (ImGui::MenuItem("Pause")) {
+				if (m_PauseManager.GetCurrentState() == ApplicationStates::Paused)
+					m_PauseManager.ChangeState(ApplicationStates::Play);
+				else if (m_PauseManager.GetCurrentState() == ApplicationStates::Play)
+					m_PauseManager.ChangeState(ApplicationStates::Paused);
+			}
+
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
 	}
-	ImGui::End();
 }
 
 void PhysicsApplication::ShowEntityMenu()
@@ -306,7 +364,20 @@ void PhysicsApplication::ShowEntityMenu()
 
 	if (ImGui::CollapsingHeader("Transform")) { // Transform
 		ImGui::DragFloat3("Traslation", (float*)&objectTransform.translation, 0.025f);
-		ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f);
+
+		//ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f); // depricated
+		if (ImGui::DragFloat3("Rotation", (float*)&objectTransform.rotation, 0.1f)) {
+			objectTransform.orientation = glm::quat(glm::radians(objectTransform.rotation));
+		}
+		if (!ImGui::IsItemActive()) {
+			glm::vec3 currentEuler = glm::degrees(glm::eulerAngles(objectTransform.orientation));
+
+			if (glm::distance(objectTransform.rotation, currentEuler) > 0.01f) {
+				objectTransform.rotation = currentEuler;
+			}
+		}
+
+
 		ImGui::DragFloat3("Scale", (float*)&objectTransform.scale, 0.025f);
 	}
 
@@ -321,8 +392,67 @@ void PhysicsApplication::ShowEntityMenu()
 	if (ImGui::CollapsingHeader("Rigidbody")) { // Rigidbody
 		ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().rigidbody.isStatic);
 		ImGui::Checkbox("Use Gravity", &m_SelectedEntity->GetProperties().rigidbody.useGravity);
+
+		ImGui::Separator();
+
 		ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
 		ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+
+		ImGui::Separator();
+
+		ImGui::DragFloat("Static Friction", &m_SelectedEntity->GetProperties().rigidbody.staticFriction, 0.05f, 0.1f, 10.0f);
+		ImGui::DragFloat("Dynamic Friction", &m_SelectedEntity->GetProperties().rigidbody.dynamicFriction, 0.05f, 0.1f, 10.0f);
+		
+		ImGui::Separator();
+
+		ImGui::InputFloat3("Linear Velocity", (float*) &m_SelectedEntity->GetProperties().rigidbody.linearVelocity);
+		ImGui::InputFloat3("Angular Velocity", (float*) &m_SelectedEntity->GetProperties().rigidbody.angularVelocity);
+	}
+
+	ImGui::End();
+}
+
+void PhysicsApplication::ShowSpawningMenu()
+{
+	ImGui::Begin("Spawning");
+
+	SelectEntityType();
+
+	ImGui::Separator();
+
+	ImGui::Text("Entity Properties");
+
+	Transform& transform = m_SpawnManager.GetProperties().transform;
+	Rigidbody3D& rigidbody = m_SpawnManager.GetProperties().rigidbody;
+
+	if (ImGui::CollapsingHeader("Transform")) {
+		ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
+	}
+
+	if (ImGui::CollapsingHeader("Rigidbody")) {
+		ImGui::Checkbox("Static", &rigidbody.isStatic);
+		ImGui::Checkbox("Use Gravity", &rigidbody.useGravity);
+
+		ImGui::Separator();
+
+		ImGui::DragFloat("Mass", &rigidbody.mass, 0.02f, 0.01f, 1000.0f);
+		ImGui::DragFloat("Restitution", &rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+
+		ImGui::Separator();
+
+		ImGui::DragFloat("Static Friction", &rigidbody.staticFriction, 0.05f, 0.1f, 10.0f);
+		ImGui::DragFloat("Dynamic Friction", &rigidbody.dynamicFriction, 0.05f, 0.1f, 10.0f);
+	}
+
+	ImGui::Separator();
+
+	ImGui::DragFloat3("Spawn Point", &m_SpawnManager.GetSpawnPointChangeable()[0], 0.1f);
+	if (ImGui::Button("Spawn", ImVec2(-1, 0))) {
+		Entity& entity = m_SpawnManager.Spawn(m_PhysicsWorld);
+
+		if (m_PauseManager.GetCurrentState() == ApplicationStates::Play) {
+			m_PhysicsWorld->AddToDeleteAfterStopSimulation(entity.GetId());
+		}
 	}
 
 	ImGui::End();

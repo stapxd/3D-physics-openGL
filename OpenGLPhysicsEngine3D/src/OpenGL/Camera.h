@@ -25,7 +25,7 @@ private:
 
 	float m_MovementSpeed = 10.0f;
 
-	float m_FOV = 100.0f;
+	float m_FOV = 99.36f;
 
 public:
 	Camera(int width, int height);

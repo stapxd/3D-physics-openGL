@@ -10,7 +10,7 @@ class SpawnManager
 public:
 	SpawnManager();
 
-	void Spawn(PhysicsWorld& physicsWorld);
+	Entity& Spawn(PhysicsWorld& physicsWorld);
 
 	glm::vec3& GetSpawnPointChangeable() { return m_SpawnPoint; }
 
