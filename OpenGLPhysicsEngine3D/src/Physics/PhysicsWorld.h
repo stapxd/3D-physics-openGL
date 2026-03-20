@@ -58,7 +58,7 @@ protected:
 		float depth,
 		const std::vector<glm::vec3>& contactPoints);
 private:
-	bool m_Paused = false;
+	bool m_Paused = true;
 	static glm::vec3 m_Gravity;
 	static float m_DragCoeff;
 	static bool m_IsVacuum;

@@ -161,18 +161,17 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
 
             axis /= len;
 
-            float radiusA = std::abs(glm::dot(obbA.axes[0] * obbA.halfSize.x, axis)) +
+            rA = std::abs(glm::dot(obbA.axes[0] * obbA.halfSize.x, axis)) +
                 std::abs(glm::dot(obbA.axes[1] * obbA.halfSize.y, axis)) +
                 std::abs(glm::dot(obbA.axes[2] * obbA.halfSize.z, axis));
 
-
-            float radiusB = std::abs(glm::dot(obbB.axes[0] * obbB.halfSize.x, axis)) +
+            rB = std::abs(glm::dot(obbB.axes[0] * obbB.halfSize.x, axis)) +
                 std::abs(glm::dot(obbB.axes[1] * obbB.halfSize.y, axis)) +
                 std::abs(glm::dot(obbB.axes[2] * obbB.halfSize.z, axis));
 
             float proj = std::abs(glm::dot(tAWorld, axis));
 
-            float overlap = radiusA + radiusB - proj;
+            float overlap = rA + rB - proj;
 
             if (overlap < 0.0f)
                 return false;

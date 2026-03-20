@@ -45,12 +45,42 @@ void EntityManager::DeleteEntity(unsigned int id)
 	m_ToDelete.push_back(id);
 }
 
+void EntityManager::AddToDeleteAfterStopSimulation(unsigned int id)
+{
+	if (id < 0 || id >= m_LastId)
+		throw std::out_of_range("EntityManager::FindEntity : id is out of range");
+	m_DeleteAfterStopSimulation.push_back(id);
+}
+
 Entity* EntityManager::FindEntity(unsigned int id)
 {
 	if (m_Entities.find(id) != m_Entities.end())
 		return &m_Entities[id];
 	else
 		return nullptr;
+}
+
+void EntityManager::SetSnapshots()
+{
+	for (auto it = m_Entities.begin(); it != m_Entities.end(); it++) {
+		m_SnapshotManager.SetSnapshot(it->first, it->second.GetProperties());
+	}
+}
+
+void EntityManager::ReturnToSnapshot()
+{
+	for (auto id : m_DeleteAfterStopSimulation) {
+		if (FindEntity(id) != nullptr)
+			m_Entities.erase(id);
+	}
+	m_DeleteAfterStopSimulation.clear();
+
+	for (auto it = m_Entities.begin(); it != m_Entities.end(); it++) {
+		ObjectProperties* objP = m_SnapshotManager.GetSnapshotByEntityId(it->first);
+		if (objP) {
+			it->second.GetProperties() = *objP;
+		}
+	}
 }
 
 void EntityManager::ClearAll()

@@ -45,6 +45,7 @@ private:
 	bool m_KeyPressed = false;
 	bool m_LMButtonIsPressed = false;
 	bool m_ShowAxes = false;
+	bool m_ShowSpawningMenu = false;
 
 	// Light
 	glm::vec3 m_LightPosition = glm::vec3(15.0f, 15.0f, 15.0f);
@@ -99,7 +100,7 @@ protected:
 	void ShowImGui();
 	void ShowMainMenu();
 	void ShowEntityMenu();
-
+	void ShowSpawningMenu();
 
 private:
 	void RenderScene();

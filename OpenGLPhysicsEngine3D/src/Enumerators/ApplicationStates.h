@@ -2,5 +2,6 @@
 
 enum class ApplicationStates {
 	Play,
-	Paused
+	Paused,
+	Stop
 };

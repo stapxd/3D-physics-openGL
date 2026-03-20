@@ -115,6 +115,9 @@ void PhysicsWorld::ChangeState(ApplicationStates newState)
 	else if (newState == ApplicationStates::Paused) {
 		m_Paused = true;
 	}
+	else if (newState == ApplicationStates::Stop) {
+		m_Paused = true;
+	}
 }
 
 void PhysicsWorld::NarrowPhase()
@@ -136,9 +139,9 @@ void PhysicsWorld::NarrowPhase()
 
 			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
 
-			//ResolveCollision(bodyA, bodyB, normal, depth);
+			ResolveCollision(bodyA, bodyB, normal, depth);
 			//ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, contactPoints);
-			ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, contactPoints);
+			//ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, contactPoints);
 		}
 	}
 }

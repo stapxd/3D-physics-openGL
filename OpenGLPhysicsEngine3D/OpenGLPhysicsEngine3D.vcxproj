@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Managers\RenderSnapshotManager.cpp" />
     <ClCompile Include="src\Application\Globals.cpp" />
     <ClCompile Include="src\Managers\SaveManager.cpp" />
     <ClCompile Include="src\Interfaces\IPausable.cpp" />
@@ -185,6 +186,7 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Managers\RenderSnapshotManager.h" />
     <ClInclude Include="src\Application\Globals.h" />
     <ClInclude Include="src\Managers\SaveManager.h" />
     <ClInclude Include="src\Enumerators\ApplicationStates.h" />
