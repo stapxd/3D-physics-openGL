@@ -1,5 +1,6 @@
 #include "PhysicsApplication.h"
 #include <iostream>
+#include <helpers.h>
 #include <thread>
 #include <glm/glm.hpp>
 
@@ -30,6 +31,8 @@ void PhysicsApplication::Start()
 	
 	m_ShadowMap = std::make_unique<ShadowMap>();
 
+	m_SkyBox.Init("res/skyboxes/field");
+
 	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
 	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
 
@@ -38,17 +41,25 @@ void PhysicsApplication::Start()
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
 
+	// Shaders
 	m_Shader = std::make_unique<Shader>("res/shaders/basic.shader");
 	m_AxisShader = std::make_unique<Shader>("res/shaders/axis.shader");
 	m_ShadowShader = std::make_unique<Shader>("res/shaders/shadow.shader");
+	m_SkyBoxShader = std::make_unique<Shader>("res/shaders/skybox.shader");
 
 	m_Shader->UnBind();
 	m_AxisShader->UnBind();
 	m_ShadowShader->UnBind();
+	m_SkyBoxShader->UnBind();
 	
 	m_PauseManager.Attach(&m_PhysicsWorld);
 
 	glClearColor(0.102f, 0.204f, 0.349f, 1.0f);
+}
+
+void PhysicsApplication::FixedUpdate(float fixedDeltaTime) {
+	// Update world
+	m_PhysicsWorld.Update(fixedDeltaTime, 1);
 }
 
 void PhysicsApplication::Update(float deltaTime)
@@ -60,7 +71,7 @@ void PhysicsApplication::Update(float deltaTime)
 	m_Camera->Inputs(m_Window, deltaTime);
 	
 	// Update world
-	m_PhysicsWorld.Update(deltaTime, 1);
+	//m_PhysicsWorld.Update(deltaTime, 1);
 
 	// Rendering
 	glViewport(0, 0, m_ShadowMap->GetShadowWidth(), m_ShadowMap->GetShadowHeight());
@@ -115,6 +126,18 @@ void PhysicsApplication::RenderScene()
 		m_Axes->Draw(*m_AxisShader);
 		m_AxisShader->UnBind();
 	}
+
+	if (m_ShowSkyBox) {
+		m_SkyBoxShader->Bind();
+
+		m_SkyBoxShader->SetUniformMat4f("uProj", m_Camera->GetProjection());
+		m_SkyBoxShader->SetUniformMat4f("uView", m_Camera->GetView());
+		m_SkyBoxShader->SetUniform1i("uSkyBox", 0);
+
+		m_SkyBox.Render();
+
+		m_SkyBoxShader->UnBind();
+	}
 }
 
 void PhysicsApplication::RenderSceneDepthMap()
@@ -157,8 +180,8 @@ void PhysicsApplication::Inputs(float deltaTime)
 		try {
 			m_SaveManager.Load();
 		}
-		catch (const std::string& e) {
-			std::cout << "Loading error (" << e << ")\n";
+		catch (const std::runtime_error e) {
+			std::cout << "Loading error (" << e.what() << ")\n";
 		}
 		m_PauseManager.ChangeState(ApplicationStates::Stop);
 		m_F6Pressed = true;
@@ -280,8 +303,8 @@ void PhysicsApplication::ShowMainMenu()
 					try {
 						m_SaveManager.Save();
 					}
-					catch (const std::string& e) {
-						std::cout << "Saving error (" << e << ")\n";
+					catch (const std::runtime_error& e) {
+						helpers::logError("SaveManager::Load", e.what());
 					}
 				}
 			}
@@ -289,8 +312,8 @@ void PhysicsApplication::ShowMainMenu()
 				try {
 					m_SaveManager.Load();
 				}
-				catch (const std::string& e) {
-					std::cout << "Loading error (" << e << ")\n";
+				catch (const std::runtime_error& e) {
+					helpers::logError("SaveManager::Load", e.what());
 				}
 				m_PauseManager.ChangeState(ApplicationStates::Stop);
 			}
@@ -299,6 +322,7 @@ void PhysicsApplication::ShowMainMenu()
 		if (ImGui::BeginMenu("General"))
 		{
 
+			ImGui::Checkbox("Show SkyBox", &m_ShowSkyBox);
 			ImGui::Checkbox("Show Axes", &m_ShowAxes);
 
 			bool isVaccum = m_PhysicsWorld.GetIsVaccum();

@@ -11,7 +11,8 @@
 #include "Physics/PhysicsWorld.h"
 
 //-----
-#include "Objects/Axes.h"
+#include "Engine/Axes.h"
+#include "Engine/SkyBox.h"
 
 #include "Managers/SpawnManager.h"
 #include "Managers/PauseManager.h"
@@ -27,6 +28,7 @@ private:
 	SaveManager  m_SaveManager;
 
 	// World
+	SkyBox m_SkyBox;
 	PhysicsWorld m_PhysicsWorld;
 	Entity* m_SelectedEntity = nullptr;
 	std::unique_ptr<Axes> m_Axes;
@@ -38,6 +40,7 @@ private:
 	std::unique_ptr<Shader> m_Shader;
 	std::unique_ptr<Shader> m_AxisShader;
 	std::unique_ptr<Shader> m_ShadowShader;
+	std::unique_ptr<Shader> m_SkyBoxShader;
 
 	// Flags
 	bool m_F5Pressed = false;
@@ -46,6 +49,7 @@ private:
 	bool m_LMButtonIsPressed = false;
 	bool m_ShowAxes = false;
 	bool m_ShowSpawningMenu = false;
+	bool m_ShowSkyBox = false;
 
 	// Light
 	glm::vec3 m_LightPosition = glm::vec3(15.0f, 15.0f, 15.0f);
@@ -91,6 +95,7 @@ public:
 
 	void Start();
 	void Update(float deltaTime);
+	void FixedUpdate(float fixedDeltaTime);
 	void Inputs(float deltaTime);
 	
 protected:

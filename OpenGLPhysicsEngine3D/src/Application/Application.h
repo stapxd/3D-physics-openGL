@@ -18,6 +18,7 @@ public:
 
 	virtual void Start();
 	virtual void Update(float deltaTime);
+	virtual void FixedUpdate(float fixedDeltaTime);
 	virtual void Inputs(float deltaTime);
 
 	explicit operator bool();
@@ -46,5 +47,8 @@ private:
 private:
 	float m_DeltaTime = 0.0f;
 	float m_LastFrame = 0.0f;
+
+	float m_FixedDeltaTimeAccumulator = 0.0f;
+	float m_FixedDeltaTime = 1.0f / 60;
 };
 

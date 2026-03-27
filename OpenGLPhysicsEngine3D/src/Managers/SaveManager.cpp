@@ -13,9 +13,12 @@ SaveManager::SaveManager(PhysicsWorld& physicsWorld)
 
 void SaveManager::Save()
 {
+	if (m_PhysicsWorld->GetEntities().size() == 0)
+		return;
+
 	std::string filepath = GetFilePathWithExplorer(SaveActions::Save);
 
-	if (filepath == "")
+	if (filepath.empty())
 		return;
 
 	std::fstream file;
@@ -36,7 +39,7 @@ void SaveManager::Load()
 {
 	std::string filepath = GetFilePathWithExplorer(SaveActions::Load);
 
-	if (filepath == "")
+	if (filepath.empty())
 		return;
 
 	std::fstream file;
@@ -49,7 +52,7 @@ void SaveManager::Load()
 	auto fileSize = file.tellg();
 
 	if (fileSize == -1 || fileSize % expectedEntitySize != 0)
-		throw "File is broken!";
+		throw std::runtime_error("File is broken!");
 
 	file.seekg(0, std::ios::beg);
 

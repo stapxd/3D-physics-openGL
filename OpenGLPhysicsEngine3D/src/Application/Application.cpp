@@ -106,6 +106,12 @@ void Application::Run()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+		m_FixedDeltaTimeAccumulator += m_DeltaTime;
+		while (m_FixedDeltaTimeAccumulator >= m_FixedDeltaTime) {
+			FixedUpdate(m_FixedDeltaTime);
+			m_FixedDeltaTimeAccumulator -= m_FixedDeltaTime;
+		}
+
         Inputs(m_DeltaTime);
         Update(m_DeltaTime);
 
@@ -124,6 +130,10 @@ void Application::Start()
 }
 
 void Application::Update(float deltaTime)
+{
+}
+
+void Application::FixedUpdate(float fixedDeltaTime)
 {
 }
 
