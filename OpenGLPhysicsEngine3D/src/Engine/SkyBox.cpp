@@ -67,7 +67,7 @@ void SkyBox::Init(const std::string& directory)
 	m_IBO->UnBind();
 }
 
-void SkyBox::Render()
+void SkyBox::Draw()
 {
 	GLCall(glDepthFunc(GL_LEQUAL));
 

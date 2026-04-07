@@ -1,7 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include <vector>
-#include "Application/Renderer.h"
+#include "Application/Core.h"
 
 struct VertexLayoutElement {
 	unsigned int  count;

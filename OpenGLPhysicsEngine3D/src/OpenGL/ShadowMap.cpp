@@ -3,7 +3,7 @@
 
 #include <GL/glew.h>
 
-#include "Application/Renderer.h"
+#include "Application/Core.h"
 
 ShadowMap::ShadowMap()
 {
@@ -54,7 +54,7 @@ void ShadowMap::Initialize()
     UnBind();
 }
 
-void ShadowMap::BindDepthMap()
+void ShadowMap::BindDepthMap() const
 {
 	GLCall(glBindTexture(GL_TEXTURE_2D, m_DepthMap));
 }

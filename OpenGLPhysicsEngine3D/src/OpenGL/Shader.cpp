@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include "Application/Renderer.h"
+#include "Application/Core.h"
 
 Shader::Shader(const std::string& filepath)
     :m_Filepath(filepath)

@@ -19,7 +19,6 @@ public:
 	
 	void Draw(const Shader& shader);
 
-
 private:
 	void UpdateModel();
 private:

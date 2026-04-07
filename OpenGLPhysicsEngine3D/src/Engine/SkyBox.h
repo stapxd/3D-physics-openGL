@@ -19,7 +19,7 @@ public:
 
 	void Init(const std::string& directory);
 
-	void Render();
+	void Draw();
 
 private:
 	bool isImage(const fs::path& path);

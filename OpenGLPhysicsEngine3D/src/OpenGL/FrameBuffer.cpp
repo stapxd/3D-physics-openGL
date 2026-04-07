@@ -2,7 +2,7 @@
 
 #include <GL/glew.h>
 
-#include "Application/Renderer.h"
+#include "Application/Core.h"
 
 FrameBuffer::FrameBuffer()
 {

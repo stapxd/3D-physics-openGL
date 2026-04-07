@@ -1,7 +1,7 @@
 #include "CubeMapTexture.h"
 
 #include <stb/stb_image.h>
-#include "Application/Renderer.h"
+#include "Application/Core.h"
 
 CubeMapTexture::CubeMapTexture(const std::vector<std::string>& faces)
 {

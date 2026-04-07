@@ -18,6 +18,8 @@
 #include "Managers/PauseManager.h"
 #include "Managers/SaveManager.h"
 
+#include "Structures/LightData.h"
+
 class PhysicsApplication : public Application
 {
 private:
@@ -52,15 +54,10 @@ private:
 	bool m_ShowSkyBox = false;
 
 	// Light
-	glm::vec3 m_LightPosition = glm::vec3(15.0f, 15.0f, 15.0f);
-	glm::vec3 m_LightColor = glm::vec3(1);
-
-	float m_NearPlane = 1.0f, m_FarPlane = 50.0f;
-	glm::mat4 m_LightProjection = glm::mat4(1);
-	glm::mat4 m_LightView = glm::mat4(1);
+	LightData m_LightData;
 
 	// Temp
-	Transform m_Transform1 = {
+	/*Transform m_Transform1 = {
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(10.0f, 0.25f, 10.0f),
@@ -87,7 +84,7 @@ private:
 		m_Transform2,
 		glm::vec3(0.5f, 0.5f, 0.5f),
 		m_RB
-	};
+	};*/
 
 public:
 	PhysicsApplication();

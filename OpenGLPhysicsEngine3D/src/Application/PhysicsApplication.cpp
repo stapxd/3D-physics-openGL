@@ -36,7 +36,7 @@ void PhysicsApplication::Start()
 	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
 	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
 
-	m_LightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, m_NearPlane, m_FarPlane);
+	m_LightData.lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, m_LightData.nearPlane, m_LightData.farPlane);
 
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
@@ -91,64 +91,38 @@ void PhysicsApplication::Update(float deltaTime)
 
 void PhysicsApplication::RenderScene()
 {
-	m_Shader->Bind();
-	m_Shader->SetUniformMat4f("uProj", m_Camera->GetProjection());
-	m_Shader->SetUniformMat4f("uView", m_Camera->GetView());
-
-	m_Shader->SetUniformMat4f("uLightProj", m_LightProjection);
-	m_Shader->SetUniformMat4f("uLightView", m_LightView);
-
-	m_Shader->SetUniform3f("uLightColor", m_LightColor.x, m_LightColor.y, m_LightColor.z);
-	m_Shader->SetUniform3f("uLightPosition", m_LightPosition.x, m_LightPosition.y, m_LightPosition.z);
-
-	glActiveTexture(GL_TEXTURE0);
-	m_ShadowMap->BindDepthMap();
-	m_Shader->SetUniform1i("uShadowMap", 0);
-
-	glm::vec3 camPos = m_Camera->GetPosition();
-	m_Shader->SetUniform3f("uCameraPosition", camPos.x, camPos.y, camPos.z);
+	Renderer::BeginSceneLight(*m_Camera, *m_Shader, m_LightData);
+	Renderer::SetShadowLigntUniforms(*m_ShadowMap, *m_Camera, *m_Shader);
 
 	for (auto& entity : m_PhysicsWorld.GetEntities()) {
 		ObjectProperties properties = entity.second.GetProperties();
-
-		m_Shader->SetUniform3f("uColor", properties.color.x, properties.color.y, properties.color.z);
-
-		entity.second->Draw(*m_Shader);
+		Renderer::DrawMesh(*m_Shader, *(entity.second->GetMesh()), properties.color);
 	}
-
-	m_Shader->UnBind();
+	Renderer::EndScene(*m_Shader);
 
 	if (m_ShowAxes) {
-		m_AxisShader->Bind();
-		m_AxisShader->SetUniformMat4f("uProj", m_Camera->GetProjection());
-		m_AxisShader->SetUniformMat4f("uView", m_Camera->GetView());
-
+		Renderer::BeginScene(*m_Camera, *m_AxisShader);
 		m_Axes->Draw(*m_AxisShader);
-		m_AxisShader->UnBind();
+		Renderer::EndScene(*m_AxisShader);
 	}
 
 	if (m_ShowSkyBox) {
-		m_SkyBoxShader->Bind();
-
-		m_SkyBoxShader->SetUniformMat4f("uProj", m_Camera->GetProjection());
-		m_SkyBoxShader->SetUniformMat4f("uView", m_Camera->GetView());
+		Renderer::BeginScene(*m_Camera, *m_SkyBoxShader);
 		m_SkyBoxShader->SetUniform1i("uSkyBox", 0);
-
-		m_SkyBox.Render();
-
-		m_SkyBoxShader->UnBind();
+		m_SkyBox.Draw();
+		Renderer::EndScene(*m_SkyBoxShader);
 	}
 }
 
 void PhysicsApplication::RenderSceneDepthMap()
 {
-	m_LightView = glm::lookAt(m_LightPosition,
+	m_LightData.lightView = glm::lookAt(m_LightData.lightPosition,
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 
 	m_ShadowShader->Bind();
-	m_ShadowShader->SetUniformMat4f("uLightProj", m_LightProjection);
-	m_ShadowShader->SetUniformMat4f("uLightView", m_LightView);
+	m_ShadowShader->SetUniformMat4f("uLightProj", m_LightData.lightProjection);
+	m_ShadowShader->SetUniformMat4f("uLightView", m_LightData.lightView);
 
 	for (auto& entity : m_PhysicsWorld.GetEntities()) {
 		ObjectProperties properties = entity.second.GetProperties();
@@ -330,7 +304,7 @@ void PhysicsApplication::ShowMainMenu()
 				m_PhysicsWorld.SetIsVaccum(isVaccum);
 			}
 
-			ImGui::DragFloat3("Lighting position", &m_LightPosition[0], 0.025f);
+			ImGui::DragFloat3("Lighting position", &m_LightData.lightPosition[0], 0.025f);
 
 			ImGui::EndMenu();
 		}

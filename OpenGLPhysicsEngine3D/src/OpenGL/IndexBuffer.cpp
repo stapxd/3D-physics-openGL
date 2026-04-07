@@ -1,6 +1,6 @@
 #include "IndexBuffer.h"
 #include <GL/glew.h>
-#include "Application/Renderer.h"
+#include "Application/Core.h"
 
 IndexBuffer::IndexBuffer(const void* indices, unsigned int count)
 {

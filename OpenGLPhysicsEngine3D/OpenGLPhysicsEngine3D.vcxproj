@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Application\Core.cpp" />
     <ClCompile Include="src\Engine\SkyBox.cpp" />
     <ClCompile Include="src\Managers\RenderSnapshotManager.cpp" />
     <ClCompile Include="src\Application\Globals.cpp" />
@@ -197,6 +198,7 @@
     <ClCompile Include="src\vendor\stb\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Application\Core.h" />
     <ClInclude Include="src\Engine\SkyBox.h" />
     <ClInclude Include="src\Managers\RenderSnapshotManager.h" />
     <ClInclude Include="src\Application\Globals.h" />
@@ -219,6 +221,7 @@
     <ClInclude Include="src\Structures\EntityParameters.h" />
     <ClInclude Include="src\Structures\Face.h" />
     <ClInclude Include="src\Structures\ForceAtPoint.h" />
+    <ClInclude Include="src\Structures\LightData.h" />
     <ClInclude Include="src\Structures\ObjectProperties.h" />
     <ClInclude Include="src\Physics\Collisions.h" />
     <ClInclude Include="src\Physics\PhysicsWorld.h" />

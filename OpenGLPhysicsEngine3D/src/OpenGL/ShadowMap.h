@@ -14,7 +14,7 @@ public:
 	void Bind() const;
 	void UnBind() const;
 
-	void BindDepthMap();
+	void BindDepthMap() const;
 
 	unsigned int GetShadowWidth() const { return m_ShadowWidth; }
 	unsigned int GetShadowHeight() const { return m_ShadowHeight; }
