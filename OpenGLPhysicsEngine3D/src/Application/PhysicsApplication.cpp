@@ -15,6 +15,11 @@
 
 #include "Structures/ObjectProperties.h"
 
+
+// TEMP ---------------------
+#include "Physics/GJK.h"
+
+
 PhysicsApplication::PhysicsApplication()
 	: m_SaveManager(m_PhysicsWorld)
 {
@@ -47,12 +52,34 @@ void PhysicsApplication::Start()
 	m_ShadowShader = std::make_unique<Shader>("res/shaders/shadow.shader");
 	m_SkyBoxShader = std::make_unique<Shader>("res/shaders/skybox.shader");
 
+	m_SolidColorShader = std::make_unique<Shader>("res/shaders/solidColor.shader");
+
 	m_Shader->UnBind();
 	m_AxisShader->UnBind();
 	m_ShadowShader->UnBind();
 	m_SkyBoxShader->UnBind();
+
+	m_SolidColorShader->UnBind();
 	
 	m_PauseManager.Attach(&m_PhysicsWorld);
+
+
+
+
+
+	m_OBBPointsVAO = std::make_unique<VertexArray>();
+	m_OBBPointsVBO = std::make_unique<VertexBuffer>(nullptr, 64*3*sizeof(float), GL_DYNAMIC_DRAW);
+
+	m_OBBLayout.Push<float>(3);
+	m_OBBPointsVAO->AddBufferLayout(*m_OBBPointsVBO, m_OBBLayout);
+
+	unsigned int incidesTriangles[12] = { 0,1,2, 0,2,3, 0,3,1, 1,2,3 };
+	m_OBBPointsIBOTriangles = std::make_unique<IndexBuffer>((const void*)incidesTriangles, 12);
+
+
+	m_OBBPointsVAO->UnBind();
+	m_OBBPointsVBO->UnBind();
+	m_OBBPointsIBOTriangles->UnBind();
 
 	glClearColor(0.102f, 0.204f, 0.349f, 1.0f);
 }
@@ -99,6 +126,81 @@ void PhysicsApplication::RenderScene()
 		Renderer::DrawMesh(*m_Shader, *(entity.second->GetMesh()), properties.color);
 	}
 	Renderer::EndScene(*m_Shader);
+
+#ifdef GJK_DEBUG
+	Renderer::BeginScene(*m_Camera, *m_SolidColorShader);
+	for (auto& entity : m_PhysicsWorld.GetEntities()) {
+		auto obb = entity.second->GetOBB();
+		m_SolidColorShader->SetUniform4f("uColor", 0.9f, 0.9f, 0.9f, 1.0f);
+		std::vector<glm::vec3> minkowskiPoints = m_PhysicsWorld.GetMinkowsiDiff();
+		if (!minkowskiPoints.empty()) {
+			m_OBBPointsVBO->Bind();
+			m_OBBPointsVBO->ChangeData(minkowskiPoints.data(), minkowskiPoints.size() * sizeof(glm::vec3));
+
+			m_OBBPointsVAO->Bind();
+			glPointSize(5.0f);
+			glDrawArrays(GL_POINTS, 0, (GLsizei)minkowskiPoints.size());
+			glPointSize(1.0f);
+		}
+
+	}
+	Renderer::EndScene(*m_SolidColorShader);
+
+
+	Renderer::BeginScene(*m_Camera, *m_SolidColorShader);
+
+	m_SimplexPoints = m_PhysicsWorld.GetSimplexPoints();
+	unsigned int count = (unsigned int)m_SimplexPoints.size();
+
+	if (count > 0) {
+
+		m_OBBPointsVBO->Bind();
+		m_OBBPointsVBO->ChangeData(m_SimplexPoints.data(), count * sizeof(glm::vec3));
+		m_OBBPointsVAO->Bind();
+
+		m_SolidColorShader->SetUniform4f("uColor", 1.0f, 0.1f, 0.1f, 1.0f);
+		glPointSize(10.0f);
+		glDrawArrays(GL_POINTS, 0, count);
+
+		m_SolidColorShader->SetUniform4f("uColor", 1.0f, 1.0f, 0.0f, 0.5f);
+
+		if (count == 2) {
+			glLineWidth(2.0f);
+			glDrawArrays(GL_LINES, 0, 2);
+		}
+		else if (count == 3) {
+			m_SolidColorShader->SetUniform4f("uColor", 0.0f, 0.4f, 0.8f, 0.4f);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+
+			m_SolidColorShader->SetUniform4f("uColor", 1.0f, 1.0f, 0.0f, 1.0f);
+			glDrawArrays(GL_LINE_LOOP, 0, 3);
+		}
+		else if (count == 4) {
+			m_OBBPointsIBOTriangles->Bind();
+
+			glDisable(GL_CULL_FACE);
+
+			m_SolidColorShader->SetUniform4f("uColor", 1.0f, 1.0f, 0.0f, 1.0f);
+			glLineWidth(2.0f);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+			glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, nullptr);
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			m_SolidColorShader->SetUniform4f("uColor", 0.0f, 1.0f, 0.5f, 0.2f);
+			glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, nullptr);
+
+			glEnable(GL_CULL_FACE);
+			m_OBBPointsIBOTriangles->UnBind();
+		}
+
+		m_OBBPointsVAO->UnBind();
+
+		glPointSize(1.0f);
+		glLineWidth(1.0f);
+	}
+
+	Renderer::EndScene(*m_SolidColorShader);
+#endif
 
 	if (m_ShowAxes) {
 		Renderer::BeginScene(*m_Camera, *m_AxisShader);
@@ -264,6 +366,15 @@ void PhysicsApplication::ShowImGui()
 	if (m_SelectedEntity) {
 		ShowEntityMenu();
 	}
+	
+
+#ifdef GJK_DEBUG
+
+	if (m_PhysicsWorld.GetCollides()) {
+		ImGui::Begin("Collides");
+		ImGui::End();
+	}
+#endif
 }
 
 void PhysicsApplication::ShowMainMenu()
@@ -285,6 +396,7 @@ void PhysicsApplication::ShowMainMenu()
 			if (ImGui::MenuItem("Open...", "F6")) {
 				try {
 					m_SaveManager.Load();
+					m_SelectedEntity = nullptr;
 				}
 				catch (const std::runtime_error& e) {
 					helpers::logError("SaveManager::Load", e.what());
@@ -310,8 +422,10 @@ void PhysicsApplication::ShowMainMenu()
 		}
 		if (ImGui::BeginMenu("Objects"))
 		{
-			if (ImGui::Button("Clear all entities", ImVec2(-1, 0)))
+			if (ImGui::Button("Clear all entities", ImVec2(-1, 0))) {
 				m_PhysicsWorld->ClearAll();
+				m_SelectedEntity = nullptr;
+			}
 
 			ImGui::Checkbox("Toggle Spawning Menu", &m_ShowSpawningMenu);
 
@@ -319,8 +433,10 @@ void PhysicsApplication::ShowMainMenu()
 		}
 		if (ImGui::BeginMenu("Simulation")) {
 			if (ImGui::MenuItem("Play")) {
-				m_PauseManager.ChangeState(ApplicationStates::Play);
-				m_PhysicsWorld->SetSnapshots();
+				if (m_PauseManager.GetCurrentState() != ApplicationStates::Play) {
+					m_PauseManager.ChangeState(ApplicationStates::Play);
+					m_PhysicsWorld->SetSnapshots();
+				}
 			}
 			if (ImGui::MenuItem("Stop")) {
 				if(m_PauseManager.GetCurrentState() != ApplicationStates::Stop)

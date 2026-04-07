@@ -19,6 +19,8 @@ public:
 
     static std::vector<ContactPoint> GenerateOBBContactPoints(const OBB& A, const OBB& B, const glm::vec3& normal, float depth);
 
+    // GJK
+
 private:
     static std::vector<glm::vec3> GetOBBVertices(const OBB& obb);
 

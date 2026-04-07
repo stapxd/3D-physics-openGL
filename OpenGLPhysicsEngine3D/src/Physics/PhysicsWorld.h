@@ -12,6 +12,9 @@
 
 #include "OpenGL/Camera.h"
 
+
+#include "Structures/Simplex.h"
+
 class PhysicsWorld : public IPausable
 {
 public:
@@ -33,6 +36,30 @@ public:
 
 	static void SetIsVaccum(bool v) { m_IsVacuum = v; }
 	static bool GetIsVaccum() { return m_IsVacuum; }
+
+#ifdef GJK_DEBUG
+
+	const std::vector<glm::vec3>& GetMinkowsiDiff() const { return m_MinkowsiDiff; }
+	std::vector<glm::vec3> GetSimplexPoints() const { 
+		switch (m_Simplex.count)
+		{
+		case 1:
+			return { m_Simplex.a};
+		case 2:
+			return { m_Simplex.a, m_Simplex.b};
+		case 3:
+			return { m_Simplex.a, m_Simplex.b, m_Simplex.c};
+		case 4:
+			return { m_Simplex.a, m_Simplex.b, m_Simplex.c, m_Simplex.d };
+		default:
+			return {};
+		}
+	}
+
+	bool GetCollides() { return m_Collides; }
+
+#endif
+
 
 protected:
 	void ApplyForceAtPoint();
@@ -67,5 +94,18 @@ private:
 
 	std::vector<CollisionPair> m_CollisionPairs;
 	EntityManager m_Manager;
+
+
+
+
+#ifdef GJK_DEBUG
+
+	// GJK
+	bool m_Collides = false;
+
+	Simplex m_Simplex;
+
+	std::vector<glm::vec3> m_MinkowsiDiff;
+#endif
 };
 

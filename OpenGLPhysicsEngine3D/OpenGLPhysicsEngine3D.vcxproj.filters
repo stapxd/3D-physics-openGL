@@ -138,6 +138,12 @@
     <ClCompile Include="src\Application\Core.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\Physics\GJK.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\EPA.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h">
@@ -317,11 +323,24 @@
     <ClInclude Include="src\Application\Core.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="src\Physics\GJK.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\Simplex.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\EPA.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\EPAResult.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\basic.shader" />
     <None Include="res\shaders\axis.shader" />
     <None Include="res\shaders\shadow.shader" />
     <None Include="res\shaders\skybox.shader" />
+    <None Include="res\shaders\solidColor.shader" />
   </ItemGroup>
 </Project>

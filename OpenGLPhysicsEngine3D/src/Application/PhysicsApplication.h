@@ -20,6 +20,8 @@
 
 #include "Structures/LightData.h"
 
+// ------ TEmp
+
 class PhysicsApplication : public Application
 {
 private:
@@ -44,6 +46,8 @@ private:
 	std::unique_ptr<Shader> m_ShadowShader;
 	std::unique_ptr<Shader> m_SkyBoxShader;
 
+	std::unique_ptr<Shader> m_SolidColorShader;
+
 	// Flags
 	bool m_F5Pressed = false;
 	bool m_F6Pressed = false;
@@ -57,6 +61,15 @@ private:
 	LightData m_LightData;
 
 	// Temp
+
+	std::vector<glm::vec3> m_SimplexPoints;
+
+	std::unique_ptr<VertexArray> m_OBBPointsVAO;
+	std::unique_ptr<VertexBuffer> m_OBBPointsVBO;
+	std::unique_ptr<IndexBuffer> m_OBBPointsIBOLines;
+	std::unique_ptr<IndexBuffer> m_OBBPointsIBOTriangles;
+	VertexLayout m_OBBLayout;
+
 	/*Transform m_Transform1 = {
 		glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 0.0f, 0.0f),

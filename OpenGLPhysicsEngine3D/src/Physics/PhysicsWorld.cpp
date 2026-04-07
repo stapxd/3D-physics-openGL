@@ -6,6 +6,10 @@
 
 #include "Application/Globals.h"
 
+
+#include "GJK.h"
+#include "EPA.h"
+
 glm::vec3 PhysicsWorld::m_Gravity = glm::vec3(0.0f, -9.81f, 0.0f);
 float PhysicsWorld::m_DragCoeff = 0.1f;
 bool PhysicsWorld::m_IsVacuum = true;
@@ -122,6 +126,10 @@ void PhysicsWorld::ChangeState(ApplicationStates newState)
 
 void PhysicsWorld::NarrowPhase()
 {
+#ifdef GJK_DEBUG
+	m_MinkowsiDiff.clear();
+	m_MinkowsiDiff.reserve(64);
+#endif
 	for (size_t i = 0; i < m_CollisionPairs.size(); i++) {
 		Entity& bodyA = m_CollisionPairs[i].bodyA;
 		Entity& bodyB = m_CollisionPairs[i].bodyB;
@@ -133,6 +141,9 @@ void PhysicsWorld::NarrowPhase()
 		bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
 		bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
 
+
+
+#ifndef GJK_DEBUG
 		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth, contactPoints)) {
 			//auto contacts = Collisions::GenerateOBBContactPoints(bodyA->GetOBB(), bodyB->GetOBB(), normal, depth);
 			//std::printf("x: %f    y: %f    z: %f\n", contactPoint.x, contactPoint.y, contactPoint.z);
@@ -143,7 +154,28 @@ void PhysicsWorld::NarrowPhase()
 			//ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, contactPoints);
 			//ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, contactPoints);
 		}
+#endif
+
+
+#ifdef GJK_DEBUG
+		if (GJK::Solve(bodyA, bodyB, m_Simplex, &m_MinkowsiDiff)) {
+			EPAResult r = EPA::Solve(m_Simplex, bodyA, bodyB);
+
+			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, r.normal, r.depth);
+
+			/*if (!m_Collides) {
+				m_Collides = true;
+			}*/
+
+		}
+		else {
+			/*if (m_Collides) {
+				m_Collides = false;
+			}*/
+		}
+#endif
 	}
+
 }
 
 void PhysicsWorld::BroadPhase()
@@ -151,8 +183,8 @@ void PhysicsWorld::BroadPhase()
 	m_CollisionPairs.clear();
 
 	auto& entities = m_Manager.GetEntities();
-	for (auto itA = entities.begin(); itA != entities.end(); ++itA) {
-		for (auto itB = std::next(itA); itB != entities.end(); ++itB) {
+	for (auto itA = entities.begin(); itA != entities.end(); itA++) {
+		for (auto itB = std::next(itA); itB != entities.end(); itB++) {
 			Entity& bodyA = itA->second;
 			Entity& bodyB = itB->second;
 
@@ -161,6 +193,11 @@ void PhysicsWorld::BroadPhase()
 
 			if (Collisions::CheckAABBCollision(bodyA, bodyB))
 				m_CollisionPairs.push_back({ bodyA, bodyB });
+#ifdef GJK_DEBUG
+			else {
+				m_Collides = false;
+			}
+#endif
 		}
 	}
 }
