@@ -21,6 +21,7 @@
 #include "Structures/LightData.h"
 
 // ------ TEmp
+#include "Structures/CollisionManifold.h"
 
 class PhysicsApplication : public Application
 {
@@ -61,6 +62,7 @@ private:
 	LightData m_LightData;
 
 	// Temp
+	CollisionManifold m_CollisionManifold;
 
 	std::vector<glm::vec3> m_SimplexPoints;
 

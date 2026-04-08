@@ -86,7 +86,7 @@ void PhysicsApplication::Start()
 
 void PhysicsApplication::FixedUpdate(float fixedDeltaTime) {
 	// Update world
-	m_PhysicsWorld.Update(fixedDeltaTime, 1);
+	m_PhysicsWorld.Update(fixedDeltaTime, 10);
 }
 
 void PhysicsApplication::Update(float deltaTime)
@@ -126,6 +126,89 @@ void PhysicsApplication::RenderScene()
 		Renderer::DrawMesh(*m_Shader, *(entity.second->GetMesh()), properties.color);
 	}
 	Renderer::EndScene(*m_Shader);
+
+#ifdef COLLISION_POINTS_DEBUG
+	Renderer::BeginScene(*m_Camera, *m_SolidColorShader);
+
+	m_CollisionManifold = m_PhysicsWorld.GetCollisionManifold();
+	size_t count = m_CollisionManifold.contactPoints.size();
+
+	if (m_CollisionManifold.reference) {
+		glDisable(GL_DEPTH_TEST);/*
+		glm::vec3 v0 = m_CollisionManifold.reference->vertices[0];
+		std::cout << v0.x << " " << v0.y << " " << v0.z << "\n";*/
+
+		m_OBBPointsVBO->Bind();
+		m_OBBPointsVBO->ChangeData((const void*)m_CollisionManifold.reference->vertices, 4 * sizeof(glm::vec3));
+		m_OBBPointsVAO->Bind();
+
+		m_SolidColorShader->SetUniform4f("uColor", 0.0f, 1.0f, 1.0f, 0.6f);
+		glPointSize(10.0f);
+		glDrawArrays(GL_POINTS, 0, 4);
+		glPointSize(1.0f);
+
+		m_SolidColorShader->SetUniform4f("uColor", 0.0f, 0.1f, 0.8f, 0.6f);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		m_OBBPointsVAO->UnBind();
+		glEnable(GL_DEPTH_TEST);
+	}
+
+	if (m_CollisionManifold.incident) {
+		glDisable(GL_DEPTH_TEST);/*
+		glm::vec3 v0 = m_CollisionManifold.incident->vertices[0];
+		std::cout << v0.x << " " << v0.y << " " << v0.z << "\n";*/
+
+		m_OBBPointsVBO->Bind();
+		m_OBBPointsVBO->ChangeData((const void*)m_CollisionManifold.incident->vertices, 4 * sizeof(glm::vec3));
+		m_OBBPointsVAO->Bind();
+
+		m_SolidColorShader->SetUniform4f("uColor", 1.0f, 0.0f, 1.0f, 0.6f);
+		glPointSize(10.0f);
+		glDrawArrays(GL_POINTS, 0, 4);
+		glPointSize(1.0f);
+
+		m_SolidColorShader->SetUniform4f("uColor", 1.0f, 0.8f, 0.1f, 0.6f);
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		m_OBBPointsVAO->UnBind();
+		glEnable(GL_DEPTH_TEST);
+	}
+
+	if (glm::length(m_CollisionManifold.normal) != 0) {
+		glDisable(GL_DEPTH_TEST);/*
+		glm::vec3 v0 = m_CollisionManifold.incident->vertices[0];
+		std::cout << v0.x << " " << v0.y << " " << v0.z << "\n";*/
+		std::vector<glm::vec3> normalToDraw = {
+			{0.0f, 0.0f, 0.0f},
+			m_CollisionManifold.normal
+		};
+		m_OBBPointsVBO->Bind();
+		m_OBBPointsVBO->ChangeData((const void*)normalToDraw.data(), 2 * sizeof(glm::vec3));
+		m_OBBPointsVAO->Bind();
+
+		m_SolidColorShader->SetUniform4f("uColor", 1.0f, 0.8f, 0.1f, 0.6f);
+		glDrawArrays(GL_LINES, 0, 2);
+		m_OBBPointsVAO->UnBind();
+		glEnable(GL_DEPTH_TEST);
+	}
+	if (count > 0) {
+
+		//std::cout << "Contact point count: " << count << "\n";
+		m_OBBPointsVBO->Bind();
+		m_OBBPointsVBO->ChangeData(m_CollisionManifold.contactPoints.data(), count * sizeof(glm::vec3));
+		m_OBBPointsVAO->Bind();
+
+		m_SolidColorShader->SetUniform4f("uColor", 1.0f, 0.1f, 0.1f, 1.0f);
+		glPointSize(10.0f);
+		glDrawArrays(GL_POINTS, 0, count);
+
+		m_OBBPointsVAO->UnBind();
+
+		glPointSize(1.0f);
+		glLineWidth(1.0f);
+	}
+
+	Renderer::EndScene(*m_SolidColorShader);
+#endif
 
 #ifdef GJK_DEBUG
 	Renderer::BeginScene(*m_Camera, *m_SolidColorShader);
@@ -367,14 +450,6 @@ void PhysicsApplication::ShowImGui()
 		ShowEntityMenu();
 	}
 	
-
-#ifdef GJK_DEBUG
-
-	if (m_PhysicsWorld.GetCollides()) {
-		ImGui::Begin("Collides");
-		ImGui::End();
-	}
-#endif
 }
 
 void PhysicsApplication::ShowMainMenu()

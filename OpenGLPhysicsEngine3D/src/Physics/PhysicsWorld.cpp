@@ -130,6 +130,11 @@ void PhysicsWorld::NarrowPhase()
 	m_MinkowsiDiff.clear();
 	m_MinkowsiDiff.reserve(64);
 #endif
+
+#ifdef ROTATIONAL_PHYSICS_TEST
+	m_CollisionManifold.contactPoints.clear();
+#endif
+
 	for (size_t i = 0; i < m_CollisionPairs.size(); i++) {
 		Entity& bodyA = m_CollisionPairs[i].bodyA;
 		Entity& bodyB = m_CollisionPairs[i].bodyB;
@@ -144,34 +149,33 @@ void PhysicsWorld::NarrowPhase()
 
 
 #ifndef GJK_DEBUG
-		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth, contactPoints)) {
-			//auto contacts = Collisions::GenerateOBBContactPoints(bodyA->GetOBB(), bodyB->GetOBB(), normal, depth);
+		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
 			//std::printf("x: %f    y: %f    z: %f\n", contactPoint.x, contactPoint.y, contactPoint.z);
 
+	#ifndef ROTATIONAL_PHYSICS_TEST
 			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
-
 			ResolveCollision(bodyA, bodyB, normal, depth);
-			//ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, contactPoints);
-			//ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, contactPoints);
+	#endif
+
+	#ifdef ROTATIONAL_PHYSICS_TEST
+			m_CollisionManifold = Collisions::FindOBBContactPoints(bodyA, bodyB, normal, depth);
+			//std::cout << "Collides: "<< m_CollisionManifold.contactPoints.size() << "\n";
+
+			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
+			ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
+			//ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
+	#endif
+
 		}
 #endif
 
 
 #ifdef GJK_DEBUG
 		if (GJK::Solve(bodyA, bodyB, m_Simplex, &m_MinkowsiDiff)) {
-			EPAResult r = EPA::Solve(m_Simplex, bodyA, bodyB);
+			std::cout << "Collision Detected\n";
+			//EPAResult r = EPA::Solve(m_Simplex, bodyA, bodyB);
 
-			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, r.normal, r.depth);
-
-			/*if (!m_Collides) {
-				m_Collides = true;
-			}*/
-
-		}
-		else {
-			/*if (m_Collides) {
-				m_Collides = false;
-			}*/
+			//SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, r.normal, r.depth);
 		}
 #endif
 	}
@@ -193,11 +197,6 @@ void PhysicsWorld::BroadPhase()
 
 			if (Collisions::CheckAABBCollision(bodyA, bodyB))
 				m_CollisionPairs.push_back({ bodyA, bodyB });
-#ifdef GJK_DEBUG
-			else {
-				m_Collides = false;
-			}
-#endif
 		}
 	}
 }
@@ -270,6 +269,7 @@ void PhysicsWorld::ResolveCollisionWithRotation3D(
 	float depth,
 	const std::vector<glm::vec3>& contactPoints)
 {
+
 	ObjectProperties& propertiesA = bodyA.GetProperties();
 	ObjectProperties& propertiesB = bodyB.GetProperties();
 
@@ -316,7 +316,7 @@ void PhysicsWorld::ResolveCollisionWithRotation3D(
 
 		float contactVelocityMag = glm::dot(relativeVelocity, actualNormal);
 
-		if (contactVelocityMag >= 0.0f)
+		if (contactVelocityMag > 0.0f)
 			continue;
 
 		glm::vec3 geometricTorqueA = glm::cross(rA, actualNormal);
@@ -397,7 +397,7 @@ void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
 
 		float contactVelocityMag = glm::dot(relativeVelocity, actualNormal);
 
-		if (contactVelocityMag >= 0.0f)
+		if (contactVelocityMag > 0.0f)
 			continue;
 
 		glm::vec3 geometricTorqueA = glm::cross(rA, actualNormal);
@@ -450,11 +450,12 @@ void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
 				float jt = -glm::dot(relativeVelocity, tangent) / (denominator * (float)contactCount);
 
 				float frictionMag;
-				if (glm::abs(jt) <= j * sf) {
+				float jAbs = std::abs(j);
+				if (std::abs(jt) <= jAbs * sf) {
 					frictionMag = jt;
 				}
 				else {
-					frictionMag = -j * df;
+					frictionMag = (jt > 0.0f ? 1.0f : -1.0f) * jAbs * df;
 				}
 
 				glm::vec3 frictionImpulse = frictionMag * tangent;

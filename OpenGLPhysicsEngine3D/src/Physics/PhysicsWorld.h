@@ -14,6 +14,7 @@
 
 
 #include "Structures/Simplex.h"
+#include "Structures/CollisionManifold.h"
 
 class PhysicsWorld : public IPausable
 {
@@ -37,6 +38,10 @@ public:
 	static void SetIsVaccum(bool v) { m_IsVacuum = v; }
 	static bool GetIsVaccum() { return m_IsVacuum; }
 
+
+	const std::vector<glm::vec3>& GetContactPoints() const { return m_CollisionManifold.contactPoints; }
+	const CollisionManifold& GetCollisionManifold() const { return m_CollisionManifold; }
+
 #ifdef GJK_DEBUG
 
 	const std::vector<glm::vec3>& GetMinkowsiDiff() const { return m_MinkowsiDiff; }
@@ -56,7 +61,6 @@ public:
 		}
 	}
 
-	bool GetCollides() { return m_Collides; }
 
 #endif
 
@@ -97,12 +101,11 @@ private:
 
 
 
+	CollisionManifold m_CollisionManifold;
+	std::vector<glm::vec3> m_ContactPoints;
 
 #ifdef GJK_DEBUG
-
 	// GJK
-	bool m_Collides = false;
-
 	Simplex m_Simplex;
 
 	std::vector<glm::vec3> m_MinkowsiDiff;

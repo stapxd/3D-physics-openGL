@@ -29,21 +29,23 @@ std::vector<glm::vec3> Collisions::GetOBBVertices(const OBB& obb) {
     return vertices;
 }
 
-Face Collisions::GetIncidentFace(const OBB& obb, const glm::vec3& hitNormal) {
+Face Collisions::GetContactFace(const OBB& obb, const glm::vec3& hitNormal) {
     Face face;
 
-    float minDot = 1.0f;
+    float maxDot = -1.0f;
     int axisIndex = 0;
+
     for (int i = 0; i < 3; i++) {
-        float d = glm::dot(hitNormal, obb.axes[i]);
-        if (d < minDot) {
-            minDot = d;
+        float d = glm::abs(glm::dot(hitNormal, obb.axes[i]));
+        if (d > maxDot) {
+            maxDot = d;
             axisIndex = i;
         }
     }
 
     glm::vec3 normal = obb.axes[axisIndex];
-    if (glm::dot(hitNormal, normal) > 0.0f) normal = -normal;
+    if (glm::dot(hitNormal, normal) > 0.0f)
+        normal = -normal;
 
     int i1 = (axisIndex + 1) % 3;
     int i2 = (axisIndex + 2) % 3;
@@ -57,33 +59,123 @@ Face Collisions::GetIncidentFace(const OBB& obb, const glm::vec3& hitNormal) {
     return face;
 }
 
-void Collisions::Clip(std::vector<glm::vec3>& points, const glm::vec3& planeNormal, float planeDist) {
+void Collisions::Clip(std::vector<glm::vec3>& points, const glm::vec3& planeNormal, float planeDistance) {
     std::vector<glm::vec3> clipped;
     if (points.empty()) return;
 
     glm::vec3 p1 = points.back();
-    float d1 = glm::dot(p1, planeNormal) - planeDist;
+    float d1 = glm::dot(planeNormal, p1) - planeDistance;
 
     for (const auto& p2 : points) {
-        float d2 = glm::dot(p2, planeNormal) - planeDist;
+        float d2 = glm::dot(planeNormal, p2) - planeDistance;
 
-        if (d2 <= 0.0f) {
-            if (d1 > 0.0f) {
-                clipped.push_back(p1 + (p2 - p1) * (d1 / (d1 - d2)));
-            }
+        if (d1 >= 0.0f && d2 >= 0.0f) {
             clipped.push_back(p2);
         }
-        else if (d1 <= 0.0f) {
-            clipped.push_back(p1 + (p2 - p1) * (d1 / (d1 - d2)));
+        else if (d1 >= 0.0f && d2 < 0.0f) {
+            float t = d1 / (d1 - d2);
+            clipped.push_back(p1 + t * (p2 - p1));
         }
+        else if (d1 < 0.0f && d2 >= 0.0f) {
+            float t = d1 / (d1 - d2);
+            clipped.push_back(p1 + t * (p2 - p1));
+            clipped.push_back(p2);
+        }
+
         p1 = p2;
         d1 = d2;
     }
     points = clipped;
 }
-bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth, std::vector<glm::vec3>& contactPoints)
+
+CollisionManifold Collisions::FindOBBContactPoints(Entity& bodyA, Entity& bodyB, glm::vec3 normal, float depth)
 {
-    contactPoints.clear();
+    CollisionManifold collisionManifold;
+
+    collisionManifold.depth = depth;
+    collisionManifold.normal = normal;
+
+    Face faceA = GetContactFace(bodyA->GetOBB(), -normal);
+    Face faceB = GetContactFace(bodyB->GetOBB(), normal);
+
+    for (int i = 0; i < 4; i++) {
+        collisionManifold.pointsOfFaces.push_back(faceA.vertices[i]);
+        collisionManifold.pointsOfFaces.push_back(faceB.vertices[i]);
+    }
+
+    std::shared_ptr<Face> reference;
+    std::shared_ptr<Face> incident;
+
+    bool flipped = false;
+
+    float dotA = glm::abs(glm::dot(faceA.normal, normal));
+    float dotB = glm::abs(glm::dot(faceB.normal, normal));
+
+    OBB referenceOBB = bodyA->GetOBB();
+
+    const float bias = 1.05f;
+    if (dotA * bias >= dotB) {
+        reference = std::make_shared<Face>(faceA);
+        incident = std::make_shared<Face>(faceB);
+        referenceOBB = bodyA->GetOBB();
+    }
+    else {
+        reference = std::make_shared<Face>(faceB);
+        incident = std::make_shared<Face>(faceA);
+        referenceOBB = bodyB->GetOBB();
+        flipped = true;
+    }
+
+    collisionManifold.reference = reference;
+    collisionManifold.incident = incident;
+
+    int refAxisIdx = 0;
+    float maxDot = 0.0f;
+    for (int i = 0; i < 3; i++) {
+        float dot = glm::abs(glm::dot(reference->normal, referenceOBB.axes[i]));
+        if (dot > maxDot) {
+            maxDot = dot;
+            refAxisIdx = i;
+        }
+    }
+
+    int i1 = (refAxisIdx + 1) % 3;
+    int i2 = (refAxisIdx + 2) % 3;
+
+    std::vector<glm::vec3> contactPoints = {
+        incident->vertices[0], incident->vertices[1],
+        incident->vertices[2], incident->vertices[3]
+    };
+
+   /* std::vector<glm::vec3> contactPoints = {
+        incident->vertices[0]
+    };*/
+
+    float d1 = glm::dot(referenceOBB.axes[i1], referenceOBB.center);
+    float d2 = glm::dot(referenceOBB.axes[i2], referenceOBB.center);
+
+    Clip(contactPoints, -referenceOBB.axes[i1], -(d1 + referenceOBB.halfSize[i1]));
+    Clip(contactPoints, referenceOBB.axes[i1], d1 - referenceOBB.halfSize[i1]);
+
+    Clip(contactPoints, -referenceOBB.axes[i2], -(d2 + referenceOBB.halfSize[i2]));
+    Clip(contactPoints, referenceOBB.axes[i2], d2 - referenceOBB.halfSize[i2]);
+
+    std::vector<glm::vec3> finalPoints; // ---
+    float refPlaneDist = glm::dot(reference->normal, reference->vertices[0]);
+
+    for (const auto& p : contactPoints) {
+        float separation = glm::dot(reference->normal, p) - refPlaneDist;
+
+        if (separation <= 0.01f) {
+            collisionManifold.contactPoints.push_back(p);
+        }
+    }
+
+    return collisionManifold;
+}
+
+bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth)
+{
     const float eps = 1e-4f;
     depth = FLT_MAX;
 
@@ -187,57 +279,8 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
 
     if (glm::dot(tA, normal) < 0)
         normal = -normal;
-
-    // Contact Points
-    glm::vec3 hA = obbA.halfSize;
-    glm::vec3 hB = obbB.halfSize;
-
-    OBB* ref = &obbA; OBB* inc = &obbB;
-    glm::vec3 rH = hA, iH = hB;
-    bool flipped = false;
-
-    float aMax = 0, bMax = 0;
-    for (int i = 0; i < 3; i++) {
-        aMax = std::max(aMax, std::abs(glm::dot(normal, obbA.axes[i])));
-        bMax = std::max(bMax, std::abs(glm::dot(normal, obbB.axes[i])));
-    }
-    if (bMax > aMax) { std::swap(ref, inc); std::swap(rH, iH); flipped = true; }
-
-    Face incidentFace = GetIncidentFace(*inc, flipped ? -normal : normal);
-
-    int refAxis = 0; float maxD = 0;
-    for (int i = 0; i < 3; i++) {
-        float d = std::abs(glm::dot(flipped ? -normal : normal, ref->axes[i]));
-        if (d > maxD) { maxD = d; refAxis = i; }
-    }
-
-    int s1 = (refAxis + 1) % 3; int s2 = (refAxis + 2) % 3;
-    std::vector<glm::vec3> points = { incidentFace.vertices[0], incidentFace.vertices[1], incidentFace.vertices[2], incidentFace.vertices[3] };
-
-    Clip(points, ref->axes[s1], glm::dot(ref->center + ref->axes[s1] * rH[s1], ref->axes[s1]));
-    Clip(points, -ref->axes[s1], glm::dot(ref->center - ref->axes[s1] * rH[s1], -ref->axes[s1]));
-    Clip(points, ref->axes[s2], glm::dot(ref->center + ref->axes[s2] * rH[s2], ref->axes[s2]));
-    Clip(points, -ref->axes[s2], glm::dot(ref->center - ref->axes[s2] * rH[s2], -ref->axes[s2]));
-
-    glm::vec3 refNormal = ref->axes[refAxis];
-    if (glm::dot(refNormal, flipped ? -normal : normal) < 0) refNormal = -refNormal;
-    float planeDist = glm::dot(ref->center + refNormal * rH[refAxis], refNormal);
-
-    for (auto& p : points) {
-        float separation = glm::dot(p, refNormal) - planeDist;
-        if (separation <= 0.1f) {
-            contactPoints.push_back(p);
-        }
-    }
-
-    if (contactPoints.empty()) {
-        for (int i = 0; i < 4; i++) {
-            float s = glm::dot(incidentFace.vertices[i], refNormal) - planeDist;
-            if (s <= 0.1f) contactPoints.push_back(incidentFace.vertices[i]);
-        }
-    }
-
-    return !contactPoints.empty();
+    
+    return true;
 }
 
 bool Collisions::CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distance, glm::vec3* hitPoint)
