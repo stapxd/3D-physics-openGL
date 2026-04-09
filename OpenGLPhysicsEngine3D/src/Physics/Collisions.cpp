@@ -1,6 +1,9 @@
 #include "Collisions.h"
 #include "Structures/OBB.h"
 
+#include "Objects/Sphere.h"
+#include "Objects/Cube.h"
+
 #include <array>
 
 bool Collisions::CheckAABBCollision(Entity& bodyA, Entity& bodyB)
@@ -88,15 +91,15 @@ void Collisions::Clip(std::vector<glm::vec3>& points, const glm::vec3& planeNorm
     points = clipped;
 }
 
-CollisionManifold Collisions::FindOBBContactPoints(Entity& bodyA, Entity& bodyB, glm::vec3 normal, float depth)
+CollisionManifold Collisions::FindOBBContactPoints(const OBB& bodyAOBB, const OBB& bodyBOBB, glm::vec3 normal, float depth)
 {
     CollisionManifold collisionManifold;
 
     collisionManifold.depth = depth;
     collisionManifold.normal = normal;
 
-    Face faceA = GetContactFace(bodyA->GetOBB(), -normal);
-    Face faceB = GetContactFace(bodyB->GetOBB(), normal);
+    Face faceA = GetContactFace(bodyAOBB, -normal);
+    Face faceB = GetContactFace(bodyBOBB, normal);
 
     for (int i = 0; i < 4; i++) {
         collisionManifold.pointsOfFaces.push_back(faceA.vertices[i]);
@@ -111,18 +114,18 @@ CollisionManifold Collisions::FindOBBContactPoints(Entity& bodyA, Entity& bodyB,
     float dotA = glm::abs(glm::dot(faceA.normal, normal));
     float dotB = glm::abs(glm::dot(faceB.normal, normal));
 
-    OBB referenceOBB = bodyA->GetOBB();
+    OBB referenceOBB = bodyAOBB;
 
     const float bias = 1.05f;
     if (dotA * bias >= dotB) {
         reference = std::make_shared<Face>(faceA);
         incident = std::make_shared<Face>(faceB);
-        referenceOBB = bodyA->GetOBB();
+        referenceOBB = bodyAOBB;
     }
     else {
         reference = std::make_shared<Face>(faceB);
         incident = std::make_shared<Face>(faceA);
-        referenceOBB = bodyB->GetOBB();
+        referenceOBB = bodyBOBB;
         flipped = true;
     }
 
@@ -280,6 +283,102 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
     if (glm::dot(tA, normal) < 0)
         normal = -normal;
     
+    return true;
+}
+
+bool Collisions::CheckSphereOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth, std::vector<glm::vec3>& contactPoints)
+{
+    Sphere* sphereEntity = (Sphere*)(bodyA.GetEntity());
+    Cube* cubeEntity = (Cube*)(bodyB.GetEntity());
+
+    OBB obb = cubeEntity->GetOBB();
+    glm::vec3 sphereCenter = sphereEntity->GetMesh()->GetModel()[3];
+    float radius = sphereEntity->GetRadius();
+
+    glm::vec3 relativeCenter = sphereCenter - obb.center;
+
+    glm::vec3 localCenter;
+    localCenter.x = glm::dot(relativeCenter, obb.axes[0]);
+    localCenter.y = glm::dot(relativeCenter, obb.axes[1]);
+    localCenter.z = glm::dot(relativeCenter, obb.axes[2]);
+
+    glm::vec3 localClosestPoint;
+    localClosestPoint.x = glm::clamp(localCenter.x, -obb.halfSize.x, obb.halfSize.x);
+    localClosestPoint.y = glm::clamp(localCenter.y, -obb.halfSize.y, obb.halfSize.y);
+    localClosestPoint.z = glm::clamp(localCenter.z, -obb.halfSize.z, obb.halfSize.z);
+
+    glm::vec3 worldClosestPoint = obb.center; // <--- contact point
+    for (int i = 0; i < 3; i++) {
+        worldClosestPoint += obb.axes[i] * localClosestPoint[i];
+    }
+
+    glm::vec3 collisionVec = worldClosestPoint - sphereCenter;
+    float distanceSq = glm::dot(collisionVec, collisionVec);
+
+    if (distanceSq >= radius * radius) {
+        return false;
+    }
+
+    float distance = std::sqrt(distanceSq);
+
+    if (distance > 0.0001f) {
+        normal = collisionVec / distance;
+        depth = radius - distance;
+    }
+    else {
+        float faceDistX = obb.halfSize.x - std::abs(localCenter.x);
+        float faceDistY = obb.halfSize.y - std::abs(localCenter.y);
+        float faceDistZ = obb.halfSize.z - std::abs(localCenter.z);
+
+        if (faceDistX < faceDistY && faceDistX < faceDistZ) {
+            normal = (localCenter.x > 0) ? obb.axes[0] : -obb.axes[0];
+            depth = faceDistX + radius;
+        }
+        else if (faceDistY < faceDistZ) {
+            normal = (localCenter.y > 0) ? obb.axes[1] : -obb.axes[1];
+            depth = faceDistY + radius;
+        }
+        else {
+            normal = (localCenter.z > 0) ? obb.axes[2] : -obb.axes[2];
+            depth = faceDistZ + radius;
+        }
+    }
+
+    contactPoints.push_back(worldClosestPoint);
+
+    return true;
+}
+
+bool Collisions::CheckSphereSphereCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth, std::vector<glm::vec3>& contactPoints)
+{
+    glm::vec3 posA = glm::vec3(bodyA.GetEntity()->GetMesh()->GetModel()[3]);
+    glm::vec3 posB = glm::vec3(bodyB.GetEntity()->GetMesh()->GetModel()[3]);
+
+    glm::vec3 relativePos = posB - posA;
+    float distanceSq = glm::dot(relativePos, relativePos);
+
+    float radiusA = ((Sphere*)bodyA.GetEntity())->GetRadius();
+    float radiusB = ((Sphere*)bodyB.GetEntity())->GetRadius();
+
+    float radiusSum = radiusA + radiusB;
+
+    if (distanceSq >= radiusSum * radiusSum) {
+        return false;
+    }
+
+    float distance = glm::sqrt(distanceSq);
+
+    if (distance != 0.0f) {
+        depth = radiusSum - distance;
+        normal = relativePos / distance;
+    }
+    else {
+        depth = radiusSum;
+        normal = glm::vec3(0.0f, 1.0f, 0.0f);
+    }
+
+    contactPoints.push_back(posA + (normal * radiusA));
+
     return true;
 }
 

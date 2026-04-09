@@ -14,8 +14,12 @@ class Collisions
 {
 public:
     static bool CheckAABBCollision(Entity& bodyA, Entity& bodyB);
+
     static bool CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth);
-    static CollisionManifold FindOBBContactPoints(Entity& bodyA, Entity& bodyB, glm::vec3 normal, float depth);
+    static bool CheckSphereOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth, std::vector<glm::vec3>& contactPoints);
+    static bool CheckSphereSphereCollision(Entity& bodyA, Entity& bodyB, glm::vec3& normal, float& depth, std::vector<glm::vec3>& contactPoints);
+
+    static CollisionManifold FindOBBContactPoints(const OBB& bodyAOBB, const OBB& bodyBOBB, glm::vec3 normal, float depth);
 
     static bool CheckRayOBBCollision(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const OBB& obb, float& distance, glm::vec3* hitPoint);
 

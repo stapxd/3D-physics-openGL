@@ -131,9 +131,7 @@ void PhysicsWorld::NarrowPhase()
 	m_MinkowsiDiff.reserve(64);
 #endif
 
-#ifdef ROTATIONAL_PHYSICS_TEST
 	m_CollisionManifold.contactPoints.clear();
-#endif
 
 	for (size_t i = 0; i < m_CollisionPairs.size(); i++) {
 		Entity& bodyA = m_CollisionPairs[i].bodyA;
@@ -146,10 +144,30 @@ void PhysicsWorld::NarrowPhase()
 		bool isStatic_A = bodyA.GetProperties().rigidbody.isStatic;
 		bool isStatic_B = bodyB.GetProperties().rigidbody.isStatic;
 
-
-
 #ifndef GJK_DEBUG
-		if (Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth)) {
+		bool collided = false;
+
+		EntityTypes typeA = bodyA.GetType();
+		EntityTypes typeB = bodyB.GetType();
+
+		if (typeA == EntityTypes::Cube && typeB == EntityTypes::Cube) {
+			collided = Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth);
+			m_CollisionManifold = Collisions::FindOBBContactPoints(bodyA->GetOBB(), bodyB->GetOBB(), normal, depth);
+		}
+		else if (typeA == EntityTypes::Sphere && typeB == EntityTypes::Sphere) {
+			collided = Collisions::CheckSphereSphereCollision(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
+		}
+		else {
+			if (typeA == EntityTypes::Sphere) {
+				collided = Collisions::CheckSphereOBBCollision(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
+			}
+			else {
+				collided = Collisions::CheckSphereOBBCollision(bodyB, bodyA, normal, depth, m_CollisionManifold.contactPoints);
+				normal = -normal;
+			}
+		}
+
+		if (collided) {
 			//std::printf("x: %f    y: %f    z: %f\n", contactPoint.x, contactPoint.y, contactPoint.z);
 
 	#ifndef ROTATIONAL_PHYSICS_TEST
@@ -158,7 +176,6 @@ void PhysicsWorld::NarrowPhase()
 	#endif
 
 	#ifdef ROTATIONAL_PHYSICS_TEST
-			m_CollisionManifold = Collisions::FindOBBContactPoints(bodyA, bodyB, normal, depth);
 			//std::cout << "Collides: "<< m_CollisionManifold.contactPoints.size() << "\n";
 
 			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
@@ -241,7 +258,8 @@ void PhysicsWorld::ResolveCollision(Entity& bodyA, Entity& bodyB, glm::vec3 norm
 
 	glm::vec3 relativeVelocity = propertiesA.rigidbody.linearVelocity - propertiesB.rigidbody.linearVelocity;
 
-	float e = std::min(propertiesA.rigidbody.restitution, propertiesB.rigidbody.restitution);
+	//float e = std::min(propertiesA.rigidbody.restitution, propertiesB.rigidbody.restitution);
+	float e = (propertiesA.rigidbody.restitution + propertiesB.rigidbody.restitution) / 2.0f;
 
 	float numerator = -(1 + e) * glm::dot(relativeVelocity, normal);
 	
@@ -289,7 +307,8 @@ void PhysicsWorld::ResolveCollisionWithRotation3D(
 		actualNormal = -actualNormal;
 	}
 
-	float e = std::min(rbA.restitution, rbB.restitution);
+	//float e = std::min(rbA.restitution, rbB.restitution);
+	float e = (rbA.restitution + rbB.restitution) / 2.0f;
 
 	float massA = rbA.mass;
 	float invMassA = (!rbA.isStatic && massA > 0.0f)
@@ -368,7 +387,9 @@ void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
 		actualNormal = -actualNormal;
 	}
 
-	float e = std::min(rbA.restitution, rbB.restitution);
+	//float e = std::min(rbA.restitution, rbB.restitution);
+	float e = (rbA.restitution + rbB.restitution) * 0.5f;
+
 	float sf = (rbA.staticFriction + rbB.staticFriction) * 0.5f;
 	float df = (rbA.dynamicFriction + rbB.dynamicFriction) * 0.5f;
 

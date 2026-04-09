@@ -194,7 +194,11 @@ void PhysicsApplication::RenderScene()
 	}
 	if (count > 0) {
 
-		//std::cout << "Contact point count: " << count << "\n";
+		std::cout << "Contact point count: " << count << "\n";
+		
+		glm::vec3 cp0 = m_CollisionManifold.contactPoints[0];
+		std::cout << cp0.x << " " << cp0.y << " " << cp0.z << "\n";
+
 		m_OBBPointsVBO->Bind();
 		m_OBBPointsVBO->ChangeData(m_CollisionManifold.contactPoints.data(), count * sizeof(glm::vec3));
 		m_OBBPointsVAO->Bind();
