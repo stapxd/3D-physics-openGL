@@ -15,6 +15,8 @@
 
 #include "Structures/ObjectProperties.h"
 
+#include "Objects/Sphere.h"
+
 
 // TEMP ---------------------
 #include "Physics/GJK.h"
@@ -566,8 +568,39 @@ void PhysicsApplication::ShowEntityMenu()
 			}
 		}
 
+		EntityTypes type = m_SelectedEntity->GetType();
+		switch (type)
+		{
+		case EntityTypes::Cube:
+			{
+				if (ImGui::DragFloat3("Scale", &objectTransform.scale[0], 0.025f)) {
+					m_SelectedEntity->GetEntity()->ApplyTransform(objectTransform);
 
-		ImGui::DragFloat3("Scale", (float*)&objectTransform.scale, 0.025f);
+					m_SelectedEntity->GetEntity()->EstimateInertiaTensor(m_SelectedEntity->GetProperties().rigidbody);
+				}
+				break;
+			}
+		case EntityTypes::Sphere:
+			{
+				Sphere* sphere = (Sphere*)m_SelectedEntity->GetEntity();
+
+				float currentRadius = objectTransform.scale.x;
+
+				if (ImGui::DragFloat("Radius", &currentRadius, 0.025f, 0.5f, 10.0f, "%.3f", ImGuiSliderFlags_AlwaysClamp)) {
+
+					objectTransform.scale = glm::vec3(currentRadius);
+
+					sphere->SetRadius(currentRadius);
+
+					m_SelectedEntity->GetEntity()->ApplyTransform(objectTransform);
+
+					m_SelectedEntity->GetEntity()->EstimateInertiaTensor(m_SelectedEntity->GetProperties().rigidbody);
+				}
+				break;
+			}
+		default:
+			helpers::logError("PhysicsApplication::ShowSpawningMenu", "invalid entity type!");
+		}
 	}
 
 	ImGui::Separator();
@@ -614,8 +647,23 @@ void PhysicsApplication::ShowSpawningMenu()
 	Transform& transform = m_SpawnManager.GetProperties().transform;
 	Rigidbody3D& rigidbody = m_SpawnManager.GetProperties().rigidbody;
 
-	if (ImGui::CollapsingHeader("Transform")) {
-		ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
+	EntityTypes type = m_SpawnManager.GetSelectedEntityType();
+	switch (type)
+	{
+	case EntityTypes::Cube:
+		if (ImGui::CollapsingHeader("Transform")) {
+			ImGui::DragFloat3("Scale", &transform.scale[0], 0.025f);
+		}
+		break;
+	case EntityTypes::Sphere:
+		if (ImGui::CollapsingHeader("Transform")) {
+			if(ImGui::DragFloat("Radius", &m_Radius, 0.025f, 0.5f, 10.0f)) {
+				transform.scale = glm::vec3(m_Radius);
+			}
+		}
+		break;
+	default:
+		helpers::logError("PhysicsApplication::ShowSpawningMenu", "invalid entity type!");
 	}
 
 	if (ImGui::CollapsingHeader("Rigidbody")) {
@@ -649,10 +697,13 @@ void PhysicsApplication::ShowSpawningMenu()
 
 void PhysicsApplication::SelectEntityType()
 {
-	const char* items[] = { "Cube" };
+	const char* items[] = { "Cube", "Sphere" };
 
 	int selectedType = static_cast<int>(m_SpawnManager.GetSelectedEntityType());
 	if (ImGui::Combo("Select type", &selectedType, items, IM_ARRAYSIZE(items))) {
 		m_SpawnManager.SetSelectedEntityType(static_cast<EntityTypes>(selectedType));
+
+		Transform& transform = m_SpawnManager.GetProperties().transform;
+		transform.scale = glm::vec3(0.5f);
 	}
 }

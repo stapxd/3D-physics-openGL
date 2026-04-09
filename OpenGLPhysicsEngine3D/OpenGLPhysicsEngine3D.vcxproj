@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Objects\Sphere.cpp" />
     <ClCompile Include="src\Physics\EPA.cpp" />
     <ClCompile Include="src\Physics\GJK.cpp" />
     <ClCompile Include="src\Application\Core.cpp" />
@@ -200,6 +201,7 @@
     <ClCompile Include="src\vendor\stb\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Objects\Sphere.h" />
     <ClInclude Include="src\Physics\EPA.h" />
     <ClInclude Include="src\Physics\GJK.h" />
     <ClInclude Include="src\Application\Core.h" />

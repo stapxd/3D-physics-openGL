@@ -13,11 +13,10 @@
 class Mesh
 {
 public:
-	Mesh(unsigned int vertexCount, unsigned int indexCount);
-	Mesh() = delete;
+	Mesh();
 	Mesh(const Mesh& copy) = delete;
 
-	void Initialize(const VertexLayout& layout);
+	void Initialize(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const VertexLayout& layout);
 
 	void Scale(glm::vec3 scale);
 	void Rotate(glm::vec3 rotation);
@@ -33,9 +32,6 @@ public:
 
 	void Draw(const Shader& shader);
 
-	void SetVertices(std::vector<Vertex> vertices);
-	void SetIndices(std::vector<unsigned int> indices);
-
 	const std::vector<Vertex>& GetTransformedVertices();
 
 private:
@@ -50,6 +46,7 @@ private:
 	std::unique_ptr<IndexBuffer> m_EBO;
 
 	bool m_ShouldBeTransformed;
+	bool m_Initialized = false;
 
 	glm::vec3 m_Scale;
 	glm::vec3 m_Rotation;		//depricated

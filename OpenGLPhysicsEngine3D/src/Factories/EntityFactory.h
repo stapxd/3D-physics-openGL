@@ -8,6 +8,6 @@
 class EntityFactory
 {
 public:
-	static std::unique_ptr<IEntity> CreateEntity(EntityTypes type);
+	static std::unique_ptr<IEntity> CreateEntity(EntityTypes type, const ObjectProperties& properties);
 };
 

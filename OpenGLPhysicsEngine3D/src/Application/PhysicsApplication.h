@@ -33,6 +33,8 @@ private:
 	SaveManager  m_SaveManager;
 
 	// World
+	float m_Radius = 0.5f;
+
 	SkyBox m_SkyBox;
 	PhysicsWorld m_PhysicsWorld;
 	Entity* m_SelectedEntity = nullptr;

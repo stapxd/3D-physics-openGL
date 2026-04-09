@@ -1,20 +1,20 @@
 #include "Mesh.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <helpers.h>
 
-
-Mesh::Mesh(unsigned int vertexCount, unsigned int indexCount)
+Mesh::Mesh()
     : m_Scale(1), m_Rotation(0), m_Orientation(1.0f, 0.0f, 0.0f, 0.0f), m_Translation(0), m_Model(1)
 {
-    m_Vertices = std::vector<Vertex>(vertexCount);
-    m_TransformedVertices = std::vector<Vertex>(vertexCount);
-    m_Indices = std::vector<unsigned int>(indexCount);
-
-    m_ShouldBeTransformed = true;
 }
 
-void Mesh::Initialize(const VertexLayout& layout)
+void Mesh::Initialize(std::vector<Vertex> vertices, std::vector<unsigned int> indices, const VertexLayout& layout)
 {
+    m_Vertices = std::move(vertices);
+    m_TransformedVertices = std::vector<Vertex>(m_Vertices.size());
+    m_Indices = std::move(indices);
+
+    // Init OpenGL Buffers
     m_VAO = std::make_unique<VertexArray>();
 
     m_VBO = std::make_unique<VertexBuffer>(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex), GL_STATIC_DRAW);
@@ -26,6 +26,9 @@ void Mesh::Initialize(const VertexLayout& layout)
     m_VAO->UnBind();
     m_VBO->UnBind();
     m_EBO->UnBind();
+
+    m_Initialized = true;
+    m_ShouldBeTransformed = true;
 }
 
 void Mesh::Scale(glm::vec3 scale)
@@ -82,8 +85,15 @@ glm::mat4 Mesh::GetModel()
 
 void Mesh::Draw(const Shader& shader)
 {
+    if (!m_Initialized) {
+        helpers::logError("Mesh::Draw", "mesh is not initialized!");
+        return;
+    }
+
     //shader.Bind();
-    if (m_ShouldBeTransformed) UpdateTransformedVertices();
+    if (m_ShouldBeTransformed) 
+        UpdateTransformedVertices();
+
     shader.SetUniformMat4f("uModel", m_Model);
 
     m_VAO->Bind();
@@ -91,16 +101,6 @@ void Mesh::Draw(const Shader& shader)
     m_VAO->UnBind();
 
     //shader.UnBind();
-}
-
-void Mesh::SetVertices(std::vector<Vertex> vertices)
-{
-    m_Vertices = std::move(vertices);
-}
-
-void Mesh::SetIndices(std::vector<unsigned int> indices)
-{
-    m_Indices = std::move(indices);
 }
 
 const std::vector<Vertex>& Mesh::GetTransformedVertices()

@@ -144,6 +144,9 @@
     <ClCompile Include="src\Physics\EPA.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="src\Objects\Sphere.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h">
@@ -336,6 +339,9 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="src\Structures\CollisionManifold.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Sphere.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

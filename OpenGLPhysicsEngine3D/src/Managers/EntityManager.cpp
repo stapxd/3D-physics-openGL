@@ -6,7 +6,7 @@
 
 Entity& EntityManager::AddEntity(EntityTypes type, const ObjectProperties& properties)
 {
-	auto entityPtr = EntityFactory::CreateEntity(type);
+	auto entityPtr = EntityFactory::CreateEntity(type, properties);
 	Entity entity(m_LastId, type, std::move(entityPtr));
 	entity.GetProperties() = properties;
 
