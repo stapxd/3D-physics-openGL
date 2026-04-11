@@ -280,8 +280,9 @@ bool Collisions::CheckOBBCollision(Entity& bodyA, Entity& bodyB, glm::vec3& norm
 
     normal = glm::normalize(candidateNormal);
 
-    if (glm::dot(tA, normal) < 0)
+    if (glm::dot(tAWorld, normal) < 0.0f) {
         normal = -normal;
+    }
     
     return true;
 }

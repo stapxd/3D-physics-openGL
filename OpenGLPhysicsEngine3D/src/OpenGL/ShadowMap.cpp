@@ -14,6 +14,7 @@ ShadowMap::ShadowMap()
 ShadowMap::~ShadowMap()
 {
     GLCall(glDeleteFramebuffers(1, &m_RendererID));
+    GLCall(glDeleteTextures(1, &m_DepthMap));
 }
 
 void ShadowMap::Bind() const

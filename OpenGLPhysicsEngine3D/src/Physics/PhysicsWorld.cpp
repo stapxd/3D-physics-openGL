@@ -95,6 +95,8 @@ void PhysicsWorld::ApplyForceAtPoint()
 	if (m_ForcesAtPoints.empty()) return;
 
 	for (auto& hit : m_ForcesAtPoints) {
+		//hit.entity.Wake();
+
 		Rigidbody3D& rb = hit.entity.GetProperties().rigidbody;
 		const Transform& transform = hit.entity.GetProperties().transform;
 
@@ -152,7 +154,7 @@ void PhysicsWorld::NarrowPhase()
 
 		if (typeA == EntityTypes::Cube && typeB == EntityTypes::Cube) {
 			collided = Collisions::CheckOBBCollision(bodyA, bodyB, normal, depth);
-			m_CollisionManifold = Collisions::FindOBBContactPoints(bodyA->GetOBB(), bodyB->GetOBB(), normal, depth);
+			//m_CollisionManifold = Collisions::FindOBBContactPoints(bodyA->GetOBB(), bodyB->GetOBB(), normal, depth);
 		}
 		else if (typeA == EntityTypes::Sphere && typeB == EntityTypes::Sphere) {
 			collided = Collisions::CheckSphereSphereCollision(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
@@ -169,6 +171,8 @@ void PhysicsWorld::NarrowPhase()
 
 		if (collided) {
 			//std::printf("x: %f    y: %f    z: %f\n", contactPoint.x, contactPoint.y, contactPoint.z);
+			if (typeA == EntityTypes::Cube && typeB == EntityTypes::Cube)
+				m_CollisionManifold = Collisions::FindOBBContactPoints(bodyA->GetOBB(), bodyB->GetOBB(), normal, depth);
 
 	#ifndef ROTATIONAL_PHYSICS_TEST
 			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
@@ -179,8 +183,8 @@ void PhysicsWorld::NarrowPhase()
 			//std::cout << "Collides: "<< m_CollisionManifold.contactPoints.size() << "\n";
 
 			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
-			ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
-			//ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
+			//ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
+			ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints);
 	#endif
 
 		}
@@ -276,6 +280,11 @@ void PhysicsWorld::ResolveCollision(Entity& bodyA, Entity& bodyB, glm::vec3 norm
 	float denominator = invMassA + invMassB;
 	float j = numerator / denominator;
 
+	/*if (j > 0.05f) {
+		bodyA.Wake();
+		bodyB.Wake();
+	}*/
+
 	propertiesA.rigidbody.linearVelocity += j * invMassA * normal;
 	propertiesB.rigidbody.linearVelocity -= j * invMassB * normal;
 }
@@ -287,6 +296,7 @@ void PhysicsWorld::ResolveCollisionWithRotation3D(
 	float depth,
 	const std::vector<glm::vec3>& contactPoints)
 {
+	//std::cout << "New resolving Collision======================================\n";
 
 	ObjectProperties& propertiesA = bodyA.GetProperties();
 	ObjectProperties& propertiesB = bodyB.GetProperties();
@@ -321,43 +331,78 @@ void PhysicsWorld::ResolveCollisionWithRotation3D(
 		: 0.0f;
 
 	glm::vec3 cp(0.0f);
+	glm::vec3 rA(0.0f);
+	glm::vec3 rB(0.0f);
+	glm::vec3 angularVA(0.0f);
+	glm::vec3 angularVB(0.0f);
+	glm::vec3 relativeVelocity(0.0f);
+	float contactVelocityMag = 0.0f;
+	glm::vec3 geometricTorqueA(0.0f);
+	glm::vec3 geometricTorqueB(0.0f);
+	float angTermA = 0.0f;
+	float angTermB = 0.0f;
+	float denominator = 0.0f;
+	float j = 0.0f;
+	glm::vec3 impulse(0.0f);
 
 	for (size_t i = 0; i < contactCount; i++) {
 		cp = contactPoints[i];
 
-		glm::vec3 rA = cp - transformA.translation;
-		glm::vec3 rB = cp - transformB.translation;
+		rA = cp - transformA.translation;
+		rB = cp - transformB.translation;
 
-		glm::vec3 angularVA = glm::cross(rbA.angularVelocity, rA);
-		glm::vec3 angularVB = glm::cross(rbB.angularVelocity, rB);
+		angularVA = glm::cross(rbA.angularVelocity, rA);
+		angularVB = glm::cross(rbB.angularVelocity, rB);
 
-		glm::vec3 relativeVelocity = (rbA.linearVelocity + angularVA) - (rbB.linearVelocity + angularVB);
+		relativeVelocity = (rbA.linearVelocity + angularVA) - (rbB.linearVelocity + angularVB);
 
-		float contactVelocityMag = glm::dot(relativeVelocity, actualNormal);
+		contactVelocityMag = glm::dot(relativeVelocity, actualNormal);
+
+		/*std::cout << "--- Contact Point [" << i << "] ---\n";
+		std::cout << "CP: " << cp.x << ", " << cp.y << ", " << cp.z << "\n";
+		std::cout << "rA: " << rA.x << ", " << rA.y << ", " << rA.z << " | rB: " << rB.x << ", " << rB.y << ", " << rB.z << "\n";
+		std::cout << "RelVel: " << relativeVelocity.x << ", " << relativeVelocity.y << ", " << relativeVelocity.z << "\n";
+		std::cout << "VelMag: " << contactVelocityMag << "\n";*/
 
 		if (contactVelocityMag > 0.0f)
 			continue;
 
-		glm::vec3 geometricTorqueA = glm::cross(rA, actualNormal);
-		glm::vec3 geometricTorqueB = glm::cross(rB, actualNormal);
+		geometricTorqueA = glm::cross(rA, actualNormal);
+		geometricTorqueB = glm::cross(rB, actualNormal);
 
-		float angTermA = glm::dot(geometricTorqueA, rbA.inverseInertiaTensorWorld * geometricTorqueA);
-		float angTermB = glm::dot(geometricTorqueB, rbB.inverseInertiaTensorWorld * geometricTorqueB);
+		angTermA = glm::dot(geometricTorqueA, rbA.inverseInertiaTensorWorld * geometricTorqueA);
+		angTermB = glm::dot(geometricTorqueB, rbB.inverseInertiaTensorWorld * geometricTorqueB);
 
-		float denominator = invMassA + invMassB + angTermA + angTermB;
+		denominator = invMassA + invMassB + angTermA + angTermB;
+
+		/*std::cout << "GeoTorqueA: " << geometricTorqueA.x << ", " << geometricTorqueA.y << ", " << geometricTorqueA.z << "\n";
+		std::cout << "AngTermA: " << angTermA << " | AngTermB: " << angTermB << "\n";
+		std::cout << "Denominator: " << denominator << "\n";*/
 
 		if (denominator < 0.000001f) continue;
 
-		float j = -(1.0f + e) * contactVelocityMag;
+		j = -(1.0f + e) * contactVelocityMag;
 		j /= (denominator * (float)contactCount);
 
-		glm::vec3 impulse = j * actualNormal;
+		/*if (j > 0.05f) {
+			bodyA.Wake();
+			bodyB.Wake();
+		}*/
+
+		impulse = j * actualNormal;
+
+		/*std::cout << "Scalar Impulse (j): " << j << "\n";
+		std::cout << "Final Impulse Vector: " << impulse.x << ", " << impulse.y << ", " << impulse.z << "\n";*/
 
 		rbA.linearVelocity += impulse * invMassA;
 		rbA.angularVelocity += rbA.inverseInertiaTensorWorld * glm::cross(rA, impulse);
 
 		rbB.linearVelocity -= impulse * invMassB;
 		rbB.angularVelocity -= rbB.inverseInertiaTensorWorld * glm::cross(rB, impulse);
+
+		/*std::cout << "New LinVelA: " << rbA.linearVelocity.x << ", " << rbA.linearVelocity.y << ", " << rbA.linearVelocity.z << "\n";
+		std::cout << "New AngVelA: " << rbA.angularVelocity.x << ", " << rbA.angularVelocity.y << ", " << rbA.angularVelocity.z << "\n";
+		std::cout << "---------------------------\n" << std::endl;*/
 	}
 }
 
@@ -433,9 +478,14 @@ void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
 
 		float j = -(1.0f + e) * contactVelocityMag;
 		j /= (denominator * (float)contactCount);
+		
+		//std::cout << j << "\n";
+		/*if (j > 0.01f) {
+			bodyA.Wake();
+			bodyB.Wake();
+		}*/
 
 		glm::vec3 impulse = j * actualNormal;
-
 
 		if (!rbA.isStatic) {
 			rbA.linearVelocity += impulse * invMassA;

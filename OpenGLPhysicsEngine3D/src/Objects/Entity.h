@@ -23,6 +23,7 @@ public:
 
 	void Step(float deltaTime);
 	void Move(glm::vec3 direction);
+	void Wake();
 	//void AddRotation(glm::vec3 rotation); // depricated
 
 	void UpdateInertiaTensor();
@@ -37,5 +38,8 @@ private:
 	EntityTypes m_Type;
 	std::unique_ptr<IEntity> m_Entity;
 	ObjectProperties m_Properties;
+
+	bool m_IsSleeping = false;
+	float m_SleepTimer = 0.0f;
 };
 

@@ -18,27 +18,47 @@ Entity::Entity(unsigned int id, EntityTypes type, std::unique_ptr<IEntity> entit
 
 void Entity::Step(float deltaTime)
 {
-	if (m_Properties.rigidbody.isStatic)
+	if (m_Properties.rigidbody.isStatic /*|| m_IsSleeping*/)
 		return;
 
-	if (m_Properties.rigidbody.useGravity) {
-		glm::vec3 acceleration(0.0f);
+	//float linEnergy = glm::dot(m_Properties.rigidbody.linearVelocity, m_Properties.rigidbody.linearVelocity);
+	//float angEnergy = glm::dot(m_Properties.rigidbody.angularVelocity, m_Properties.rigidbody.angularVelocity);
 
+	//const float sleepThresholdVel = 0.05f;
+	//const float sleepThresholdAng = 0.02f;
+	//const float timeToSleep = 1.0f;
+
+	//if (linEnergy < sleepThresholdVel && angEnergy < sleepThresholdAng) {
+	//	m_SleepTimer += deltaTime;
+	//	//std::cout << "Object " << m_Id << " sleeping in: " << (timeToSleep - m_SleepTimer) << std::endl;
+	//}
+	//else {
+	//	m_SleepTimer = 0.0f;
+	//}
+
+	//if (m_SleepTimer >= timeToSleep) {
+	//	m_IsSleeping = true;
+	//	m_Properties.rigidbody.linearVelocity = glm::vec3(0);
+	//	m_Properties.rigidbody.angularVelocity = glm::vec3(0);
+	//	return;
+	//}
+
+	glm::vec3 acceleration(0.0f);
+
+	if (m_Properties.rigidbody.useGravity) {
 		if (!PhysicsWorld::GetIsVaccum()) {
 			glm::vec3 gravityForce = m_Properties.rigidbody.mass * PhysicsWorld::GetGravity();
-
 			glm::vec3 velocity = m_Properties.rigidbody.linearVelocity;
-			float speed = glm::length(velocity);
+			float speedSqr = glm::dot(velocity, velocity);
 			glm::vec3 dragForce(0.0f);
 
-			if (speed > 0.0001f) {
+			if (speedSqr > 0.0001f) {
+				float speed = glm::sqrt(speedSqr);
 				float rho = 1.225f;
 				float Cd = 1.05f;
-
 				float L = m_Properties.transform.scale.x * m_Properties.transform.scale.z;
 				float A = 1.5f * (L * L);
-
-				float dragMagnitude = 0.5f * rho * Cd * A * (speed * speed);
+				float dragMagnitude = 0.5f * rho * Cd * A * speedSqr;
 				dragForce = -glm::normalize(velocity) * dragMagnitude;
 			}
 
@@ -48,29 +68,31 @@ void Entity::Step(float deltaTime)
 		else {
 			acceleration = PhysicsWorld::GetGravity();
 		}
-
 		m_Properties.rigidbody.linearVelocity += acceleration * deltaTime;
 	}
-	else
-		m_Properties.rigidbody.linearVelocity += m_Properties.rigidbody.force * deltaTime;
-
-	Move(m_Properties.rigidbody.linearVelocity * deltaTime);
-
-	m_Properties.rigidbody.force = glm::vec3(0);
-
-	//AddRotation(m_Properties.rigidbody.angularVelocity * deltaTime);
-	UpdateOrientation(deltaTime);
-	m_Properties.rigidbody.angularVelocity *= glm::pow(0.99f, deltaTime);
-	if (glm::length(m_Properties.rigidbody.angularVelocity) < 0.001f) {
-		m_Properties.rigidbody.angularVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
+	else {
+		m_Properties.rigidbody.linearVelocity += (m_Properties.rigidbody.force / m_Properties.rigidbody.mass) * deltaTime;
 	}
 
+	Move(m_Properties.rigidbody.linearVelocity * deltaTime);
+	UpdateOrientation(deltaTime);
+
+	m_Properties.rigidbody.linearVelocity *= glm::pow(0.98f, deltaTime);
+	m_Properties.rigidbody.angularVelocity *= glm::pow(0.95f, deltaTime);
+
+	m_Properties.rigidbody.force = glm::vec3(0);
 	m_Entity->ApplyTransform(m_Properties.transform);
 }
 
 void Entity::Move(glm::vec3 direction)
 {
 	m_Properties.transform.translation += direction;
+}
+
+void Entity::Wake()
+{
+	m_IsSleeping = false;
+	m_SleepTimer = 0.0f;
 }
 
 void Entity::UpdateInertiaTensor()
