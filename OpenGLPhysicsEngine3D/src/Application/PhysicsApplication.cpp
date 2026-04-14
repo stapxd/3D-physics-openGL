@@ -88,7 +88,7 @@ void PhysicsApplication::Start()
 
 void PhysicsApplication::FixedUpdate(float fixedDeltaTime) {
 	// Update world
-	m_PhysicsWorld.Update(fixedDeltaTime, 10);
+	m_PhysicsWorld.Update(fixedDeltaTime, 1);
 }
 
 void PhysicsApplication::Update(float deltaTime)

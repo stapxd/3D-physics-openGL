@@ -1,355 +1,424 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Исходные файлы">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Application">
+      <UniqueIdentifier>{D9DE78AF-4594-F1A4-CE88-EB7B3A3DE8A8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы заголовков">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{DBC7D3B0-C769-FE86-B024-12DB9C6585D7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы ресурсов">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Enumerators">
+      <UniqueIdentifier>{DA239BDE-46D9-13D4-CFCD-0DAB3B820AD8}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Application\Application.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Application\PhysicsApplication.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Application\Renderer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\IndexBuffer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\Shader.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\VertexArray.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\VertexBuffer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\VertexLayout.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\Camera.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Objects\Cube.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_demo.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_draw.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_impl_glfw.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_impl_opengl3.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_tables.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\Axes.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Objects\Parts\Mesh.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Objects\Parts\PhysicsBody.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\PhysicsWorld.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\Collisions.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Objects\Entity.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Factories\EntityFactory.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\EntityManager.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Patterns\Iterator.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\SpawnManager.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Objects\Interfaces\IPhysicsBody.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\FrameBuffer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\ShadowMap.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\PauseManager.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Patterns\Observer.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Interfaces\IPausable.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\SaveManager.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Application\Globals.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Managers\RenderSnapshotManager.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Engine\SkyBox.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OpenGL\CubeMapTexture.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\vendor\stb\stb_image.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Application\Core.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\GJK.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Physics\EPA.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Objects\Sphere.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
+    <Filter Include="Factories">
+      <UniqueIdentifier>{05F1892C-715B-3EA3-BA99-EF4826431CF8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interfaces">
+      <UniqueIdentifier>{A9FC10E8-95B4-5235-FEBB-2B91EA92ED25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{B34CFEBD-9F19-59C9-C832-4771B45E8E57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{CF2649B1-3B06-C84C-441E-5323B07C2EAE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Interfaces">
+      <UniqueIdentifier>{C24BB694-AE2F-77EA-1790-713D0393616C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\Parts">
+      <UniqueIdentifier>{0809E69A-74C9-61D1-3D04-AB4EA983A6AD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OpenGL">
+      <UniqueIdentifier>{8A864AC8-7628-759E-5FE3-88F24B24FCEE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Patterns">
+      <UniqueIdentifier>{B6AE1992-A27B-749D-CB94-6245B7C0A92B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{888B590D-F46A-D8A8-FD82-637F69E13E0A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Structures">
+      <UniqueIdentifier>{499D90A0-3555-D2ED-9E5C-AB498A336DDE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\glm">
+      <UniqueIdentifier>{829FC5A8-6E57-07F6-D75E-E051C335A2E6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\glm\detail">
+      <UniqueIdentifier>{04D16468-70E7-62FE-B95E-EE1F25B43386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\glm\simd">
+      <UniqueIdentifier>{1EFDF202-8A88-60C7-9399-E3BBFFA3BCC7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\imgui">
+      <UniqueIdentifier>{5D3BD0F0-499E-5F95-F223-984BDE652B18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\stb">
+      <UniqueIdentifier>{8BD3C5A8-778B-07F6-E092-E051CC69A2E6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Application\PhysicsApplication.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Application\Renderer.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\IndexBuffer.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\Shader.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\VertexArray.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\VertexBuffer.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\VertexLayout.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\Camera.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Cube.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imconfig.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imgui.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imgui_internal.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imstb_rectpack.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imstb_textedit.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imstb_truetype.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3_loader.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\Axes.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Interfaces\IMesh.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Interfaces\IEntity.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Interfaces\IPhysicsBody.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\Vertex.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Parts\Mesh.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Parts\PhysicsBody.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Physics\PhysicsWorld.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Physics\Collisions.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\AABB.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\OBB.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\ObjectProperties.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\Transform.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Objects\Entity.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\EntityParameters.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Enumerators\EntityTypes.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Factories\EntityFactory.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Managers\EntityManager.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Patterns\Iterator.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Managers\SpawnManager.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\Rigidbody3D.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\CollisionPair.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\ContactPoint.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\CollisionType.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\FrameBuffer.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\ShadowMap.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Managers\PauseManager.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Patterns\Observer.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Interfaces\IPausable.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Enumerators\ApplicationStates.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Managers\SaveManager.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Application\Globals.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\ForceAtPoint.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\Face.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Managers\RenderSnapshotManager.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Engine\SkyBox.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\OpenGL\CubeMapTexture.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vendor\stb\stb_image.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Structures\LightData.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Application</Filter>
     </ClInclude>
     <ClInclude Include="src\Application\Core.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\Physics\GJK.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="src\Application\Globals.h">
+      <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\Structures\Simplex.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="src\Application\PhysicsApplication.h">
+      <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\Physics\EPA.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="src\Application\Renderer.h">
+      <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\Structures\EPAResult.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="src\Engine\Axes.h">
+      <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Structures\CollisionManifold.h">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="src\Engine\SkyBox.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enumerators\ApplicationStates.h">
+      <Filter>Enumerators</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Enumerators\EntityTypes.h">
+      <Filter>Enumerators</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Factories\EntityFactory.h">
+      <Filter>Factories</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Interfaces\IPausable.h">
+      <Filter>Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Managers\EntityManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Managers\PauseManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Managers\RenderSnapshotManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Managers\SaveManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Managers\SpawnManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Cube.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Entity.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Interfaces\IEntity.h">
+      <Filter>Objects\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Interfaces\IMesh.h">
+      <Filter>Objects\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Interfaces\IPhysicsBody.h">
+      <Filter>Objects\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Parts\Mesh.h">
+      <Filter>Objects\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Objects\Parts\PhysicsBody.h">
+      <Filter>Objects\Parts</Filter>
     </ClInclude>
     <ClInclude Include="src\Objects\Sphere.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\Camera.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\CubeMapTexture.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\FrameBuffer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\IndexBuffer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\Shader.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\ShadowMap.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\VertexArray.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\VertexBuffer.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OpenGL\VertexLayout.h">
+      <Filter>OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\Iterator.h">
+      <Filter>Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Patterns\Observer.h">
+      <Filter>Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\Collisions.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\EPA.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\GJK.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics\PhysicsWorld.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\AABB.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\CollisionManifold.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\CollisionPair.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\CollisionType.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\ContactPoint.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\EPAResult.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\EntityParameters.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\Face.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\ForceAtPoint.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\LightData.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\OBB.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\ObjectProperties.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\Rigidbody3D.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\Simplex.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\Transform.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Structures\Vertex.h">
+      <Filter>Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\common.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\exponential.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\geometric.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\integer.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\matrix.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\neon.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\packing.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\platform.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\trigonometric.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\glm\simd\vector_relational.h">
+      <Filter>vendor\glm\simd</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imconfig.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imgui.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imgui_internal.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imstb_rectpack.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imstb_textedit.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imstb_truetype.h">
+      <Filter>vendor\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vendor\stb\stb_image.h">
+      <Filter>vendor\stb</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\basic.shader" />
-    <None Include="res\shaders\axis.shader" />
-    <None Include="res\shaders\shadow.shader" />
-    <None Include="res\shaders\skybox.shader" />
-    <None Include="res\shaders\solidColor.shader" />
+    <ClCompile Include="src\Application\Application.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application\Core.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application\Globals.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application\PhysicsApplication.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application\Renderer.cpp">
+      <Filter>Application</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\Axes.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine\SkyBox.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Factories\EntityFactory.cpp">
+      <Filter>Factories</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Interfaces\IPausable.cpp">
+      <Filter>Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\EntityManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\PauseManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\RenderSnapshotManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\SaveManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Managers\SpawnManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Cube.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Entity.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Interfaces\IPhysicsBody.cpp">
+      <Filter>Objects\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Parts\Mesh.cpp">
+      <Filter>Objects\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Parts\PhysicsBody.cpp">
+      <Filter>Objects\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Objects\Sphere.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\Camera.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\CubeMapTexture.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\FrameBuffer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\IndexBuffer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\Shader.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\ShadowMap.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\VertexArray.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\VertexBuffer.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpenGL\VertexLayout.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Patterns\Iterator.cpp">
+      <Filter>Patterns</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Patterns\Observer.cpp">
+      <Filter>Patterns</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\Collisions.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\EPA.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\GJK.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Physics\PhysicsWorld.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\vendor\glm\detail\glm.cpp">
+      <Filter>vendor\glm\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_demo.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_draw.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_impl_glfw.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_impl_opengl3.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_tables.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp">
+      <Filter>vendor\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\vendor\stb\stb_image.cpp">
+      <Filter>vendor\stb</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

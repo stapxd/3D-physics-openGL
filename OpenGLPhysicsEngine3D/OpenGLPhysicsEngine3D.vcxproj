@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -9,19 +9,11 @@
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{DA79610B-46E6-1C06-0FDA-B4637B053F6E}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1c5a376a-6339-4712-9c0c-0d79a46d53f1}</ProjectGuid>
     <RootNamespace>OpenGLPhysicsEngine3D</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -29,33 +21,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -63,199 +39,140 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(ProjectDir)..\bin\Debug-windows-x86\OpenGLPhysicsEngine3D\</OutDir>
+    <IntDir>$(ProjectDir)..\bin-int\Debug-windows-x86\OpenGLPhysicsEngine3D\</IntDir>
+    <TargetName>OpenGLPhysicsEngine3D</TargetName>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)..\bin\Release-windows-x86\OpenGLPhysicsEngine3D\</OutDir>
+    <IntDir>$(ProjectDir)..\bin-int\Release-windows-x86\OpenGLPhysicsEngine3D\</IntDir>
+    <TargetName>OpenGLPhysicsEngine3D</TargetName>
+    <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLEW_STATIC;GLEW_STATIC;ROTATIONAL_PHYSICS_TEST;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\helpers\include;$(SolutionDir)OpenGLPhysicsEngine3D\src;$(SolutionDir)OpenGLPhysicsEngine3D\src\vendor;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Dependencies\GLFW\include;..\Dependencies\GLEW\include;..\Dependencies\helpers\include;src;src\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\helpers\lib;$(SolutionDir)Dependencies\GLEW\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>helpers_dll.lib;glfw3.lib;glew32s.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;helpers_dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Dependencies\GLFW\lib;..\Dependencies\GLEW\lib\Release\Win32;..\Dependencies\helpers\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <ProjectReference>
+    </ProjectReference>
+    <PostBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)Dependencies\helpers\lib\helpers_dll.dll"\ (xcopy /Q /E /Y /I "$(SolutionDir)Dependencies\helpers\lib\helpers_dll.dll" "$(TargetDir)" &gt; nul) ELSE (xcopy /Q /Y /I "$(SolutionDir)Dependencies\helpers\lib\helpers_dll.dll" "$(TargetDir)" &gt; nul)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\Dependencies\GLFW\include;..\Dependencies\GLEW\include;..\Dependencies\helpers\include;src;src\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLEW_STATIC;GLEW_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\helpers\include;$(SolutionDir)OpenGLPhysicsEngine3D\src;$(SolutionDir)OpenGLPhysicsEngine3D\src\vendor;$(SolutionDir)Dependencies\GLEW\include;$(SolutionDir)Dependencies\GLFW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\helpers\lib;$(SolutionDir)Dependencies\GLEW\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>helpers_dll.lib;glfw3.lib;glew32s.lib;opengl32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;helpers_dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\Dependencies\GLFW\lib;..\Dependencies\GLEW\lib\Release\Win32;..\Dependencies\helpers\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLEW_STATIC;GLEW_STATIC;ROTATIONAL_PHYSICS_TEST;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\helpers\include;$(SolutionDir)OpenGLPhysicsEngine3D\src;$(SolutionDir)OpenGLPhysicsEngine3D\src\vendor;$(SolutionDir)Dependencies\GLFW\include;$(SolutionDir)Dependencies\GLEW\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\helpers\lib;$(SolutionDir)Dependencies\GLEW\lib\Release\Win32;$(SolutionDir)Dependencies\GLFW\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>helpers_dll.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dependencies\helpers\include;</AdditionalIncludeDirectories>
-    </ClCompile>
-    <Link>
-      <SubSystem>Console</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)Dependencies\helpers\lib;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>helpers_dll.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
+    <ProjectReference>
+    </ProjectReference>
+    <PostBuildEvent>
+      <Command>IF EXIST "$(SolutionDir)Dependencies\helpers\lib\helpers_dll.dll"\ (xcopy /Q /E /Y /I "$(SolutionDir)Dependencies\helpers\lib\helpers_dll.dll" "$(TargetDir)" &gt; nul) ELSE (xcopy /Q /Y /I "$(SolutionDir)Dependencies\helpers\lib\helpers_dll.dll" "$(TargetDir)" &gt; nul)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Objects\Sphere.cpp" />
-    <ClCompile Include="src\Physics\EPA.cpp" />
-    <ClCompile Include="src\Physics\GJK.cpp" />
-    <ClCompile Include="src\Application\Core.cpp" />
-    <ClCompile Include="src\Engine\SkyBox.cpp" />
-    <ClCompile Include="src\Managers\RenderSnapshotManager.cpp" />
-    <ClCompile Include="src\Application\Globals.cpp" />
-    <ClCompile Include="src\Managers\SaveManager.cpp" />
-    <ClCompile Include="src\Interfaces\IPausable.cpp" />
-    <ClCompile Include="src\OpenGL\CubeMapTexture.cpp" />
-    <ClCompile Include="src\Patterns\Observer.cpp" />
-    <ClCompile Include="src\Managers\PauseManager.cpp" />
-    <ClCompile Include="src\OpenGL\ShadowMap.cpp" />
-    <ClCompile Include="src\OpenGL\FrameBuffer.cpp" />
-    <ClCompile Include="src\Managers\SpawnManager.cpp" />
-    <ClCompile Include="src\Patterns\Iterator.cpp" />
-    <ClCompile Include="src\Managers\EntityManager.cpp" />
-    <ClCompile Include="src\Factories\EntityFactory.cpp" />
-    <ClCompile Include="src\Objects\Entity.cpp" />
-    <ClCompile Include="src\Objects\Interfaces\IPhysicsBody.cpp" />
-    <ClCompile Include="src\Physics\Collisions.cpp" />
-    <ClCompile Include="src\Physics\PhysicsWorld.cpp" />
-    <ClCompile Include="src\Objects\Parts\PhysicsBody.cpp" />
-    <ClCompile Include="src\Objects\Parts\Mesh.cpp" />
-    <ClCompile Include="src\Engine\Axes.cpp" />
-    <ClCompile Include="src\Objects\Cube.cpp" />
-    <ClCompile Include="src\Application\Application.cpp" />
-    <ClCompile Include="src\Application\PhysicsApplication.cpp" />
-    <ClCompile Include="src\Application\Renderer.cpp" />
-    <ClCompile Include="src\OpenGL\Camera.cpp" />
-    <ClCompile Include="src\OpenGL\IndexBuffer.cpp" />
-    <ClCompile Include="src\OpenGL\Shader.cpp" />
-    <ClCompile Include="src\OpenGL\VertexArray.cpp" />
-    <ClCompile Include="src\OpenGL\VertexBuffer.cpp" />
-    <ClCompile Include="src\OpenGL\VertexLayout.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui_demo.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui_draw.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui_tables.cpp" />
-    <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\vendor\stb\stb_image.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\Objects\Sphere.h" />
-    <ClInclude Include="src\Physics\EPA.h" />
-    <ClInclude Include="src\Physics\GJK.h" />
-    <ClInclude Include="src\Application\Core.h" />
-    <ClInclude Include="src\Engine\SkyBox.h" />
-    <ClInclude Include="src\Managers\RenderSnapshotManager.h" />
-    <ClInclude Include="src\Application\Globals.h" />
-    <ClInclude Include="src\Managers\SaveManager.h" />
-    <ClInclude Include="src\Enumerators\ApplicationStates.h" />
-    <ClInclude Include="src\Interfaces\IPausable.h" />
-    <ClInclude Include="src\OpenGL\CubeMapTexture.h" />
-    <ClInclude Include="src\Patterns\Observer.h" />
-    <ClInclude Include="src\Managers\PauseManager.h" />
-    <ClInclude Include="src\OpenGL\ShadowMap.h" />
-    <ClInclude Include="src\OpenGL\FrameBuffer.h" />
-    <ClInclude Include="src\Managers\SpawnManager.h" />
-    <ClInclude Include="src\Patterns\Iterator.h" />
-    <ClInclude Include="src\Managers\EntityManager.h" />
-    <ClInclude Include="src\Factories\EntityFactory.h" />
-    <ClInclude Include="src\Enumerators\EntityTypes.h" />
-    <ClInclude Include="src\Objects\Entity.h" />
-    <ClInclude Include="src\Structures\CollisionManifold.h" />
-    <ClInclude Include="src\Structures\CollisionPair.h" />
-    <ClInclude Include="src\Structures\ContactPoint.h" />
-    <ClInclude Include="src\Structures\EntityParameters.h" />
-    <ClInclude Include="src\Structures\EPAResult.h" />
-    <ClInclude Include="src\Structures\Face.h" />
-    <ClInclude Include="src\Structures\ForceAtPoint.h" />
-    <ClInclude Include="src\Structures\LightData.h" />
-    <ClInclude Include="src\Structures\ObjectProperties.h" />
-    <ClInclude Include="src\Physics\Collisions.h" />
-    <ClInclude Include="src\Physics\PhysicsWorld.h" />
-    <ClInclude Include="src\Objects\Parts\PhysicsBody.h" />
-    <ClInclude Include="src\Objects\Parts\Mesh.h" />
-    <ClInclude Include="src\Engine\Axes.h" />
-    <ClInclude Include="src\Objects\Cube.h" />
     <ClInclude Include="src\Application\Application.h" />
+    <ClInclude Include="src\Application\Core.h" />
+    <ClInclude Include="src\Application\Globals.h" />
     <ClInclude Include="src\Application\PhysicsApplication.h" />
     <ClInclude Include="src\Application\Renderer.h" />
+    <ClInclude Include="src\Engine\Axes.h" />
+    <ClInclude Include="src\Engine\SkyBox.h" />
+    <ClInclude Include="src\Enumerators\ApplicationStates.h" />
+    <ClInclude Include="src\Enumerators\EntityTypes.h" />
+    <ClInclude Include="src\Factories\EntityFactory.h" />
+    <ClInclude Include="src\Interfaces\IPausable.h" />
+    <ClInclude Include="src\Managers\EntityManager.h" />
+    <ClInclude Include="src\Managers\PauseManager.h" />
+    <ClInclude Include="src\Managers\RenderSnapshotManager.h" />
+    <ClInclude Include="src\Managers\SaveManager.h" />
+    <ClInclude Include="src\Managers\SpawnManager.h" />
+    <ClInclude Include="src\Objects\Cube.h" />
+    <ClInclude Include="src\Objects\Entity.h" />
     <ClInclude Include="src\Objects\Interfaces\IEntity.h" />
     <ClInclude Include="src\Objects\Interfaces\IMesh.h" />
     <ClInclude Include="src\Objects\Interfaces\IPhysicsBody.h" />
+    <ClInclude Include="src\Objects\Parts\Mesh.h" />
+    <ClInclude Include="src\Objects\Parts\PhysicsBody.h" />
+    <ClInclude Include="src\Objects\Sphere.h" />
     <ClInclude Include="src\OpenGL\Camera.h" />
+    <ClInclude Include="src\OpenGL\CubeMapTexture.h" />
+    <ClInclude Include="src\OpenGL\FrameBuffer.h" />
     <ClInclude Include="src\OpenGL\IndexBuffer.h" />
     <ClInclude Include="src\OpenGL\Shader.h" />
+    <ClInclude Include="src\OpenGL\ShadowMap.h" />
     <ClInclude Include="src\OpenGL\VertexArray.h" />
     <ClInclude Include="src\OpenGL\VertexBuffer.h" />
     <ClInclude Include="src\OpenGL\VertexLayout.h" />
+    <ClInclude Include="src\Patterns\Iterator.h" />
+    <ClInclude Include="src\Patterns\Observer.h" />
+    <ClInclude Include="src\Physics\Collisions.h" />
+    <ClInclude Include="src\Physics\EPA.h" />
+    <ClInclude Include="src\Physics\GJK.h" />
+    <ClInclude Include="src\Physics\PhysicsWorld.h" />
     <ClInclude Include="src\Structures\AABB.h" />
-    <ClInclude Include="src\Structures\OBB.h" />
-    <ClInclude Include="src\Structures\Rigidbody3D.h" />
+    <ClInclude Include="src\Structures\CollisionManifold.h" />
+    <ClInclude Include="src\Structures\CollisionPair.h" />
     <ClInclude Include="src\Structures\CollisionType.h" />
+    <ClInclude Include="src\Structures\ContactPoint.h" />
+    <ClInclude Include="src\Structures\EPAResult.h" />
+    <ClInclude Include="src\Structures\EntityParameters.h" />
+    <ClInclude Include="src\Structures\Face.h" />
+    <ClInclude Include="src\Structures\ForceAtPoint.h" />
+    <ClInclude Include="src\Structures\LightData.h" />
+    <ClInclude Include="src\Structures\OBB.h" />
+    <ClInclude Include="src\Structures\ObjectProperties.h" />
+    <ClInclude Include="src\Structures\Rigidbody3D.h" />
     <ClInclude Include="src\Structures\Simplex.h" />
     <ClInclude Include="src\Structures\Transform.h" />
     <ClInclude Include="src\Structures\Vertex.h" />
+    <ClInclude Include="src\vendor\glm\simd\common.h" />
+    <ClInclude Include="src\vendor\glm\simd\exponential.h" />
+    <ClInclude Include="src\vendor\glm\simd\geometric.h" />
+    <ClInclude Include="src\vendor\glm\simd\integer.h" />
+    <ClInclude Include="src\vendor\glm\simd\matrix.h" />
+    <ClInclude Include="src\vendor\glm\simd\neon.h" />
+    <ClInclude Include="src\vendor\glm\simd\packing.h" />
+    <ClInclude Include="src\vendor\glm\simd\platform.h" />
+    <ClInclude Include="src\vendor\glm\simd\trigonometric.h" />
+    <ClInclude Include="src\vendor\glm\simd\vector_relational.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />
     <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h" />
@@ -268,11 +185,51 @@
     <ClInclude Include="src\vendor\stb\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\axis.shader" />
-    <None Include="res\shaders\basic.shader" />
-    <None Include="res\shaders\solidColor.shader" />
-    <None Include="res\shaders\shadow.shader" />
-    <None Include="res\shaders\skybox.shader" />
+    <ClCompile Include="src\Application\Application.cpp" />
+    <ClCompile Include="src\Application\Core.cpp" />
+    <ClCompile Include="src\Application\Globals.cpp" />
+    <ClCompile Include="src\Application\PhysicsApplication.cpp" />
+    <ClCompile Include="src\Application\Renderer.cpp" />
+    <ClCompile Include="src\Engine\Axes.cpp" />
+    <ClCompile Include="src\Engine\SkyBox.cpp" />
+    <ClCompile Include="src\Factories\EntityFactory.cpp" />
+    <ClCompile Include="src\Interfaces\IPausable.cpp" />
+    <ClCompile Include="src\Managers\EntityManager.cpp" />
+    <ClCompile Include="src\Managers\PauseManager.cpp" />
+    <ClCompile Include="src\Managers\RenderSnapshotManager.cpp" />
+    <ClCompile Include="src\Managers\SaveManager.cpp" />
+    <ClCompile Include="src\Managers\SpawnManager.cpp" />
+    <ClCompile Include="src\Objects\Cube.cpp" />
+    <ClCompile Include="src\Objects\Entity.cpp" />
+    <ClCompile Include="src\Objects\Interfaces\IPhysicsBody.cpp" />
+    <ClCompile Include="src\Objects\Parts\Mesh.cpp" />
+    <ClCompile Include="src\Objects\Parts\PhysicsBody.cpp" />
+    <ClCompile Include="src\Objects\Sphere.cpp" />
+    <ClCompile Include="src\OpenGL\Camera.cpp" />
+    <ClCompile Include="src\OpenGL\CubeMapTexture.cpp" />
+    <ClCompile Include="src\OpenGL\FrameBuffer.cpp" />
+    <ClCompile Include="src\OpenGL\IndexBuffer.cpp" />
+    <ClCompile Include="src\OpenGL\Shader.cpp" />
+    <ClCompile Include="src\OpenGL\ShadowMap.cpp" />
+    <ClCompile Include="src\OpenGL\VertexArray.cpp" />
+    <ClCompile Include="src\OpenGL\VertexBuffer.cpp" />
+    <ClCompile Include="src\OpenGL\VertexLayout.cpp" />
+    <ClCompile Include="src\Patterns\Iterator.cpp" />
+    <ClCompile Include="src\Patterns\Observer.cpp" />
+    <ClCompile Include="src\Physics\Collisions.cpp" />
+    <ClCompile Include="src\Physics\EPA.cpp" />
+    <ClCompile Include="src\Physics\GJK.cpp" />
+    <ClCompile Include="src\Physics\PhysicsWorld.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\vendor\glm\detail\glm.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_demo.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_draw.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_tables.cpp" />
+    <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\vendor\stb\stb_image.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
