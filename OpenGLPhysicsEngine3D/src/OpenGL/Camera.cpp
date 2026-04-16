@@ -68,12 +68,12 @@ glm::mat4 Camera::GetProjection() const
 	//return glm::ortho(-halfW, halfW, -halfH, halfH);
 
 	//3D
-	return glm::perspective(m_FOV, (float)m_Width / (float)m_Height, 0.1f, 1000.0f);
+	return glm::perspective(glm::radians(m_FOV), (float)m_Width / (float)m_Height, 0.1f, 1000.0f);
 }
 
 glm::mat4 Camera::GetView() const
 {
-	return glm::lookAt(m_Position, m_Position + m_Front, -m_Up);
+	return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
 glm::vec3 Camera::GetWorldPosition(glm::vec2 position) const

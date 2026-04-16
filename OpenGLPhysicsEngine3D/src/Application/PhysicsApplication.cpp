@@ -43,7 +43,7 @@ void PhysicsApplication::Start()
 	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
 	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
 
-	m_LightData.lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, m_LightData.nearPlane, m_LightData.farPlane);
+	m_LightData.lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, m_LightData.nearPlane, m_LightData.farPlane);
 
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
@@ -107,9 +107,7 @@ void PhysicsApplication::Update(float deltaTime)
 
 	m_ShadowMap->Bind();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glCullFace(GL_FRONT);
 	RenderSceneDepthMap();
-	glCullFace(GL_BACK);
 	m_ShadowMap->UnBind();
 
 	glViewport(0, 0, m_Width, m_Height);
@@ -703,9 +701,9 @@ void PhysicsApplication::SelectEntityType()
 {
 	const char* items[] = { "Cube", "Sphere" };
 
-	int selectedType = static_cast<int>(m_SpawnManager.GetSelectedEntityType());
+	int selectedType = (int)(m_SpawnManager.GetSelectedEntityType());
 	if (ImGui::Combo("Select type", &selectedType, items, IM_ARRAYSIZE(items))) {
-		m_SpawnManager.SetSelectedEntityType(static_cast<EntityTypes>(selectedType));
+		m_SpawnManager.SetSelectedEntityType((EntityTypes)(selectedType));
 
 		Transform& transform = m_SpawnManager.GetProperties().transform;
 		transform.scale = glm::vec3(0.5f);
