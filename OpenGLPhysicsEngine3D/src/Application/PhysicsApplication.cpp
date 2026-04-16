@@ -43,7 +43,7 @@ void PhysicsApplication::Start()
 	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params1);
 	//m_PhysicsWorld->AddEntity(EntityTypes::Cube, m_Params2);
 
-	m_LightData.lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, m_LightData.nearPlane, m_LightData.farPlane);
+	m_LightData.lightProjection = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, m_LightData.nearPlane, m_LightData.farPlane);
 
 	m_Axes = std::make_unique<Axes>();
 	m_Axes->Scale(glm::vec3(100, 100, 100));
