@@ -18,30 +18,8 @@ Entity::Entity(unsigned int id, EntityTypes type, std::unique_ptr<IEntity> entit
 
 void Entity::Step(float deltaTime)
 {
-	if (m_Properties.rigidbody.isStatic /*|| m_IsSleeping*/)
+	if (m_Properties.rigidbody.isStatic)
 		return;
-
-	//float linEnergy = glm::dot(m_Properties.rigidbody.linearVelocity, m_Properties.rigidbody.linearVelocity);
-	//float angEnergy = glm::dot(m_Properties.rigidbody.angularVelocity, m_Properties.rigidbody.angularVelocity);
-
-	//const float sleepThresholdVel = 0.05f;
-	//const float sleepThresholdAng = 0.02f;
-	//const float timeToSleep = 1.0f;
-
-	//if (linEnergy < sleepThresholdVel && angEnergy < sleepThresholdAng) {
-	//	m_SleepTimer += deltaTime;
-	//	//std::cout << "Object " << m_Id << " sleeping in: " << (timeToSleep - m_SleepTimer) << std::endl;
-	//}
-	//else {
-	//	m_SleepTimer = 0.0f;
-	//}
-
-	//if (m_SleepTimer >= timeToSleep) {
-	//	m_IsSleeping = true;
-	//	m_Properties.rigidbody.linearVelocity = glm::vec3(0);
-	//	m_Properties.rigidbody.angularVelocity = glm::vec3(0);
-	//	return;
-	//}
 
 	glm::vec3 acceleration(0.0f);
 
