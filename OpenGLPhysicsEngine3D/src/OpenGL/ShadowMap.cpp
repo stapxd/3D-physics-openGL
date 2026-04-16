@@ -32,7 +32,7 @@ void ShadowMap::Initialize()
     GLCall(glGenTextures(1, &m_DepthMap));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_DepthMap));
 
-    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT,
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24,
         m_ShadowWidth, m_ShadowHeight,
         0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr));
 

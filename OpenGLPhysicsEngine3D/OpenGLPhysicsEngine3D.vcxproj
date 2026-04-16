@@ -58,7 +58,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GLEW_STATIC;ROTATIONAL_PHYSICS_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Dependencies\GLFW\include;..\Dependencies\GLEW\include;..\Dependencies\helpers\include;src;src\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
@@ -83,7 +83,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>GLEW_STATIC;ROTATIONAL_PHYSICS_TEST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\Dependencies\GLFW\include;..\Dependencies\GLEW\include;..\Dependencies\helpers\include;src;src\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -200,7 +200,10 @@
     <ClCompile Include="src\Managers\SaveManager.cpp" />
     <ClCompile Include="src\Managers\SpawnManager.cpp" />
     <ClCompile Include="src\Objects\Cube.cpp" />
-    <ClCompile Include="src\Objects\Entity.cpp" />
+    <ClCompile Include="src\Objects\Entity.cpp">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="src\Objects\Interfaces\IPhysicsBody.cpp" />
     <ClCompile Include="src\Objects\Parts\Mesh.cpp" />
     <ClCompile Include="src\Objects\Parts\PhysicsBody.cpp" />

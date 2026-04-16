@@ -10,4 +10,5 @@ struct LightData {
 
 	float nearPlane = 1.0f;
 	float farPlane = 50.0f;
+	float orthoSize = 10.0f;
 };

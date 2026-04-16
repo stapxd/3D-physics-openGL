@@ -19,7 +19,7 @@ public:
 	unsigned int GetShadowWidth() const { return m_ShadowWidth; }
 	unsigned int GetShadowHeight() const { return m_ShadowHeight; }
 private:
-	const unsigned int m_ShadowWidth = 4096, m_ShadowHeight = 4095;
+	const unsigned int m_ShadowWidth = 2048, m_ShadowHeight = 2048;
 	unsigned int m_DepthMap;
 
 protected:

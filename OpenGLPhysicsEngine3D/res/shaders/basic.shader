@@ -52,7 +52,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 lightDirection, vec3 normal
 
     float currentDepth = projCoords.z;
 
-    float bias = max(0.005 * dot(normal, lightDirection), 0.0005);
+    float bias = max(0.002 * dot(normal, lightDirection), 0.0005);
     
     float shadow = 0.0;
     
