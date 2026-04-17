@@ -75,10 +75,10 @@
     <ClInclude Include="src\Application\Renderer.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\Axes.h">
+    <ClInclude Include="src\Environment\Axes.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="src\Engine\SkyBox.h">
+    <ClInclude Include="src\Environment\SkyBox.h">
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="src\Enumerators\ApplicationStates.h">
@@ -302,10 +302,10 @@
     <ClCompile Include="src\Application\Renderer.cpp">
       <Filter>Application</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\Axes.cpp">
+    <ClCompile Include="src\Environment\Axes.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Engine\SkyBox.cpp">
+    <ClCompile Include="src\Environment\SkyBox.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="src\Factories\EntityFactory.cpp">

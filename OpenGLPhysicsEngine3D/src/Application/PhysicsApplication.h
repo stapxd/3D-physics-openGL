@@ -11,8 +11,8 @@
 #include "Physics/PhysicsWorld.h"
 
 //-----
-#include "Engine/Axes.h"
-#include "Engine/SkyBox.h"
+#include "Environment/Axes.h"
+#include "Environment/SkyBox.h"
 
 #include "Managers/SpawnManager.h"
 #include "Managers/PauseManager.h"

@@ -24,6 +24,7 @@ public:
 	explicit operator bool();
 public:
 	// Getters
+	GLFWwindow* GetWindow() { return m_Window; }
 	int GetWidth() { return m_Width; }
 	int GetHeight() { return m_Height; }
 

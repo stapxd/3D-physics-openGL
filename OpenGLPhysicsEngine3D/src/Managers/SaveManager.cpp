@@ -4,6 +4,9 @@
 #include <commdlg.h>
 #include <fstream>
 
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+
 #include "Application/Globals.h"
 
 SaveManager::SaveManager(PhysicsWorld& physicsWorld)
@@ -11,12 +14,12 @@ SaveManager::SaveManager(PhysicsWorld& physicsWorld)
 {
 }
 
-void SaveManager::Save()
+void SaveManager::Save(GLFWwindow* window)
 {
 	if (m_PhysicsWorld->GetEntities().size() == 0)
 		return;
 
-	std::string filepath = GetFilePathWithExplorer(SaveActions::Save);
+	std::string filepath = GetFilePathWithExplorer(SaveActions::Save, window);
 
 	if (filepath.empty())
 		return;
@@ -35,9 +38,9 @@ void SaveManager::Save()
 	file.close();
 }
 
-void SaveManager::Load()
+void SaveManager::Load(GLFWwindow* window)
 {
-	std::string filepath = GetFilePathWithExplorer(SaveActions::Load);
+	std::string filepath = GetFilePathWithExplorer(SaveActions::Load, window);
 
 	if (filepath.empty())
 		return;
@@ -71,14 +74,15 @@ void SaveManager::Load()
 	file.close();
 }
 
-std::string SaveManager::GetFilePathWithExplorer(SaveActions action)
+std::string SaveManager::GetFilePathWithExplorer(SaveActions action, GLFWwindow* window)
 {
 	OPENFILENAMEA ofn;
 	CHAR szFile[260] = { 0 };
 
 	ZeroMemory(&ofn, sizeof(ofn));
-
+	
 	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = glfwGetWin32Window(window);
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
 	ofn.lpstrFilter = "Scene Files\0*.scene\0All Files\0*.*\0";

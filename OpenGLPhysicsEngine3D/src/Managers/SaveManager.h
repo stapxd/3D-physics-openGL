@@ -14,10 +14,10 @@ class SaveManager
 public:
 	SaveManager(PhysicsWorld& physicsWorld);
 
-	void Save();
-	void Load();
+	void Save(GLFWwindow* window);
+	void Load(GLFWwindow* window);
 
-	std::string GetFilePathWithExplorer(SaveActions action);
+	std::string GetFilePathWithExplorer(SaveActions action, GLFWwindow* window);
 
 private:
 	PhysicsWorld& m_PhysicsWorld;

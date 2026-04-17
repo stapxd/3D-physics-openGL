@@ -327,7 +327,7 @@ void PhysicsApplication::Inputs(float deltaTime)
 	if (glfwGetKey(m_Window, GLFW_KEY_F5) == GLFW_PRESS && !m_F5Pressed) {
 		if (m_PauseManager.GetCurrentState() != ApplicationStates::Play) {
 			try {
-				m_SaveManager.Save();
+				m_SaveManager.Save(GetWindow());
 			}
 			catch (const std::string& e) {
 				std::cout << "Saving error (" << e << ")\n";
@@ -341,7 +341,7 @@ void PhysicsApplication::Inputs(float deltaTime)
 
 	if (glfwGetKey(m_Window, GLFW_KEY_F6) == GLFW_PRESS && !m_F6Pressed) {
 		try {
-			m_SaveManager.Load();
+			m_SaveManager.Load(GetWindow());
 		}
 		catch (const std::runtime_error e) {
 			std::cout << "Loading error (" << e.what() << ")\n";
@@ -465,7 +465,7 @@ void PhysicsApplication::ShowMainMenu()
 			if (ImGui::MenuItem("Save", "F5")) {
 				if (m_PauseManager.GetCurrentState() != ApplicationStates::Play) {
 					try {
-						m_SaveManager.Save();
+						m_SaveManager.Save(GetWindow());
 					}
 					catch (const std::runtime_error& e) {
 						helpers::logError("SaveManager::Load", e.what());
@@ -474,7 +474,7 @@ void PhysicsApplication::ShowMainMenu()
 			}
 			if (ImGui::MenuItem("Open...", "F6")) {
 				try {
-					m_SaveManager.Load();
+					m_SaveManager.Load(GetWindow());
 					m_SelectedEntity = nullptr;
 				}
 				catch (const std::runtime_error& e) {
