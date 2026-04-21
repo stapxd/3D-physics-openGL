@@ -1,6 +1,7 @@
 #include "Entity.h"
 
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/constants.hpp>
 
 #include "Physics/PhysicsWorld.h"
 
@@ -31,12 +32,15 @@ void Entity::Step(float deltaTime)
 			glm::vec3 dragForce(0.0f);
 
 			if (speedSqr > 0.0001f) {
-				float speed = glm::sqrt(speedSqr);
 				float rho = 1.225f;
-				float Cd = 1.05f;
+				float Cd = 1.0f;
 				float L = m_Properties.transform.scale.x * m_Properties.transform.scale.z;
-				float A = 1.5f * (L * L);
-				float dragMagnitude = 0.5f * rho * Cd * A * speedSqr;
+				float A = L * L;
+				if (m_Type == EntityTypes::Sphere) {
+					Cd = 0.47f;
+					A = L * L * glm::pi<float>();
+				}
+				float dragMagnitude = 0.5f * Cd * rho * A * speedSqr;
 				dragForce = -glm::normalize(velocity) * dragMagnitude;
 			}
 
