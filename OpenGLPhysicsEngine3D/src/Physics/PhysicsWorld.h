@@ -68,7 +68,7 @@ public:
 protected:
 	void ApplyForceAtPoint();
 
-	void NarrowPhase();
+	void NarrowPhase(float deltaTime);
 	void BroadPhase();
 	void MovementEntitiesStep(float deltaTime);
 
@@ -81,13 +81,15 @@ protected:
 		Entity& bodyA, Entity& bodyB,
 		const glm::vec3& normal,
 		float depth,
-		const std::vector<glm::vec3>& contactPoints);
+		const std::vector<glm::vec3>& contactPoints,
+		float deltaTime);
 
 	void ResolveCollisionWithRotationAndFriction3D(
 		Entity& bodyA, Entity& bodyB,
 		const glm::vec3& normal,
 		float depth,
-		const std::vector<glm::vec3>& contactPoints);
+		const std::vector<glm::vec3>& contactPoints,
+		float deltaTime);
 private:
 	bool m_Paused = true;
 	static glm::vec3 m_Gravity;
