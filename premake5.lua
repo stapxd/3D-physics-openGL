@@ -54,7 +54,7 @@ project "OpenGLPhysicsEngine3D"
         libdirs 
         { 
             "Dependencies/GLFW/lib", 
-            "Dependencies/GLEW/lib/Release/Win32",
+            "Dependencies/GLEW/lib",
             "Dependencies/helpers/lib",
         }
 

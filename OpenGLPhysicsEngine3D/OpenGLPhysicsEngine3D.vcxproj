@@ -71,7 +71,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;helpers_dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\Dependencies\GLFW\lib;..\Dependencies\GLEW\lib\Release\Win32;..\Dependencies\helpers\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Dependencies\GLFW\lib;..\Dependencies\GLEW\lib;..\Dependencies\helpers\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
     </ProjectReference>
@@ -99,7 +99,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>glfw3.lib;glew32s.lib;opengl32.lib;helpers_dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\Dependencies\GLFW\lib;..\Dependencies\GLEW\lib\Release\Win32;..\Dependencies\helpers\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Dependencies\GLFW\lib;..\Dependencies\GLEW\lib;..\Dependencies\helpers\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <ProjectReference>
     </ProjectReference>
