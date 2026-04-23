@@ -1,5 +1,5 @@
 ### About the engine
-A 3D physics engine built using C++17, OpenGL, GLFW, and GLEW. This project uses Premake5 for build configuration and project generation.
+A 3D physics engine built using C++17, OpenGL, GLFW, and GLEW. This project uses [Premake5](https://premake.github.io/download) for build configuration and project generation.
 
 Prerequisites
 - Visual Studio 2019 or 2022
