@@ -183,8 +183,11 @@ void PhysicsWorld::NarrowPhase(float deltaTime)
 			//std::cout << "Collides: "<< m_CollisionManifold.contactPoints.size() << "\n";
 
 			SeparateBodies(bodyA, isStatic_A, bodyB, isStatic_B, normal, depth);
-			//ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints, deltaTime);
+		#ifndef ROTATIONAL_PHYSICS_FRICTION
+			ResolveCollisionWithRotation3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints, deltaTime);
+		#else
 		    ResolveCollisionWithRotationAndFriction3D(bodyA, bodyB, normal, depth, m_CollisionManifold.contactPoints, deltaTime);
+		#endif
 	#endif
 
 		}

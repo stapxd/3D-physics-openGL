@@ -4,11 +4,11 @@
     <Filter Include="Application">
       <UniqueIdentifier>{D9DE78AF-4594-F1A4-CE88-EB7B3A3DE8A8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine">
-      <UniqueIdentifier>{DBC7D3B0-C769-FE86-B024-12DB9C6585D7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Enumerators">
       <UniqueIdentifier>{DA239BDE-46D9-13D4-CFCD-0DAB3B820AD8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Environment">
+      <UniqueIdentifier>{1A1AAD84-86CF-257A-0FC4-1F517B781C7E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Factories">
       <UniqueIdentifier>{05F1892C-715B-3EA3-BA99-EF4826431CF8}</UniqueIdentifier>
@@ -75,17 +75,17 @@
     <ClInclude Include="src\Application\Renderer.h">
       <Filter>Application</Filter>
     </ClInclude>
-    <ClInclude Include="src\Environment\Axes.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Environment\SkyBox.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="src\Enumerators\ApplicationStates.h">
       <Filter>Enumerators</Filter>
     </ClInclude>
     <ClInclude Include="src\Enumerators\EntityTypes.h">
       <Filter>Enumerators</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Environment\Axes.h">
+      <Filter>Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Environment\SkyBox.h">
+      <Filter>Environment</Filter>
     </ClInclude>
     <ClInclude Include="src\Factories\EntityFactory.h">
       <Filter>Factories</Filter>
@@ -303,10 +303,10 @@
       <Filter>Application</Filter>
     </ClCompile>
     <ClCompile Include="src\Environment\Axes.cpp">
-      <Filter>Engine</Filter>
+      <Filter>Environment</Filter>
     </ClCompile>
     <ClCompile Include="src\Environment\SkyBox.cpp">
-      <Filter>Engine</Filter>
+      <Filter>Environment</Filter>
     </ClCompile>
     <ClCompile Include="src\Factories\EntityFactory.cpp">
       <Filter>Factories</Filter>

@@ -38,7 +38,9 @@ project "OpenGLPhysicsEngine3D"
 
 		defines
 		{
-			"GLEW_STATIC"
+			"GLEW_STATIC",
+            "ROTATIONAL_PHYSICS_TEST",
+            "ROTATIONAL_PHYSICS_FRICTION"
 		}
 
         links 
