@@ -56,8 +56,31 @@ void Entity::Step(float deltaTime)
 		m_Properties.rigidbody.linearVelocity += (m_Properties.rigidbody.force / m_Properties.rigidbody.mass) * deltaTime;
 	}
 
-	Move(m_Properties.rigidbody.linearVelocity * deltaTime);
-	UpdateOrientation(deltaTime);
+	float linVSq = glm::dot(m_Properties.rigidbody.linearVelocity, m_Properties.rigidbody.linearVelocity);
+	float angVSq = glm::dot(m_Properties.rigidbody.angularVelocity, m_Properties.rigidbody.angularVelocity);
+
+	if (linVSq < (m_LinearVelocityThreshold * m_LinearVelocityThreshold) &&
+		angVSq < (m_AngularVelocityThreshold * m_AngularVelocityThreshold)) 
+	{
+		m_SleepTimer -= deltaTime;
+
+		if (m_SleepTimer < 0.0f) {
+			m_IsSleeping = true;
+			m_Properties.rigidbody.linearVelocity = glm::vec3(0.0f);
+			m_Properties.rigidbody.angularVelocity = glm::vec3(0.0f);
+			m_Properties.rigidbody.force = glm::vec3(0.0f);
+			return;
+		}
+	}
+	else {
+		m_SleepTimer = m_SleepTimerThreshold;
+		m_IsSleeping = false;
+	}
+
+	if (!m_IsSleeping) {
+		Move(m_Properties.rigidbody.linearVelocity * deltaTime);
+		UpdateOrientation(deltaTime);
+	}
 
 	m_Properties.rigidbody.linearVelocity *= glm::pow(0.98f, deltaTime);
 	m_Properties.rigidbody.angularVelocity *= glm::pow(0.95f, deltaTime);
@@ -97,7 +120,7 @@ void Entity::UpdateOrientation(float deltaTime)
 {
 	glm::vec3 angularVel = m_Properties.rigidbody.angularVelocity;
 
-	if (glm::length(angularVel) > 0.0001f) {
+	if (glm::dot(angularVel, angularVel) > 0.000001f) {
 		glm::quat qW(0.0f, angularVel.x, angularVel.y, angularVel.z);
 
 		m_Properties.transform.orientation += (qW * m_Properties.transform.orientation) * (deltaTime * 0.5f);

@@ -551,6 +551,13 @@ void PhysicsApplication::ShowEntityMenu()
 			ImGui::End();
 			return;
 		}
+
+		ImGui::Checkbox("Is Sleeping", &m_SelectedEntity->GetIsSleeping());
+		ImGui::DragFloat("Lin Threshold", &m_SelectedEntity->GetLinVThreshold(), 0.002f, 0.0f, 1.0f);
+		ImGui::DragFloat("Ang Threshold", &m_SelectedEntity->GetAngVThreshold(), 0.002f, 0.0f, 1.0f);
+
+		ImGui::Text("%.6f < %.6f", glm::dot(m_SelectedEntity->GetProperties().rigidbody.linearVelocity, m_SelectedEntity->GetProperties().rigidbody.linearVelocity), m_SelectedEntity->GetLinVThreshold() * m_SelectedEntity->GetLinVThreshold());
+		ImGui::Text("%.6f < %.6f", glm::dot(m_SelectedEntity->GetProperties().rigidbody.angularVelocity, m_SelectedEntity->GetProperties().rigidbody.angularVelocity), m_SelectedEntity->GetAngVThreshold() * m_SelectedEntity->GetAngVThreshold());
 	}
 
 	ImGui::Separator();
@@ -613,24 +620,26 @@ void PhysicsApplication::ShowEntityMenu()
 
 	ImGui::Separator();
 
+	Rigidbody3D& rb = m_SelectedEntity->GetProperties().rigidbody;
+
 	if (ImGui::CollapsingHeader("Rigidbody")) { // Rigidbody
-		ImGui::Checkbox("Static", &m_SelectedEntity->GetProperties().rigidbody.isStatic);
-		ImGui::Checkbox("Use Gravity", &m_SelectedEntity->GetProperties().rigidbody.useGravity);
+		ImGui::Checkbox("Static", &rb.isStatic);
+		ImGui::Checkbox("Use Gravity", &rb.useGravity);
 
 		ImGui::Separator();
 
-		ImGui::DragFloat("Mass", &m_SelectedEntity->GetProperties().rigidbody.mass, 0.02f, 0.01f, 1000.0f);
-		ImGui::DragFloat("Restitution", &m_SelectedEntity->GetProperties().rigidbody.restitution, 0.1f, 0.1f, 1000.0f);
+		ImGui::DragFloat("Mass", &rb.mass, 0.02f, 0.01f, 1000.0f);
+		ImGui::DragFloat("Restitution", &rb.restitution, 0.1f, 0.1f, 1000.0f);
 
 		ImGui::Separator();
 
-		ImGui::DragFloat("Static Friction", &m_SelectedEntity->GetProperties().rigidbody.staticFriction, 0.05f, 0.1f, 10.0f);
-		ImGui::DragFloat("Dynamic Friction", &m_SelectedEntity->GetProperties().rigidbody.dynamicFriction, 0.05f, 0.1f, 10.0f);
+		ImGui::DragFloat("Static Friction", &rb.staticFriction, 0.05f, 0.1f, 10.0f);
+		ImGui::DragFloat("Dynamic Friction", &rb.dynamicFriction, 0.05f, 0.1f, 10.0f);
 		
 		ImGui::Separator();
 
-		ImGui::InputFloat3("Linear Velocity", (float*) &m_SelectedEntity->GetProperties().rigidbody.linearVelocity);
-		ImGui::InputFloat3("Angular Velocity", (float*) &m_SelectedEntity->GetProperties().rigidbody.angularVelocity);
+		ImGui::InputFloat3("Linear Velocity", (float*) &rb.linearVelocity);
+		ImGui::InputFloat3("Angular Velocity", (float*) &rb.angularVelocity);
 	}
 
 	ImGui::End();

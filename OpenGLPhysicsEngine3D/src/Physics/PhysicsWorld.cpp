@@ -260,12 +260,23 @@ void PhysicsWorld::ResolveCollision(Entity& bodyA, Entity& bodyB, glm::vec3 norm
 	ObjectProperties& propertiesA = bodyA.GetProperties();
 	ObjectProperties& propertiesB = bodyB.GetProperties();
 
+	glm::vec3 collisionDir = propertiesA.transform.translation - propertiesB.transform.translation;
+	glm::vec3 actualNormal = normal;
+	if (glm::dot(actualNormal, collisionDir) < 0) {
+		actualNormal = -actualNormal;
+	}
+
 	glm::vec3 relativeVelocity = propertiesA.rigidbody.linearVelocity - propertiesB.rigidbody.linearVelocity;
+
+	float contactVelocityMag = glm::dot(relativeVelocity, actualNormal);
+
+	if (contactVelocityMag > 0.0f)
+		return;
 
 	//float e = std::min(propertiesA.rigidbody.restitution, propertiesB.rigidbody.restitution);
 	float e = (propertiesA.rigidbody.restitution + propertiesB.rigidbody.restitution) / 2.0f;
 
-	float numerator = -(1 + e) * glm::dot(relativeVelocity, normal);
+	float numerator = -(1 + e) * glm::dot(relativeVelocity, actualNormal);
 	
 	float massA = propertiesA.rigidbody.mass;
 	float invMassA = (!propertiesA.rigidbody.isStatic && massA > 0.0f)
@@ -285,8 +296,8 @@ void PhysicsWorld::ResolveCollision(Entity& bodyA, Entity& bodyB, glm::vec3 norm
 		bodyB.Wake();
 	}*/
 
-	propertiesA.rigidbody.linearVelocity += j * invMassA * normal;
-	propertiesB.rigidbody.linearVelocity -= j * invMassB * normal;
+	propertiesA.rigidbody.linearVelocity += j * invMassA * actualNormal;
+	propertiesB.rigidbody.linearVelocity -= j * invMassB * actualNormal;
 }
 
 void PhysicsWorld::ResolveCollisionWithRotation3D(
@@ -369,6 +380,8 @@ void PhysicsWorld::ResolveCollisionWithRotation3D(
 			if (contactVelocityMag > 0.0f)
 				continue;
 
+			
+
 			geometricTorqueA = glm::cross(rA, actualNormal);
 			geometricTorqueB = glm::cross(rB, actualNormal);
 
@@ -417,7 +430,7 @@ void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
 	if (contactCount < 1)
 		return;
 
-	float beta = 0.2f;
+	float beta = 0.1f;
 	float slop = 0.01f;
 
 	float bias = (beta / deltaTime) * std::max(0.0f, depth - slop);
@@ -477,6 +490,9 @@ void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
 			if (contactVelocityMag > 0.0f)
 				continue;
 
+			bodyA.Wake();
+			bodyB.Wake();
+
 			geometricTorqueA = glm::cross(rA, actualNormal);
 			geometricTorqueB = glm::cross(rB, actualNormal);
 
@@ -494,11 +510,6 @@ void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
 			j /= denominator;
 			j = std::max(j, 0.0f);
 
-			/*if (j > 0.05f) {
-				bodyA.Wake();
-				bodyB.Wake();
-			}*/
-
 			impulse = j * actualNormal;
 
 			rbA.linearVelocity += impulse * invMassA;
@@ -515,40 +526,45 @@ void PhysicsWorld::ResolveCollisionWithRotationAndFriction3D(
 
 			glm::vec3 tangent = relativeVelocity - (glm::dot(relativeVelocity, actualNormal) * actualNormal);
 
-			float tangentLength = glm::length(tangent);
-			if (tangentLength > 0.0001f) {
-				tangent /= tangentLength;
-
-				glm::vec3 crossAT = glm::cross(rA, tangent);
-				glm::vec3 crossBT = glm::cross(rB, tangent);
-
-				angTermA = glm::dot(crossAT, rbA.inverseInertiaTensorWorld * crossAT);
-				angTermB = glm::dot(crossBT, rbB.inverseInertiaTensorWorld * crossBT);
-
-				denominator = invMassA + invMassB + angTermA + angTermB;
-
-				if (denominator > 0.000001f) {
-					float jt = -glm::dot(relativeVelocity, tangent) / (denominator);
-
-					float frictionMag;
-					float jAbs = std::abs(j);
-					if (std::abs(jt) <= jAbs * sf) {
-						frictionMag = jt;
-					}
-					else {
-						frictionMag = (jt > 0.0f ? 1.0f : -1.0f) * jAbs * df;
-					}
-
-					glm::vec3 frictionImpulse = frictionMag * tangent;
-
-					rbA.linearVelocity += frictionImpulse * invMassA;
-					rbA.angularVelocity += rbA.inverseInertiaTensorWorld * glm::cross(rA, frictionImpulse);
-
-					rbB.linearVelocity -= frictionImpulse * invMassB;
-					rbB.angularVelocity -= rbB.inverseInertiaTensorWorld * glm::cross(rB, frictionImpulse);
-
-				}
+			float tangentVelocitySq = glm::dot(tangent, tangent);
+			if (tangentVelocitySq < 0.0001f) {
+				continue;
 			}
+
+			float tangentLength = glm::sqrt(tangentVelocitySq);
+			tangent /= tangentLength;
+
+			glm::vec3 crossAT = glm::cross(rA, tangent);
+			glm::vec3 crossBT = glm::cross(rB, tangent);
+
+			angTermA = glm::dot(crossAT, rbA.inverseInertiaTensorWorld * crossAT);
+			angTermB = glm::dot(crossBT, rbB.inverseInertiaTensorWorld * crossBT);
+
+			denominator = invMassA + invMassB + angTermA + angTermB;
+
+			if (denominator > 0.000001f) {
+				float jt = -glm::dot(relativeVelocity, tangent) / (denominator);
+				jt *= 0.5f;
+
+				float frictionMag;
+				float jAbs = std::abs(j);
+				if (std::abs(jt) <= jAbs * sf) {
+					frictionMag = jt;
+				}
+				else {
+					frictionMag = (jt > 0.0f ? 1.0f : -1.0f) * jAbs * df;
+				}
+
+				glm::vec3 frictionImpulse = frictionMag * tangent;
+
+				rbA.linearVelocity += frictionImpulse * invMassA;
+				rbA.angularVelocity += rbA.inverseInertiaTensorWorld * glm::cross(rA, frictionImpulse);
+
+				rbB.linearVelocity -= frictionImpulse * invMassB;
+				rbB.angularVelocity -= rbB.inverseInertiaTensorWorld * glm::cross(rB, frictionImpulse);
+
+			}
+			
 		}
 	}
 }

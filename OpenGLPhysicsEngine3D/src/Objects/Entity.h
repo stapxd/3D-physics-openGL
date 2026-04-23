@@ -19,7 +19,12 @@ public:
 	unsigned int GetId() { return m_Id; }
 	EntityTypes GetType() { return m_Type; }
 	IEntity* GetEntity() { return m_Entity.get(); }
+	
 	ObjectProperties& GetProperties() { return m_Properties; }
+	bool& GetIsSleeping()  { return m_IsSleeping; }
+
+	float& GetLinVThreshold() { return m_LinearVelocityThreshold; }
+	float& GetAngVThreshold() { return m_AngularVelocityThreshold; }
 
 	void Step(float deltaTime);
 	void Move(glm::vec3 direction);
@@ -39,7 +44,11 @@ private:
 	std::unique_ptr<IEntity> m_Entity;
 	ObjectProperties m_Properties;
 
+	float m_LinearVelocityThreshold = 0.015f;
+	float m_AngularVelocityThreshold = 0.01f;
+
 	bool m_IsSleeping = false;
-	float m_SleepTimer = 0.0f;
+	float m_SleepTimerThreshold = 0.5f;
+	float m_SleepTimer = m_SleepTimerThreshold;
 };
 
